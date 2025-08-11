@@ -5,10 +5,10 @@
 .home__container1 {
     width: 100%;
     height: 554px;
-    background-image: linear-gradient(rgba(111, 117, 116, 0.7), rgba(111, 117, 116, 0.7)), url("../../assets/pic/home__image.jpg");
+    background-image: linear-gradient(rgba(111, 117, 116, 0.5), rgba(111, 117, 116, 0.5)), url("../../assets/pic/home__image.jpg");
     background-repeat: no-repeat;
     background-position: center;
-    background-size: cover;
+    background-size: 1920px auto;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -141,7 +141,7 @@
     height: 320px;
     border: solid 1px #0000001A;
     border-radius: 8px;
-    box-shadow: 4px 4px 20px 2px #00000005;
+    box-shadow: 4px 4px 8px 2px #00000005;
 }
 
 .home__list2 {
@@ -149,7 +149,7 @@
     height: 320px;
     border: solid 1px #0000001A;
     border-radius: 8px;
-    box-shadow: 4px 4px 20px 2px #00000005;
+    box-shadow: 4px 4px 8px 2px #00000005;
 }
 
 .home__list3 {
@@ -157,5 +157,5 @@
     height: 320px;
     border: solid 1px #0000001A;
     border-radius: 8px;
-    box-shadow: 4px 4px 20px 2px #00000005;
+    box-shadow: 4px 4px 8px 2px #00000005;
 }
