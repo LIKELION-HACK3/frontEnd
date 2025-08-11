@@ -1,12 +1,17 @@
-import Header from './components/Header/Header'; // Corrected path
 import './assets/css/styles.module.css';
+import { Route, Routes } from 'react-router-dom';
+
+import Header from './components/header/Header';
+import Home from './pages/Home/Home';
 
 function App() {
     return (
-        <div className="App">
-            <Header /> {/* Header component rendered here */}
-            {/* Other page content goes here */}
-        </div>
+        <>
+            <Header />
+            <Routes>
+                <Route path="/" element={<Home />} />
+            </Routes>
+        </>
     );
 }
 
