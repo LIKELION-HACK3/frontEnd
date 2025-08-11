@@ -1,0 +1,245 @@
+.headerSection {
+    background-color: #555;
+    color: #fff;
+    padding: 30px;
+    margin-bottom: 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 300px;
+    gap: 40px;
+}
+
+.headerContent {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+}
+
+.contentGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.title {
+    font-size: 32px;
+    font-weight: bold;
+    margin: 0;
+}
+
+.address {
+    font-size: 18px;
+    margin: 0;
+    opacity: 0.8;
+}
+
+.headerButtons {
+    display: flex;
+    gap: 10px;
+}
+
+.actionButton {
+    padding: 10px 20px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 500;
+}
+
+.lightButton {
+    background-color: #fff;
+    color: #000;
+}
+
+.darkButton {
+    background-color: #000;
+    border: 1px solid #000;
+    color: #fff;
+}
+
+.headerImage {
+    flex: 1;
+    height: 250px;
+    background-color: #aaa;
+    border-radius: 6px;
+}
+
+.detailPage {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    font-family: 'Pretendard Variable', sans-serif;
+    color: #333;
+}
+
+.sectionTitle {
+    font-size: 20px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.imageSection,
+.detailsSection {
+    margin-bottom: 30px;
+}
+
+.imageDisclaimer {
+    font-size: 14px;
+    color: #888;
+    margin-bottom: 15px;
+}
+
+.highlightDate {
+    color: red;
+}
+
+.imageGallery {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 10px;
+}
+
+.imagePlaceholder {
+    height: 150px;
+    background-color: #d9d9d9;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 14px;
+    color: #666;
+    border-radius: 4px;
+}
+
+.detailsSubtitle {
+    font-size: 14px;
+    color: #888;
+    margin-bottom: 15px;
+}
+
+.detailsGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.detailItem {
+    border: 1px solid #ccc;
+    padding: 15px;
+    border-radius: 4px;
+    background-color: #fff;
+}
+
+.detailLabel {
+    font-weight: bold;
+    color: #555;
+    margin-bottom: 5px;
+}
+
+.detailValue {
+    white-space: pre-line;
+}
+
+.footerSection {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 30px;
+}
+
+.ratingSection,
+.reviewSection {
+    background-color: #f7f7f7;
+    padding: 20px;
+    border-radius: 8px;
+}
+
+.ratingLoginText {
+    font-size: 14px;
+    color: #888;
+    margin-bottom: 15px;
+}
+
+.ratingList {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.ratingItem {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.stars {
+    display: flex;
+    gap: 2px;
+}
+
+.filledStar {
+    color: #ffd700;
+}
+
+.emptyStar {
+    color: #ccc;
+}
+
+.writeReviewButton {
+    margin-top: 15px;
+    padding: 10px 20px;
+    border: 1px solid #000;
+    background-color: #000;
+    color: #fff;
+    border-radius: 4px;
+    cursor: pointer;
+    width: 100%;
+}
+
+.reviewHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.allReviewButton {
+    padding: 8px 16px;
+    border: 1px solid #ccc;
+    background-color: #fff;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.reviewList {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.reviewCard {
+    border: 1px solid #ccc;
+    padding: 15px;
+    border-radius: 4px;
+    background-color: #fff;
+}
+
+.reviewAuthor {
+    display: flex;
+    align-items: center;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.authorAvatar {
+    width: 24px;
+    height: 24px;
+    background-color: #d9d9d9;
+    border-radius: 50%;
+    margin-right: 8px;
+}
+
+.reviewContent {
+    margin: 0;
+}
