@@ -49,7 +49,7 @@ const Home = () => {
             </div>
             <div className={styles.home__container2}>
                 <p className={styles.home__text2}>
-                    멋쟁이사자님께, AI가 추천드려요.
+                    <span className={styles.home__text2__highlight}>멋쟁이사자</span>님께, AI가 추천드려요.
                 </p>
             </div>
         </div>
