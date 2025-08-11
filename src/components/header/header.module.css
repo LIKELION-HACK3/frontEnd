@@ -1,0 +1,92 @@
+.header {
+    width: 100%;
+    background-color: #f3f3f3;
+    border-bottom: 1px solid #d9d9d9;
+}
+
+.container {
+    max-width: 1920px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 20px;
+    box-sizing: border-box;
+}
+
+.logoPlaceholder {
+    width: 120px;
+    height: 40px;
+    background-color: #d9d9d9;
+    border-radius: 4px;
+}
+
+.nav {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.navList {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.navItem {
+    display: flex;
+}
+
+.navLink {
+    display: inline-flex; /* 아이콘과 텍스트 나란히 */
+    align-items: center;
+    gap: 6px; /* 아이콘-텍스트 간격 */
+    padding: 8px 14px;
+    text-decoration: none;
+    color: #333;
+    font-weight: 600;
+    font-size: 14px;
+    background: #eaeaea;
+    border: 1px solid #d0d0d0;
+    border-radius: 6px;
+    transition: background 0.15s ease, border-color 0.15s ease, transform 0.05s ease;
+}
+
+.navLink:hover {
+    background: #e3e3e3;
+    border-color: #c7c7c7;
+}
+
+.navLink:active {
+    transform: translateY(1px);
+}
+
+.userIconSmall {
+    width: 16px;
+    height: 16px;
+    display: block;
+}
+
+@media (max-width: 768px) {
+    .container {
+        padding: 8px 12px;
+    }
+    .logoPlaceholder {
+        width: 96px;
+        height: 34px;
+    }
+    .navList {
+        gap: 6px;
+    }
+    .navLink {
+        padding: 6px 10px;
+        font-size: 13px;
+    }
+    .userIconSmall {
+        width: 14px;
+        height: 14px;
+    }
+}
