@@ -35,6 +35,11 @@ const Home = () => {
                 <p className={styles.home__text2}>
                     <span className={styles.home__text2__highlight}>멋쟁이사자</span>님께, AI가 추천드려요.
                 </p>
+                <div className={styles.home__lists}>
+                    <div className={styles.home__list1} />
+                    <div className={styles.home__list2} />
+                    <div className={styles.home__list3} />
+                </div>
             </div>
         </div>
     );

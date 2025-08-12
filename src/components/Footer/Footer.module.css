@@ -1,13 +1,10 @@
 .footer {
     width: 100%;
-    max-width: 1920px;
-    min-height: 220px;
+    height: 80px;
     display: flex;
     justify-content: center;
     align-items: center;
-    background-color: #fff;
-    border-top: 1px solid #ccc;
-    box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.05);
+    background-color: #EDEDED;
 }
 
 .footerNavList {
@@ -15,13 +12,13 @@
     padding: 0;
     margin: 0;
     display: flex;
-    gap: 30px;
+    gap: 60px;
 }
 
 .footerNavLink {
     text-decoration: none;
-    color: #333;
-    font-weight: bold;
+    color: #4B4B4B;
+    font-weight: 400;
     font-size: 14px;
 }
 
