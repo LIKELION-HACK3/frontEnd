@@ -1,0 +1,136 @@
+.pageContainer {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 40px 20px;
+    font-family: 'Pretendard Variable', sans-serif;
+}
+
+.title {
+    font-size: 32px;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 32px;
+}
+
+.tabButtons {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    margin-bottom: 32px;
+}
+
+.tabButton {
+    padding: 12px 70px;
+    font-size: 18px;
+    border: 2px solid #00c4c4;
+    border-radius: 30px;
+    background-color: white;
+    color: #00c4c4;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.tabButton:hover {
+    background-color: #e6f8f8;
+}
+
+.active {
+    background-color: #00c4c4;
+    color: white;
+}
+
+.contentContainer {
+    display: flex;
+    gap: 32px;
+}
+
+.sidebar {
+    flex-basis: 220px;
+    border-right: 1px solid #eee;
+    padding-right: 16px;
+}
+
+.filterGroup {
+    margin-bottom: 24px;
+}
+
+.filterTitle {
+    font-size: 16px;
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+
+.filterList {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    line-height: 2;
+}
+
+.postListSection {
+    flex: 1;
+}
+
+.actionBar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 24px;
+}
+
+.writeButton {
+    background-color: #ccc;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 20px;
+    cursor: pointer;
+}
+
+.searchInput {
+    flex: 1;
+    padding: 8px 16px;
+    border: 1px solid #ccc;
+    border-radius: 20px;
+}
+
+.postList {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.postCard {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #eee;
+    padding: 16px 0;
+}
+
+.postTitle {
+    font-size: 16px;
+    font-weight: bold;
+    margin-bottom: 4px;
+}
+
+.postMeta {
+    font-size: 13px;
+    color: #666;
+}
+
+.postThumbnail {
+    width: 64px;
+    height: 64px;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+.loadMore {
+    display: block;
+    margin: 24px auto;
+    background-color: #f1f1f1;
+    border: none;
+    padding: 10px 24px;
+    border-radius: 20px;
+    cursor: pointer;
+}
