@@ -66,8 +66,8 @@ const MyPage = () => {
         <div className={styles.myPage}>
             {/* 상단 제목 영역 (회색 배경) */}
             <div className={styles.topHeader}>
-                <h1 className={styles.title}>MY 찜 목록</h1>
-                <p className={styles.subtitle}>관심 있는 매물들을 확인해보세요.</p>
+                <h1 className={styles.title}>MY 룸 목록</h1>
+                <p className={styles.subtitle}>관심 있는 집들을 한번에 확인해보세요.</p>
             </div>
 
             {/* 카드 리스트 (흰색 배경) */}
