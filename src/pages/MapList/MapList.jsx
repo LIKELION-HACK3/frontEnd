@@ -7,6 +7,7 @@ const MapList = () => {
             <div className={styles.map__categorybox}>
                 
             </div>
+            <KakaoMap />
         </div>
     );
 };
