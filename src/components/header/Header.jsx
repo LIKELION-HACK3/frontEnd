@@ -35,10 +35,10 @@ const Header = () => {
         <div className={styles.main__wrapper}>
             <div className={styles.header__logo} role="button" tabIndex={0} onClick={() => navigate('/')} onKeyDown={(e) => {if (e.key === 'Enter' || e.key === ' ') navigate('/');}} />
             <div className={styles.header__buttons}>
-                <button className={styles.header__button1}>
+                <button className={styles.header__button1} type="button" onClick={() => navigate('/map')}>
                     지도
                 </button>
-                <button className={styles.header__button1}>
+                <button className={styles.header__button1} type="button" onClick={() => navigate('/community_news')}>
                     커뮤니티
                 </button>
                 <button className={styles.header__button1}>

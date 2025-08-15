@@ -1,5 +1,6 @@
 // CommunityListPage.jsx
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import styles from './CommunityListPage.module.css';
 import TabSelector from './TabSelector';
 import FilterSidebar from './FilterSidebar';

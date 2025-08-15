@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import styles from './CommunityPage.module.css';
 
 // 게시글 카드 컴포넌트
