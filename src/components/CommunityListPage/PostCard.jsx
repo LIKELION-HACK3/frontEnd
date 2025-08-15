@@ -7,7 +7,7 @@ const PostCard = ({ title, author, thumbnail }) => {
             {/* ✅ 썸네일 먼저 위치 */}
             <img className={styles.postThumbnail} src={thumbnail} alt="thumbnail" />
 
-            {/* 그다음 텍스트 */}
+            {/* 그 다음 텍스트 */}
             <div className={styles.postInfo}>
                 <h4 className={styles.postTitle}>{title}</h4>
                 <p className={styles.postMeta}>{author}</p>

@@ -11,6 +11,7 @@
     width: 140px;
     height: 40px;
     background-color: #0ABAB5;
+    cursor: pointer;
 }
 
 .header__buttons {

@@ -1,0 +1,117 @@
+.main__wrapper {
+    width: 100%;
+    min-height: calc(100vh - 120px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.login__box {
+    width: 500px;
+    height: 500px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-color: #F9F9F9;
+    border: solid 1px #D9D9D9;
+    border-radius: 40px;
+}
+
+.login__text1 {
+    font-size: 40px;
+    font-weight: 500;
+    color: #888888;
+    padding-bottom: 50px;
+}
+
+.login__form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding-bottom: 20px;
+}
+
+.login__id {
+    box-sizing: border-box;
+    width: 380px;
+    height: 55px;
+    border: solid 1px #D9D9D9;
+    border-radius: 20px;
+    font-family: 'Pretendard Variable';
+    font-size: 16px;
+    padding: 0 0 0 20px;
+}
+
+.login__id::placeholder {
+    font-family: 'Pretendard Variable';
+    font-size: 16px;
+    font-weight: 400;
+    color: #A6A6A6;
+}
+
+.login__id:focus {
+    outline: none;
+}
+
+.login__pw {
+    box-sizing: border-box;
+    width: 380px;
+    height: 55px;
+    border: solid 1px #D9D9D9;
+    border-radius: 20px;
+    font-family: 'Pretendard Variable';
+    font-size: 16px;
+    padding: 0 0 0 20px;
+}
+
+.login__pw::placeholder {
+    font-family: 'Pretendard Variable';
+    font-size: 16px;
+    font-weight: 400;
+    color: #A6A6A6;
+}
+
+.login__pw:focus {
+    outline: none;
+}
+
+.login__button {
+    width: 380px;
+    height: 55px;
+    border: none;
+    border-radius: 20px;
+    font-family: 'Pretendard Variable';
+    font-size: 18px;
+    font-weight: 600;
+    color: #FFFFFF;
+    background-color: #0ABAB5;
+    cursor: pointer;
+}
+
+.text__box {
+    display: flex;
+    gap: 8px;
+    font-size: 16px;
+    font-weight: 400;
+    color: #A6A6A6;
+}
+
+.login__findpw, .login__signup {
+    cursor: pointer;
+}
+
+.login__findpw:hover, .login__signup:hover {
+    text-decoration: underline;
+}
+
+.login__error {
+      color: #e11d48;
+    font-size: 14px;
+    margin-bottom: 12px;
+}
+
+.login__button[disabled] {
+    opacity: 0.6;
+    cursor: not-allowed;
+}

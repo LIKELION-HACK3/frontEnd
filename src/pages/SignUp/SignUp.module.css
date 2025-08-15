@@ -1,0 +1,145 @@
+.main__wrapper {
+    width: 100%;
+    min-height: calc(100vh - 120px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.signup__box {
+    width: 500px;
+    height: 580px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-color: #F9F9F9;
+    border: solid 1px #D9D9D9;
+    border-radius: 40px;
+}
+
+.signup__text1 {
+    font-size: 40px;
+    font-weight: 500;
+    color: #888888;
+    padding-bottom: 40px;
+}
+
+.signup__form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding-bottom: 40px;
+}
+
+.signup__id {
+    box-sizing: border-box;
+    width: 380px;
+    height: 55px;
+    border: solid 1px #D9D9D9;
+    border-radius: 20px;
+    font-family: 'Pretendard Variable';
+    font-size: 16px;
+    padding: 0 0 0 20px;
+}
+
+.signup__id::placeholder {
+    font-family: 'Pretendard Variable';
+    font-size: 16px;
+    font-weight: 400;
+    color: #A6A6A6;
+}
+
+.signup__id:focus {
+    outline: none;
+}
+
+.signup__email {
+    box-sizing: border-box;
+    width: 380px;
+    height: 55px;
+    border: solid 1px #D9D9D9;
+    border-radius: 20px;
+    font-family: 'Pretendard Variable';
+    font-size: 16px;
+    padding: 0 0 0 20px;
+}
+
+.signup__email::placeholder {
+    font-family: 'Pretendard Variable';
+    font-size: 16px;
+    font-weight: 400;
+    color: #A6A6A6;
+}
+
+.signup__email:focus {
+    outline: none;
+}
+
+.signup__pw {
+    box-sizing: border-box;
+    width: 380px;
+    height: 55px;
+    border: solid 1px #D9D9D9;
+    border-radius: 20px;
+    font-family: 'Pretendard Variable';
+    font-size: 16px;
+    padding: 0 0 0 20px;
+}
+
+.signup__pw::placeholder {
+    font-family: 'Pretendard Variable';
+    font-size: 16px;
+    font-weight: 400;
+    color: #A6A6A6;
+}
+
+.signup__pw:focus {
+    outline: none;
+}
+
+.signup__cpw {
+    box-sizing: border-box;
+    width: 380px;
+    height: 55px;
+    border: solid 1px #D9D9D9;
+    border-radius: 20px;
+    font-family: 'Pretendard Variable';
+    font-size: 16px;
+    padding: 0 0 0 20px;
+}
+
+.signup__cpw::placeholder {
+    font-family: 'Pretendard Variable';
+    font-size: 16px;
+    font-weight: 400;
+    color: #A6A6A6;
+}
+
+.signup__cpw:focus {
+    outline: none;
+}
+
+.signup__button {
+    width: 380px;
+    height: 55px;
+    border: none;
+    border-radius: 20px;
+    font-family: 'Pretendard Variable';
+    font-size: 18px;
+    font-weight: 600;
+    color: #FFFFFF;
+    background-color: #0ABAB5;
+    cursor: pointer;
+}
+
+.signup__error {
+    color: #e11d48;
+    font-size: 14px;
+    margin-bottom: 12px;
+}
+
+.signup__button[disabled] {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
