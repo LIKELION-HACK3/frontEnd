@@ -1,24 +1,10 @@
 import styles from './KakaoMap.module.css';
-import { useEffect, useState } from 'react';
+import { Map } from 'react-kakao-maps-sdk';
 
-const { kakao } = window;
-
-const KakaoMap = () => {
-    const [map, setMap] = useState(null);
-
-    useEffect(() => {
-        const container = document.getElementById('map');
-        const options = { center: new kakao.maps.LatLng(33.450701, 126.570667) };
-        const kakaoMap = new kakao.maps.Map(container, options);
-        setMap(kakaoMap);
-    }, [])
-
+export default function KakaoMap() {
     return (
         <div className={styles.main__wrapper}>
-            <div id="map" className={styles.kakaoMap}>
-            </div>
+            <Map center={{ lat: 33.450701, lng: 126.570667 }} className={styles.kakaoMap} level={4} />
         </div>
     );
-};
-
-export default KakaoMap;
+}
