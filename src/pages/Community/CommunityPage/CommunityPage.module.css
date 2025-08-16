@@ -24,7 +24,7 @@
 
 .tabButton {
     padding: 12px 90px;
-    border: 2px solid #0abab5;
+    border: 2px solid #00b4b3;
     background-color: #fff;
     border-radius: 24px;
     font-weight: 500;
@@ -38,6 +38,10 @@
 .tabButton.active {
     background-color: #00b4b3;
     color: white;
+}
+
+.tabButton:hover {
+    background-color: #e6f8f8;
 }
 
 /*  소개 문단 */

@@ -75,13 +75,27 @@ const recommendedPosts = [
 
 // 실제 페이지 컴포넌트
 const CommunityPage = () => {
+    const navigate = useNavigate();
+
+    const handleTabClick = (tabName) => {
+        if (tabName === '뉴스, 팁') {
+            // 현재 페이지이므로 아무것도 하지 않음
+        } else if (tabName === '함께해요') {
+            navigate('/community_list');
+        }
+    };
+
     return (
         <div className={styles.communityPage}>
             <h1 className={styles.pageTitle}>커뮤니티</h1>
 
             <div className={styles.tabButtons}>
-                <button className={`${styles.tabButton} ${styles.active}`}>뉴스, 팁</button>
-                <button className={styles.tabButton}>함께해요</button>
+                <button className={`${styles.tabButton} ${styles.active}`} onClick={() => handleTabClick('뉴스, 팁')}>
+                    뉴스, 팁
+                </button>
+                <button className={styles.tabButton} onClick={() => handleTabClick('함께해요')}>
+                    함께해요
+                </button>
             </div>
 
             <div className={styles.introBox}>
