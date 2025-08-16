@@ -24,7 +24,7 @@
 
 .tabButton {
     padding: 12px 90px;
-    border: 2px solid #00b4b3;
+    border: 2px solid #0abab5;
     background-color: #fff;
     border-radius: 24px;
     font-weight: 500;
@@ -95,7 +95,7 @@
 .cardGrid {
     display: flex;
     gap: 20px;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
 }
 
 .card {
@@ -104,7 +104,7 @@
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
     padding: 20px;
     width: 100%;
-    max-width: 360px;
+    max-width: 300px;
     flex: 1 1 calc(33% - 20px);
     display: flex;
     flex-direction: column;
