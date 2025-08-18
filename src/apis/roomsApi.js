@@ -9,7 +9,6 @@ export async function fetchRooms(params = {}) {
 
 /**
  * 특정 방의 모든 리뷰를 가져옵니다.
- * @param {number | string} roomId 방 ID
  */
 export async function fetchReviewsForRoom(roomId) {
     const res = await api.get(`/api/rooms/${roomId}/reviews/`);
@@ -17,9 +16,15 @@ export async function fetchReviewsForRoom(roomId) {
 }
 
 /**
+ * [수정] 특정 방의 리뷰 통계(평균 별점 등)를 가져옵니다.
+ */
+export async function fetchReviewStats(roomId) {
+    const res = await api.get(`/api/rooms/${roomId}/reviews/stats/`);
+    return res.data;
+}
+
+/**
  * 특정 방에 새 리뷰를 작성합니다.
- * @param {number | string} roomId 방 ID
- * @param {object} reviewData 리뷰 데이터 { content, rating_safety, ... }
  */
 export async function createReview(roomId, reviewData) {
     const auth = loadAuth();

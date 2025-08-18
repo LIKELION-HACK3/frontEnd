@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import styles from './DetailPage.module.css';
 import { Sun, Volume2, Bug, Shield, Train, MapPin, Layers, DollarSign, Ruler } from 'lucide-react';
-import { createReview } from '../../apis/roomsApi';
+import { createReview, fetchReviewsForRoom, fetchReviewStats } from '../../apis/roomsApi';
 
 // 금액을 '억'과 '만원' 단위로 변환하는 함수
 const formatPrice = (value) => {
@@ -31,8 +31,10 @@ const DetailPage = () => {
     const [propertyData, setPropertyData] = useState(null);
     const [currentPage, setCurrentPage] = useState(0);
 
-    // 리뷰 상태
+    // 평점과 리뷰를 위한 state
+    const [ratingStats, setRatingStats] = useState(null);
     const [reviews, setReviews] = useState([]);
+
     const [newReviewContent, setNewReviewContent] = useState('');
     const [ratings, setRatings] = useState({
         rating_safety: 0,
@@ -41,25 +43,54 @@ const DetailPage = () => {
         rating_traffic: 0,
         rating_clean: 0,
     });
-
-    // 모달 상태
     const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
     const [isClosing, setIsClosing] = useState(false);
 
-    const fetchPropertyData = async () => {
-        try {
-            const response = await fetch(`https://www.uniroom.shop/api/rooms/${id}/`);
-            if (!response.ok) throw new Error('Failed to fetch');
-            const data = await response.json();
-            setPropertyData(data);
-            setReviews(data.reviews || []);
-        } catch (error) {
-            console.error('API error:', error);
-        }
+    // ✅ [수정] 새 API의 key에 맞게 매핑 객체를 수정합니다.
+    const ratingCategories = {
+        safety: { label: '보안', icon: <Shield className={styles.icon} /> },
+        noise: { label: '방음', icon: <Volume2 className={styles.icon} /> },
+        light: { label: '채광', icon: <Sun className={styles.icon} /> },
+        traffic: { label: '교통', icon: <Train className={styles.icon} /> },
+        bug: { label: '벌레', icon: <Bug className={styles.icon} /> },
     };
 
+    const newReviewRatingCategories = {
+        rating_safety: { label: '안전' },
+        rating_noise: { label: '소음' },
+        rating_light: { label: '채광' },
+        rating_traffic: { label: '교통' },
+        rating_clean: { label: '청결' },
+    };
+
+    // ✅ [수정] 데이터를 각각 안전하게 불러오도록 로직을 변경합니다.
     useEffect(() => {
-        if (id) fetchPropertyData();
+        if (!id) return;
+
+        const loadAllData = async () => {
+            try {
+                const propData = await fetch(`https://www.uniroom.shop/api/rooms/${id}/`).then((res) => res.json());
+                setPropertyData(propData);
+            } catch (e) {
+                console.error('방 정보를 불러오는데 실패했습니다:', e);
+            }
+
+            try {
+                const reviewData = await fetchReviewsForRoom(id);
+                setReviews(reviewData || []);
+            } catch (e) {
+                console.error('리뷰 목록을 불러오는데 실패했습니다:', e);
+            }
+
+            try {
+                const statsData = await fetchReviewStats(id);
+                setRatingStats(statsData);
+            } catch (e) {
+                console.error('평점 통계를 불러오는데 실패했습니다:', e);
+            }
+        };
+
+        loadAllData();
     }, [id]);
 
     const handleRatingChange = (key, value) => {
@@ -72,19 +103,18 @@ const DetailPage = () => {
             alert('리뷰 내용을 입력해주세요.');
             return;
         }
-
         try {
-            const reviewData = {
-                ...ratings,
-                content: newReviewContent,
-                room: parseInt(id, 10),
-            };
+            const reviewData = { ...ratings, content: newReviewContent, room: parseInt(id, 10) };
             await createReview(id, reviewData);
             alert('리뷰가 성공적으로 등록되었습니다.');
             setNewReviewContent('');
             setRatings({ rating_safety: 0, rating_noise: 0, rating_light: 0, rating_traffic: 0, rating_clean: 0 });
-            fetchPropertyData();
-            handleClose(); // 등록 후 모달 닫기
+            // 리뷰와 평점만 새로고침
+            fetchReviewsForRoom(id)
+                .then((data) => setReviews(data || []))
+                .catch(console.error);
+            fetchReviewStats(id).then(setRatingStats).catch(console.error);
+            handleClose();
         } catch (error) {
             alert(error.message || '리뷰 등록에 실패했습니다.');
             console.error(error);
@@ -96,24 +126,21 @@ const DetailPage = () => {
         setTimeout(() => {
             setIsReviewModalOpen(false);
             setIsClosing(false);
-        }, 250); // 애니메이션 시간
+        }, 250);
     };
 
     if (!propertyData) return <div>Loading...</div>;
 
-    const iconMap = {
-        채광: <Sun className={styles.icon} />,
-        방음: <Volume2 className={styles.icon} />,
-        벌레: <Bug className={styles.icon} />,
-        보안: <Shield className={styles.icon} />,
-        교통: <Train className={styles.icon} />,
-    };
-
     const renderStars = (score) => {
         const stars = [];
-        for (let i = 0; i < 5; i++) {
+        const roundedScore = Math.round(Number(score) * 2) / 2;
+        for (let i = 1; i <= 5; i++) {
+            let starClass = styles.emptyStar;
+            if (i <= roundedScore) {
+                starClass = styles.filledStar;
+            }
             stars.push(
-                <span key={i} className={i < score ? styles.filledStar : styles.emptyStar}>
+                <span key={i} className={starClass}>
                     ★
                 </span>
             );
@@ -160,7 +187,7 @@ const DetailPage = () => {
 
     return (
         <div className={styles.detailPage}>
-            {/* 헤더 섹션 */}
+            {/* ... 헤더, 사진, 세부정보 섹션은 동일 ... */}
             <div className={styles.headerSection}>
                 <div className={styles.headerContent}>
                     <div className={styles.contentGroup}>
@@ -183,7 +210,6 @@ const DetailPage = () => {
                 ></div>
             </div>
 
-            {/* 내부 사진 섹션 */}
             <div className={styles.imageSection}>
                 <h2 className={styles.sectionTitle}>내부 사진</h2>
                 <p className={styles.imageDisclaimer}>
@@ -222,7 +248,6 @@ const DetailPage = () => {
                 </div>
             </div>
 
-            {/* 세부 정보 섹션 */}
             <div className={styles.detailsSection}>
                 <h2 className={styles.sectionTitle}>세부 정보</h2>
                 <div className={styles.detailsGrid}>
@@ -279,18 +304,19 @@ const DetailPage = () => {
                 <div className={styles.ratingSection}>
                     <h2 className={styles.sectionTitle}>전체 평점</h2>
                     <div className={styles.ratingList}>
-                        {propertyData.rating ? (
-                            Object.keys(propertyData.rating).map((key) => (
+                        {/* ✅ 6. ratingStats state와 averages 객체를 사용하여 평점을 렌더링합니다. */}
+                        {ratingStats && ratingStats.averages ? (
+                            Object.entries(ratingCategories).map(([key, { label, icon }]) => (
                                 <div key={key} className={styles.ratingItem}>
                                     <div className={styles.ratingLabel}>
-                                        <div className={styles.iconCircle}>{iconMap[key]}</div>
-                                        <span className={styles.labelText}>{key}</span>
+                                        <div className={styles.iconCircle}>{icon}</div>
+                                        <span className={styles.labelText}>{label}</span>
                                     </div>
-                                    <div className={styles.stars}>{renderStars(propertyData.rating[key])}</div>
+                                    <div className={styles.stars}>{renderStars(ratingStats.averages[key])}</div>
                                 </div>
                             ))
                         ) : (
-                            <p>평점 데이터 없음</p>
+                            <p>평점 데이터를 불러오는 중...</p>
                         )}
                     </div>
                 </div>
@@ -302,11 +328,11 @@ const DetailPage = () => {
                     </div>
                     <div className={styles.reviewList}>
                         {reviews.length > 0 ? (
-                            reviews.map((review, index) => (
-                                <div key={review.id || index} className={styles.reviewCard}>
+                            reviews.map((review) => (
+                                <div key={review.id} className={styles.reviewCard}>
                                     <div className={styles.reviewAuthor}>
                                         <div className={styles.authorAvatar}></div>
-                                        <p>{review.author_username || '익명'}</p>
+                                        <p>{`사용자 ${review.user}` || '익명'}</p>
                                     </div>
                                     <p className={styles.reviewContent}>{review.content}</p>
                                 </div>
@@ -330,30 +356,15 @@ const DetailPage = () => {
                         <button className={styles.closeButton} onClick={handleClose}>
                             ✕
                         </button>
-
                         <form onSubmit={handleReviewSubmit} className={styles.reviewForm}>
                             <h3 className={styles.sectionTitle}>리뷰 작성하기</h3>
                             <div className={styles.ratingList}>
-                                <div className={styles.ratingItem}>
-                                    <span className={styles.labelText}>안전</span>
-                                    {renderNewReviewStars('rating_safety')}
-                                </div>
-                                <div className={styles.ratingItem}>
-                                    <span className={styles.labelText}>소음</span>
-                                    {renderNewReviewStars('rating_noise')}
-                                </div>
-                                <div className={styles.ratingItem}>
-                                    <span className={styles.labelText}>채광</span>
-                                    {renderNewReviewStars('rating_light')}
-                                </div>
-                                <div className={styles.ratingItem}>
-                                    <span className={styles.labelText}>교통</span>
-                                    {renderNewReviewStars('rating_traffic')}
-                                </div>
-                                <div className={styles.ratingItem}>
-                                    <span className={styles.labelText}>청결</span>
-                                    {renderNewReviewStars('rating_clean')}
-                                </div>
+                                {Object.entries(newReviewRatingCategories).map(([key, { label }]) => (
+                                    <div className={styles.ratingItem} key={key}>
+                                        <span className={styles.labelText}>{label}</span>
+                                        {renderNewReviewStars(key)}
+                                    </div>
+                                ))}
                             </div>
                             <textarea
                                 className={styles.reviewTextarea}
