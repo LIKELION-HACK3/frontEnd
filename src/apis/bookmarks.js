@@ -1,21 +1,11 @@
 import api from './api';
-import { loadAuth } from './auth';
-
-// 인증 헤더를 가져오는 헬퍼 함수
-function getAuthHeaders() {
-    const auth = loadAuth();
-    if (auth && auth.access) {
-        return { Authorization: `Bearer ${auth.access}` };
-    }
-    return {};
-}
 
 // GET /api/bookmarks/
+// 더 이상 수동으로 헤더를 설정할 필요가 없으므로 getAuthHeaders 함수와 headers 객체를 제거합니다.
 export async function fetchBookmarks({ page = 1, page_size = 50 } = {}) {
     try {
         const response = await api.get('/api/bookmarks/', {
             params: { page: String(page), page_size: String(page_size) },
-            headers: getAuthHeaders(), // 요청 시점에 헤더를 직접 설정
         });
         return response.data;
     } catch (error) {
@@ -38,16 +28,11 @@ export async function fetchAllBookmarks() {
 }
 
 // POST /api/bookmarks/{room_id}/toggle/
+// 여기에서도 수동 헤더 설정을 제거합니다.
 export async function toggleBookmark(roomId) {
     try {
-        // POST 요청 시 빈 객체 {}를 두 번째 인자로 전달해야 headers를 세 번째 인자로 설정할 수 있습니다.
-        const response = await api.post(
-            `/api/bookmarks/${roomId}/toggle/`,
-            {},
-            {
-                headers: getAuthHeaders(), // 요청 시점에 헤더를 직접 설정
-            }
-        );
+        // POST 요청 시 빈 객체 {}를 두 번째 인자로 전달합니다.
+        const response = await api.post(`/api/bookmarks/${roomId}/toggle/`, {});
 
         if (response.status === 201) return { action: 'added' };
         if (response.status === 200) return { action: 'removed' };
