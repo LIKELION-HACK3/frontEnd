@@ -57,7 +57,7 @@ function normalizeError(error) {
 
         throw new Error(msgs.join(' ') || `Request failed (${status})`);
     }
-    
+
     throw new Error('네트워크 오류가 발생했습니다. 다시 시도해 주세요.');
 }
 

@@ -3,10 +3,32 @@ import { useParams } from 'react-router-dom';
 import styles from './DetailPage.module.css';
 import { Sun, Volume2, Bug, Shield, Train, MapPin, Layers, DollarSign, Ruler } from 'lucide-react';
 
+// ✅ 금액을 '억'과 '만원' 단위로 변환하는 함수
+const formatPrice = (value) => {
+    const num = Number(value);
+    if (isNaN(num) || value === null || value === '') return '-';
+    if (num === 0) return '0';
+
+    if (num >= 100000000) {
+        const eok = Math.floor(num / 100000000);
+        const man = Math.floor((num % 100000000) / 10000);
+        if (man > 0) {
+            return `${eok}억 ${man.toLocaleString()}`;
+        }
+        return `${eok}억`;
+    }
+
+    if (num >= 10000) {
+        return `${(num / 10000).toLocaleString()}`;
+    }
+
+    return `${num.toLocaleString()}원`;
+};
+
 const PropertyDetail = () => {
     const { id } = useParams();
     const [propertyData, setPropertyData] = useState(null);
-    const [currentIndex, setCurrentIndex] = useState(0); // ✅ 현재 이미지 인덱스 상태 추가
+    const [currentPage, setCurrentPage] = useState(0);
 
     useEffect(() => {
         const fetchPropertyData = async () => {
@@ -45,14 +67,20 @@ const PropertyDetail = () => {
         return stars;
     };
 
-    // ✅ 좌우 버튼 클릭 함수
+    const IMAGES_PER_PAGE = 5;
+    const imageCount = propertyData.images?.length || 0;
+    const totalPages = Math.ceil(imageCount / IMAGES_PER_PAGE);
+
     const handlePrev = () => {
-        setCurrentIndex((prev) => (prev === 0 ? propertyData.images.length - 1 : prev - 1));
+        setCurrentPage((prev) => (prev > 0 ? prev - 1 : prev));
     };
 
     const handleNext = () => {
-        setCurrentIndex((prev) => (prev === propertyData.images.length - 1 ? 0 : prev + 1));
+        setCurrentPage((prev) => (prev < totalPages - 1 ? prev + 1 : prev));
     };
+
+    const visibleImages =
+        propertyData.images?.slice(currentPage * IMAGES_PER_PAGE, (currentPage + 1) * IMAGES_PER_PAGE) || [];
 
     return (
         <div className={styles.detailPage}>
@@ -87,24 +115,34 @@ const PropertyDetail = () => {
                 </p>
 
                 <div className={styles.sliderWrapper}>
-                    {/* ✅ 현재 선택된 이미지 하나만 보여줌 */}
-                    {propertyData.images?.length > 0 && (
-                        <div className={styles.imagePlaceholder}>
-                            <img
-                                src={propertyData.images[currentIndex].image_url}
-                                alt="room"
-                                style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '4px' }}
-                            />
-                        </div>
-                    )}
+                    <div className={styles.imageGallery}>
+                        {Array.from({ length: IMAGES_PER_PAGE }).map((_, index) => (
+                            <div key={index} className={styles.imagePlaceholder}>
+                                {visibleImages[index] ? (
+                                    <img
+                                        src={visibleImages[index].image_url}
+                                        alt={`room-${currentPage * IMAGES_PER_PAGE + index}`}
+                                        className={styles.galleryImage}
+                                    />
+                                ) : null}
+                            </div>
+                        ))}
+                    </div>
 
-                    {/* ✅ 좌우 화살표 버튼 */}
-                    <button className={styles.prevButton} onClick={handlePrev}>
-                        &lt;
-                    </button>
-                    <button className={styles.nextButton} onClick={handleNext}>
-                        &gt;
-                    </button>
+                    {totalPages > 1 && (
+                        <>
+                            <button className={styles.prevButton} onClick={handlePrev} disabled={currentPage === 0}>
+                                &lt;
+                            </button>
+                            <button
+                                className={styles.nextButton}
+                                onClick={handleNext}
+                                disabled={currentPage >= totalPages - 1}
+                            >
+                                &gt;
+                            </button>
+                        </>
+                    )}
                 </div>
             </div>
 
@@ -138,9 +176,10 @@ const PropertyDetail = () => {
                         </div>
                         <div className={styles.textBox}>
                             <p className={styles.cardLabel}>계약 형태, 보증금/월세/관리비</p>
+                            {/* ✅ 금액 표시 부분을 formatPrice 함수로 감싸줍니다. */}
                             <p className={styles.cardValue}>
-                                {propertyData.contract_type}, {propertyData.deposit}/{propertyData.monthly_fee}/
-                                {propertyData.maintenance_cost}
+                                {propertyData.contract_type}, {formatPrice(propertyData.deposit)}/
+                                {formatPrice(propertyData.monthly_fee)}/{formatPrice(propertyData.maintenance_cost)}
                             </p>
                         </div>
                     </div>

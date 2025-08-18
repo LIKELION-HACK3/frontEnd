@@ -1,13 +1,30 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import styles from './MyRoom.module.css';
-import FavoriteHeart from './FavoriteHeart'; // 하트 컴포넌트(이전 제공 코드)
+import FavoriteHeart from './FavoriteHeart';
 import { fetchAllBookmarks, toggleBookmark } from '../../apis/bookmarks';
 
-/**
- * 모크데이터 없음.
- * - 초기 렌더: GET /api/bookmarks/ 로 서버 북마크(room)만으로 카드/목록 구성
- * - 하트 클릭: POST /api/bookmarks/{room_id}/toggle/ 호출 후, 목록 재조회로 동기화
- */
+// ✅ 금액을 '억'과 '만원' 단위로 변환하는 함수 추가
+const formatPrice = (value) => {
+    const num = Number(value);
+    if (isNaN(num) || value === null || value === '') return '-';
+    if (num === 0) return '0원';
+
+    if (num >= 100000000) {
+        const eok = Math.floor(num / 100000000);
+        const man = Math.floor((num % 100000000) / 10000);
+        if (man > 0) {
+            return `${eok}억 ${man.toLocaleString()}만원`;
+        }
+        return `${eok}억`;
+    }
+
+    if (num >= 10000) {
+        return `${(num / 10000).toLocaleString()}만원`;
+    }
+
+    return `${num.toLocaleString()}원`;
+};
+
 const MyPage = () => {
     const [bookmarks, setBookmarks] = useState([]); // [{id, room:{...}, created_at}]
     const [favoriteRoomIds, setFavoriteRoomIds] = useState(new Set()); // room.id 집합
@@ -99,9 +116,10 @@ const MyPage = () => {
                                     <div className={styles.cardBody}>
                                         <p className={styles.cardTitle}>{room.price_label ?? room.title}</p>
                                         <p className={styles.cardType}>{room.address}</p>
+                                        {/* ✅ 금액 표시 부분을 formatPrice 함수로 감싸줍니다. */}
                                         <pre className={styles.cardDetails}>
-                                            보증금 {room.deposit} / 월세 {room.monthly_fee}
-                                            {'\n'}관리비 {room.maintenance_cost}
+                                            보증금 {formatPrice(room.deposit)} / 월세 {formatPrice(room.monthly_fee)}
+                                            {'\n'}관리비 {formatPrice(room.maintenance_cost)}
                                         </pre>
                                     </div>
                                 </div>

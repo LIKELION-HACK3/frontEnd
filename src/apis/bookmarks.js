@@ -1,9 +1,23 @@
 // src/apis/bookmarks.js
 const BASE_URL = 'https://www.uniroom.shop';
 
+/**
+ * ✅ 수정된 부분
+ * 로컬 스토리지의 'uniroom_auth' 키에서 access 토큰을 읽어와 인증 헤더를 생성합니다.
+ * 기존에는 'accessToken'이라는 잘못된 키를 사용하고 있었습니다.
+ */
 function authHeaders() {
-    const token = localStorage.getItem('accessToken'); // 프로젝트 저장 위치에 맞게 조정
-    return token ? { Authorization: `Bearer ${token}` } : {};
+    try {
+        const raw = localStorage.getItem('uniroom_auth');
+        if (!raw) return {};
+
+        const authData = JSON.parse(raw);
+        const token = authData?.access;
+
+        return token ? { Authorization: `Bearer ${token}` } : {};
+    } catch {
+        return {};
+    }
 }
 
 // GET /api/bookmarks/  (페이지네이션 + 합치기)
