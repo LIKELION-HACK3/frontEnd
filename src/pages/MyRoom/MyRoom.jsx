@@ -1,5 +1,5 @@
 import React from 'react';
-import styles from './MyPage.module.css';
+import styles from './MyRoom.module.css';
 
 const MyPage = () => {
     const favoriteProperties = [

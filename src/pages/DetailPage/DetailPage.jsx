@@ -1,5 +1,5 @@
 import React from 'react';
-import styles from './PropertyDetail.module.css';
+import styles from './DetailPage.module.css';
 import { Sun, Volume2, Bug, Shield, Train, MapPin, Layers, DollarSign, Ruler } from 'lucide-react';
 
 const PropertyDetail = () => {

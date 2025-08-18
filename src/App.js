@@ -9,7 +9,8 @@ import SignUp from './pages/SignUp/SignUp';
 import MapList from './pages/MapList/MapList';
 import CommunityPage from './pages/Community/CommunityPage/CommunityPage';
 import CommunityListPage from './pages/Community/CommunityListPage/CommunityListPage';
-import PropertyDetail from './components/PropertyDetail/PropertyDetail';
+import PropertyDetail from './pages/DetailPage/DetailPage';
+import MyRoom from './pages/MyRoom/MyRoom';
 
 function App() {
     return (
@@ -23,6 +24,7 @@ function App() {
                 <Route path="/community_list" element={<CommunityListPage />} />
                 <Route path="/community_news" element={<CommunityPage />} />
                 <Route path="/property/:id" element={<PropertyDetail />} />
+                <Route path="/myroom" element={<MyRoom />} />
             </Routes>
             <Footer />
         </>
