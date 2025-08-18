@@ -173,6 +173,17 @@
     text-align: center;
 }
 
+.menuNarrow {
+    min-width: 30px;
+}
+
+.menuNarrow .option {
+    padding: 6px 6px;
+    color: #555555;
+    text-size: 13px;
+    text-align: center;
+}
+
 .option {
     padding: 6px 2px;
     cursor: pointer;

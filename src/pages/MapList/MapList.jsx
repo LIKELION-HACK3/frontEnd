@@ -16,6 +16,40 @@ const MapList = () => {
     const listRef = useRef(null);
     const pendingScrollId = useRef(null);
 
+    const [filters, setFilters] = useState({
+        type: '',
+        lease: '',
+        price: '',
+        size: '',
+        floorLabel: '',
+        floorNum: ''
+    });
+
+    const sqmToPyeongNum = (sqm) => {
+        const n = Number(sqm);
+        return Number.isFinite(n) ? n / 3.305785 : NaN;
+    };
+
+    const getFrontFloor = (floorStr) => {
+        if (!floorStr) return null;
+        const s = String(floorStr).trim();
+
+        if (/(반지층|반지하|지하|\bB\d+)/i.test(s)) return -1;
+
+        const front = s.split('/')[0];
+        const m = front.match(/-?\d+/);
+        return m ? parseInt(m[0], 10) : null;
+    };
+
+    const isSemiBasement = (floorStr, typeStr) => {
+        const s1 = String(floorStr || '');
+        const s2 = String(typeStr || '');
+        if (/(반지층|반지하|지하|\bB\d+)/i.test(s1)) return true;
+        if (/(반지층|반지하)/i.test(s2)) return true;
+        const fr = getFrontFloor(floorStr);
+        return fr != null && fr <= 0;
+    };
+
     useEffect(() => {
         (async () => {
             try {
@@ -39,7 +73,13 @@ const MapList = () => {
 
     const toPyeong = (sqm) => {
         const n = Number(sqm);
-        return Number.isFinite(n) ? `${Math.round(n / 3.305785)}평` : '-';
+        return Number.isFinite(n) ? `${Math.floor(n / 3.305785)}평` : '-';
+    };
+
+    const toManwon = (v) => {
+        const n = Number(v);
+        if (!Number.isFinite(n)) return NaN;
+        return n >= 10000 ? n / 10000 : n;
     };
 
     const handleMarkerClick = useCallback((id) => {
@@ -84,7 +124,11 @@ const MapList = () => {
     }, [visibleSet, selectedId]);
 
     const handleVisibleChange = useCallback((ids) => {
-        setVisibleSet(new Set(ids));
+        setVisibleSet(prev => {
+            const next = new Set(ids);
+            if (prev && next.size === prev.size && ids.every(v => prev.has(v))) return prev;
+            return next;
+        });
     }, []);
 
     useEffect(() => {
@@ -92,8 +136,6 @@ const MapList = () => {
             setSelectedId(null);
         }
     }, [visibleSet, selectedId]);
-
-    const roomsToShow = visibleSet ? rooms.filter(r => visibleSet.has(r.id)) : rooms;
 
     const [openDrop, setOpenDrop] = useState({
         type: false,
@@ -137,9 +179,58 @@ const MapList = () => {
     };
 
     const handleCardClick = (id) => {
-        setSelectedId(id);
         navigate(`/property/${id}`);
     };
+
+    useEffect(() => {
+         setVisibleSet(null);
+    }, [sel.type, sel.lease, sel.price, sel.size, sel.floorLabel, sel.floorNum]);
+
+    const filteredRooms = rooms.filter((r) => {
+        const { type, lease, price, size, floorLabel, floorNum } = sel;
+
+        if (type && (r.room_type || '').trim() !== type) return false;
+
+        const monthly = Number(r?.monthly_fee);
+        const deposit = Number(r?.deposit);
+        if (lease === '월세') {
+            if (!Number.isFinite(monthly) || monthly <= 0) return false;
+        } else if (lease === '전세') {
+            const monthlyIsZero = !Number.isFinite(monthly) || monthly === 0;
+            if (!monthlyIsZero) return false;
+        }
+
+        if (sel.price) {
+            const limit = Number(sel.price);
+            if (Number.isFinite(limit)) {
+                const raw = r?.monthly_fee;
+                const monthlyMan = toManwon((raw === '' || raw == null) ? NaN : raw);
+                if (!Number.isFinite(monthlyMan)) return false;
+                if (monthlyMan > limit) return false;
+            }
+        }
+
+        if (sel.size) {
+            const base = Number(sel.size);
+             if (Number.isFinite(base)) {
+                const py = sqmToPyeongNum(r?.real_area);
+                if (!Number.isFinite(py)) return false;
+                if (py < base || py >= base + 1) return false;
+            }
+        }
+
+        if (floorLabel === '반지하' || floorLabel === '반지층') {
+            if (!isSemiBasement(r?.floor, r?.room_type)) return false;
+        } else if (floorNum) {
+            const want = parseInt(floorNum, 10);
+            const fr = getFrontFloor(r?.floor);
+            if (fr == null || fr !== want) return false;
+        }
+
+        return true;
+    });
+
+    const roomsToShow = visibleSet ? filteredRooms.filter(r => visibleSet.has(r.id)) : filteredRooms;
 
     return (
         <div className={styles.main__wrapper}>
@@ -152,7 +243,7 @@ const MapList = () => {
                         <img src={downArrow} alt="" className={styles.caretIcon} />
                     </button>
                     {openDrop.type && (
-                        <div className={styles.menu}>
+                        <div className={`${styles.menu} ${styles.menuNarrow}`}>
                             <div className={`${styles.option} ${sel.type === '원룸' ? styles.active : ''}`} onClick={() => pick('type', '원룸')}>
                                 원룸
                             </div>
@@ -170,7 +261,7 @@ const MapList = () => {
                         <img src={downArrow} alt="" className={styles.caretIcon} />
                     </button>
                     {openDrop.lease && (
-                        <div className={styles.menu}>
+                        <div className={`${styles.menu} ${styles.menuNarrow}`}>
                             <div className={`${styles.option} ${sel.lease === '월세' ? styles.active : ''}`} onClick={() => pick('lease', '월세')}>
                                 월세
                             </div>
@@ -234,7 +325,7 @@ const MapList = () => {
                 <button type="button" className={styles.resetAll} onClick={resetAll}>초기화</button>
             </div>
             <div className={styles.map__canvas}>
-                <KakaoMap rooms={rooms} selectedId={selectedId} onMarkerClick={handleMarkerClick} onVisibleChange={handleVisibleChange} />
+                <KakaoMap rooms={filteredRooms} selectedId={selectedId} onMarkerClick={handleMarkerClick} onVisibleChange={handleVisibleChange} />
                 <div className={styles.map__showestate}>
                     <div className={styles.map__scrollarea} ref={listRef}>
                         {loading && <div>불러오는 중...</div>}
