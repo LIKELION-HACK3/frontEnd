@@ -116,3 +116,8 @@
     color: #5E5E5E;
     padding-right: 18px;
 }
+
+.isActive {
+    border-color: #1B818C !important;
+    border-width: 2px;
+}

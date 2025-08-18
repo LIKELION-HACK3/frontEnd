@@ -1,12 +1,15 @@
 import styles from './MapList.module.css';
 import KakaoMap from '../../components/KakaoMap/KakaoMap';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import { fetchRooms } from '../../apis/roomsApi';
 
 const MapList = () => {
     const [rooms, setRooms] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [selectedId, setSelectedId] = useState(null);
+    const [visibleSet, setVisibleSet] = useState(null);
+    const itemRefs = useRef(new Map());
 
     useEffect(() => {
         (async () => {
@@ -26,7 +29,7 @@ const MapList = () => {
         if (v == null || v === '') return '-';
         const n = Number(v);
         if (!Number.isFinite(n)) return String(v);
-        return n >= 10000 ? `${Math.round(n / 10000).toLocaleString()}만원` : `${n.toLocaleString()}원`;
+        return n >= 10000 ? `${Math.round(n / 10000).toLocaleString()}` : `${n.toLocaleString()}`;
     };
 
     const toPyeong = (sqm) => {
@@ -34,20 +37,47 @@ const MapList = () => {
         return Number.isFinite(n) ? `${Math.round(n / 3.305785)}평` : '-';
     };
 
+    const handleMarkerClick = useCallback((id) => {
+        setSelectedId(id);
+        const el = itemRefs.current.get(id);
+        if (el && typeof el.scrollIntoView === 'function') {
+            el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+    }, []);
+
+    const handleVisibleChange = useCallback((ids) => {
+        setVisibleSet(new Set(ids));
+    }, []);
+
+    useEffect(() => {
+        if (visibleSet && selectedId && !visibleSet.has(selectedId)) {
+            setSelectedId(null);
+        }
+    }, [visibleSet, selectedId]);
+
+    const roomsToShow = visibleSet ? rooms.filter(r => visibleSet.has(r.id)) : rooms;
+
     return (
         <div className={styles.main__wrapper}>
             <div className={styles.map__categorybox} />
             <div className={styles.map__canvas}>
-                <KakaoMap rooms={rooms} />
+                <KakaoMap rooms={rooms} selectedId={selectedId} onMarkerClick={handleMarkerClick} onVisibleChange={handleVisibleChange} />
                 <div className={styles.map__showestate}>
                     <div className={styles.map__scrollarea}>
                         {loading && <div>불러오는 중...</div>}
                         {error && <div>목록을 불러오지 못했습니다.</div>}
 
-                        {!loading && !error && rooms.map((r) => {
+                        {!loading && !error && roomsToShow.map((r) => {
                             const firstImage = r?.images?.[0]?.image_url;
+                            const isActive = selectedId === r.id;
                             return (
-                                <div key={r.id} className={styles.map__showestates}>
+                                <div key={r.id} ref={(el) => {
+                                        if (el) itemRefs.current.set(r.id, el);
+                                        else itemRefs.current.delete(r.id);
+                                    }}
+                                    className={`${styles.map__showestates} ${isActive ? styles.isActive : ''}`}
+                                    onClick={() => setSelectedId(r.id)}
+                                    aria-current={isActive ? 'true' : 'false'}>
                                     <div className={styles.map__pic} aria-label="room thumbnail">
                                         {firstImage && (
                                             <img src={firstImage} alt="" className={styles.map__img} />

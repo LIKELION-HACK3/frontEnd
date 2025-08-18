@@ -1,11 +1,12 @@
 import styles from './KakaoMap.module.css';
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState, useMemo, useCallback } from 'react';
 import { Map, MapMarker } from 'react-kakao-maps-sdk';
 
-export default function KakaoMap({ rooms = [] }) {
+export default function KakaoMap({ rooms = [], selectedId = null, onMarkerClick, onVisibleChange }) {
     const FALLBACK_CENTER = { lat: 37.597607, lng: 127.058836 };
     const [center, setCenter] = useState(FALLBACK_CENTER);
-    const [selectedId, setSelectedId] = useState(null);
+
+    const [map, setMap] = useState(null);
 
     /* geolocation API, 현재 위치 불러오는 거임 */
     useEffect(() => {
@@ -52,22 +53,42 @@ export default function KakaoMap({ rooms = [] }) {
         );
     }, [rooms]);
 
+    const updateVisible = useCallback(() => {
+        if (!map || !onVisibleChange) return;
+        const bounds = map.getBounds();
+        if (!bounds) return;
+        const sw = bounds.getSouthWest();
+        const ne = bounds.getNorthEast();
+
+        const inViewIds = markers
+            .filter((m) => (
+                m.position.lat >= sw.getLat() &&
+                m.position.lat <= ne.getLat() &&
+                m.position.lng >= sw.getLng() &&
+                m.position.lng <= ne.getLng()
+            ))
+            .map((m) => m.id);
+
+            onVisibleChange(inViewIds);
+    }, [map, markers, onVisibleChange]);
+
+    useEffect(() => {
+        updateVisible();
+    }, [updateVisible]);
+
     /* 카카오 맵 출력 */
     return (
         <div className={styles.map__wrapper}>
-            <Map center={center} isPanto className={styles.kakaoMap} level={4}>
+            <Map center={center} isPanto className={styles.kakaoMap} level={4} onCreate={setMap} onCenterChanged={updateVisible} onZoomChanged={updateVisible}>
                 {markers.map((m) => (
-                    <MapMarker key={m.id} position={m.position} onClick={() => setSelectedId((prev) => (prev === m.id ? null : m.id))}>
-                        {selectedId === m.id && (
-                            <div style={{ padding: '4px 8px', fontSize: 12, lineHeight: 1.4 }}>
-                                <b>{m.title || '매물'}</b>
-                                <div>
-                                    보증금 {m.deposit?.toLocaleString?.() ?? '-'} / 월세{' '}
-                                    {m.monthly_fee?.toLocaleString?.() ?? '-'}
-                                </div>
-                            </div>
-                        )}
-                    </MapMarker>
+                    <MapMarker
+                        key={m.id}
+                        position={m.position}
+                        onClick={() => {
+                            setCenter(m.position);
+                            onMarkerClick && onMarkerClick(m.id);
+                        }}
+                    />
                 ))}
             </Map>
         </div>
