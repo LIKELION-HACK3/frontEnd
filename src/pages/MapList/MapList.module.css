@@ -1,9 +1,118 @@
 .main__wrapper {
     margin: 0 auto;
+    position: relative;
+    min-width: 100vw;
 }
 
 .map__categorybox {
     width: 100%;
     height: 40px;
     background-color: #F7F7F7;
+}
+
+.map__canvas {
+    position: relative;
+    width: 100%;
+    height: calc(100vh - 100px);
+}
+
+.map__showestate {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    left: 10px;
+    width: 500px;
+    height: calc(100vh - 126px);
+    background-color: #FFFFFF;
+    z-index: 10;
+    border-radius: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    overflow: hidden;
+    box-sizing: border-box;
+    padding: 20px;
+}
+
+.map__scrollarea {
+    width: calc(100% + 16px);
+    height: 100%;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+}
+
+.map__showestates {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 20px;
+    width: 440px;
+    min-height: 200px;
+    border: solid 1px #0000001A;
+    border-radius: 10px;
+    margin: 0 auto;
+    cursor: pointer;
+}
+
+.map__scrollarea::-webkit-scrollbar { width: 10px; }
+.map__scrollarea::-webkit-scrollbar-track { 
+    background: #efefef;
+    border-radius: 8px;
+}
+.map__scrollarea::-webkit-scrollbar-thumb {
+    background: #d3d3d3;
+    border-radius: 8px;
+    background-clip: content-box;
+}
+
+.map__pic {
+    width: 160px;
+    height: 160px;
+    flex: 0 0 160px;
+    min-width: 160px;
+    min-height: 160px;
+    border-radius: 12px;
+    margin: 0 0 0 18px;
+    overflow: hidden;
+}
+
+.map__img {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: fill;
+}
+
+.map__info {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.map__info1 {
+    font-size: 22px;
+    font-weight: 600;
+}
+
+.map__info2 {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 20px;
+}
+
+.map__info3 {
+    font-size: 16px;
+    font-weight: 400;
+    color: #1B818C;
+}
+
+.map__info4 {
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1.4;
+    color: #5E5E5E;
+    padding-right: 18px;
 }
