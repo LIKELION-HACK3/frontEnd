@@ -2,8 +2,9 @@ import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import styles from './DetailPage.module.css';
 import { Sun, Volume2, Bug, Shield, Train, MapPin, Layers, DollarSign, Ruler } from 'lucide-react';
+import { createReview } from '../../apis/roomsApi';
 
-// ✅ 금액을 '억'과 '만원' 단위로 변환하는 함수
+// 금액을 '억'과 '만원' 단위로 변환하는 함수
 const formatPrice = (value) => {
     const num = Number(value);
     if (isNaN(num) || value === null || value === '') return '-';
@@ -25,25 +26,78 @@ const formatPrice = (value) => {
     return `${num.toLocaleString()}원`;
 };
 
-const PropertyDetail = () => {
+const DetailPage = () => {
     const { id } = useParams();
     const [propertyData, setPropertyData] = useState(null);
     const [currentPage, setCurrentPage] = useState(0);
 
-    useEffect(() => {
-        const fetchPropertyData = async () => {
-            try {
-                const response = await fetch(`https://www.uniroom.shop/api/rooms/${id}/`);
-                if (!response.ok) throw new Error('Failed to fetch');
-                const data = await response.json();
-                setPropertyData(data);
-            } catch (error) {
-                console.error('API error:', error);
-            }
-        };
+    // 리뷰 상태
+    const [reviews, setReviews] = useState([]);
+    const [newReviewContent, setNewReviewContent] = useState('');
+    const [ratings, setRatings] = useState({
+        rating_safety: 0,
+        rating_noise: 0,
+        rating_light: 0,
+        rating_traffic: 0,
+        rating_clean: 0,
+    });
 
+    // 모달 상태
+    const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
+    const [isClosing, setIsClosing] = useState(false);
+
+    const fetchPropertyData = async () => {
+        try {
+            const response = await fetch(`https://www.uniroom.shop/api/rooms/${id}/`);
+            if (!response.ok) throw new Error('Failed to fetch');
+            const data = await response.json();
+            setPropertyData(data);
+            setReviews(data.reviews || []);
+        } catch (error) {
+            console.error('API error:', error);
+        }
+    };
+
+    useEffect(() => {
         if (id) fetchPropertyData();
     }, [id]);
+
+    const handleRatingChange = (key, value) => {
+        setRatings((prev) => ({ ...prev, [key]: value }));
+    };
+
+    const handleReviewSubmit = async (e) => {
+        e.preventDefault();
+        if (!newReviewContent.trim()) {
+            alert('리뷰 내용을 입력해주세요.');
+            return;
+        }
+
+        try {
+            const reviewData = {
+                ...ratings,
+                content: newReviewContent,
+                room: parseInt(id, 10),
+            };
+            await createReview(id, reviewData);
+            alert('리뷰가 성공적으로 등록되었습니다.');
+            setNewReviewContent('');
+            setRatings({ rating_safety: 0, rating_noise: 0, rating_light: 0, rating_traffic: 0, rating_clean: 0 });
+            fetchPropertyData();
+            handleClose(); // 등록 후 모달 닫기
+        } catch (error) {
+            alert(error.message || '리뷰 등록에 실패했습니다.');
+            console.error(error);
+        }
+    };
+
+    const handleClose = () => {
+        setIsClosing(true);
+        setTimeout(() => {
+            setIsReviewModalOpen(false);
+            setIsClosing(false);
+        }, 250); // 애니메이션 시간
+    };
 
     if (!propertyData) return <div>Loading...</div>;
 
@@ -65,6 +119,28 @@ const PropertyDetail = () => {
             );
         }
         return stars;
+    };
+
+    const renderNewReviewStars = (ratingKey) => {
+        return (
+            <div className={styles.stars}>
+                {[1, 2, 3, 4, 5].map((star) => (
+                    <span
+                        key={star}
+                        className={star <= ratings[ratingKey] ? styles.filledStar : styles.emptyStar}
+                        onClick={() => handleRatingChange(ratingKey, star)}
+                        style={{ cursor: 'pointer' }}
+                        role="button"
+                        tabIndex={0}
+                        onKeyDown={(e) => {
+                            if (e.key === 'Enter' || e.key === ' ') handleRatingChange(ratingKey, star);
+                        }}
+                    >
+                        ★
+                    </span>
+                ))}
+            </div>
+        );
     };
 
     const IMAGES_PER_PAGE = 5;
@@ -176,7 +252,6 @@ const PropertyDetail = () => {
                         </div>
                         <div className={styles.textBox}>
                             <p className={styles.cardLabel}>계약 형태, 보증금/월세/관리비</p>
-                            {/* ✅ 금액 표시 부분을 formatPrice 함수로 감싸줍니다. */}
                             <p className={styles.cardValue}>
                                 {propertyData.contract_type}, {formatPrice(propertyData.deposit)}/
                                 {formatPrice(propertyData.monthly_fee)}/{formatPrice(propertyData.maintenance_cost)}
@@ -226,12 +301,12 @@ const PropertyDetail = () => {
                         <button className={styles.allReviewButton}>전체 보기</button>
                     </div>
                     <div className={styles.reviewList}>
-                        {propertyData.reviews ? (
-                            propertyData.reviews.map((review, index) => (
-                                <div key={index} className={styles.reviewCard}>
+                        {reviews.length > 0 ? (
+                            reviews.map((review, index) => (
+                                <div key={review.id || index} className={styles.reviewCard}>
                                     <div className={styles.reviewAuthor}>
                                         <div className={styles.authorAvatar}></div>
-                                        <p>{review.author}</p>
+                                        <p>{review.author_username || '익명'}</p>
                                     </div>
                                     <p className={styles.reviewContent}>{review.content}</p>
                                 </div>
@@ -243,9 +318,58 @@ const PropertyDetail = () => {
                 </div>
             </div>
 
-            <button className={styles.writeReviewButton}>리뷰 작성하기</button>
+            {/* 리뷰 작성 버튼 */}
+            <button className={styles.writeReviewButton} onClick={() => setIsReviewModalOpen(true)}>
+                리뷰 작성하기
+            </button>
+
+            {/* 모달 */}
+            {isReviewModalOpen && (
+                <div className={styles.modalOverlay}>
+                    <div className={`${styles.modalContent} ${isClosing ? styles.close : ''}`}>
+                        <button className={styles.closeButton} onClick={handleClose}>
+                            ✕
+                        </button>
+
+                        <form onSubmit={handleReviewSubmit} className={styles.reviewForm}>
+                            <h3 className={styles.sectionTitle}>리뷰 작성하기</h3>
+                            <div className={styles.ratingList}>
+                                <div className={styles.ratingItem}>
+                                    <span className={styles.labelText}>안전</span>
+                                    {renderNewReviewStars('rating_safety')}
+                                </div>
+                                <div className={styles.ratingItem}>
+                                    <span className={styles.labelText}>소음</span>
+                                    {renderNewReviewStars('rating_noise')}
+                                </div>
+                                <div className={styles.ratingItem}>
+                                    <span className={styles.labelText}>채광</span>
+                                    {renderNewReviewStars('rating_light')}
+                                </div>
+                                <div className={styles.ratingItem}>
+                                    <span className={styles.labelText}>교통</span>
+                                    {renderNewReviewStars('rating_traffic')}
+                                </div>
+                                <div className={styles.ratingItem}>
+                                    <span className={styles.labelText}>청결</span>
+                                    {renderNewReviewStars('rating_clean')}
+                                </div>
+                            </div>
+                            <textarea
+                                className={styles.reviewTextarea}
+                                value={newReviewContent}
+                                onChange={(e) => setNewReviewContent(e.target.value)}
+                                placeholder="이 집에 대한 리뷰를 남겨주세요."
+                            />
+                            <button type="submit" className={styles.writeReviewButton}>
+                                리뷰 등록하기
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
 
-export default PropertyDetail;
+export default DetailPage;

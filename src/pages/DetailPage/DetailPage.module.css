@@ -422,3 +422,293 @@
     composes: sliderButton;
     right: -20px;
 }
+
+/* ... 기존 CSS ... */
+
+.footerSection {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 30px;
+    margin-bottom: 40px;
+}
+
+.ratingSection {
+    background-color: #f7f7f7;
+    padding: 20px;
+    border-radius: 8px;
+}
+
+.ratingLoginText {
+    /*평점과 리뷰 콘텐츠 컨테이너*/
+    font-size: 14px;
+    color: #888;
+    margin-bottom: 15px;
+}
+
+.ratingList {
+    /*개별 평점 항목 세로 정렬*/
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.ratingItem {
+    /*개별 평점 항목*/
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.stars {
+    /*별 표시 컨테이너*/
+    display: flex;
+    gap: 2px;
+}
+
+.filledStar {
+    /*채워진 별 색상*/
+    color: #ffd700;
+}
+
+.emptyStar {
+    /*빈 별*/
+    color: #ccc;
+}
+
+.writeReviewButton {
+    /*리뷰 작성하기 버튼 스타일*/
+    display: block;
+    margin: 20px auto 0 auto;
+    padding: 12px 24px;
+    background-color: #000;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 14px;
+    transition: background-color 0.2s ease;
+}
+
+.writeReviewButton:hover {
+    background-color: #333;
+}
+
+.ratingSection {
+    margin-bottom: 10px; /* 카드와 버튼 사이 여백 */
+}
+
+.reviewHeader {
+    /*리뷰 헤더-전체보기 버튼 포함*/
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.allReviewButton {
+    /*전체 보기 버튼 스타일*/
+    padding: 8px 16px;
+    border: 1px solid #ccc;
+    background-color: #fff;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.reviewList {
+    /*개별 리뷰 카드 컨테이너*/
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.reviewCard {
+    /*리뷰 하나하나 스타일*/
+    border: 1px solid #ccc;
+    padding: 15px;
+    border-radius: 4px;
+    background-color: #fff;
+}
+
+.reviewAuthor {
+    /*리뷰 작성자 프로필 이름름*/
+    display: flex;
+    align-items: center;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.authorAvatar {
+    /*뷰 작성자 프로필 동그라미*/
+    width: 24px;
+    height: 24px;
+    background-color: #d9d9d9;
+    border-radius: 50%;
+    margin-right: 8px;
+}
+
+.reviewContent {
+    /*리뷰 내용 나타내는 텍스트*/
+    margin: 0;
+}
+
+.ratingLabel {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.iconCircle {
+    width: 36px;
+    height: 36px;
+    background-color: #e0e0e0;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.icon {
+    width: 20px;
+    height: 20px;
+    color: #333;
+}
+
+/* 슬라이더 */
+.sliderWrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 20px 40px;
+}
+
+/* 버튼 공통 */
+.sliderButton {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(255, 255, 255, 0.8);
+    border: 1px solid #ddd;
+    width: 40px;
+    height: 40px;
+    cursor: pointer;
+    font-size: 20px;
+    font-weight: bold;
+    border-radius: 50%;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+    transition: background 0.2s, opacity 0.2s;
+    color: #333;
+    z-index: 10;
+}
+
+.sliderButton:hover {
+    background: #fff;
+}
+
+.sliderButton:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
+.prevButton {
+    composes: sliderButton;
+    left: -20px;
+}
+
+.nextButton {
+    composes: sliderButton;
+    right: -20px;
+}
+
+/* 추가된 스타일 */
+.reviewForm {
+    margin-top: 40px;
+    padding: 24px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
+}
+
+.reviewTextarea {
+    width: 100%;
+    min-height: 100px;
+    margin-top: 20px;
+    padding: 12px;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    font-family: inherit;
+    font-size: 14px;
+    resize: vertical;
+    box-sizing: border-box;
+}
+
+.reviewForm .writeReviewButton {
+    margin: 20px 0 0 0;
+    display: inline-block;
+    width: auto;
+}
+
+/* ===== 리뷰 작성 모달 관련 ===== */
+@keyframes popIn {
+    0% {
+        transform: scale(0.8);
+        opacity: 0;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+@keyframes popOut {
+    0% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(0.8);
+        opacity: 0;
+    }
+}
+
+.modalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 999;
+}
+
+.modalContent {
+    background: #fff;
+    border-radius: 12px;
+    padding: 24px;
+    width: 500px;
+    max-height: 80vh;
+    overflow-y: auto;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    position: relative;
+
+    /* 뽀잉 효과 */
+    animation: popIn 0.25s ease-out forwards;
+}
+
+.modalContent.close {
+    animation: popOut 0.25s ease-in forwards;
+}
+
+.closeButton {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: transparent;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+}
