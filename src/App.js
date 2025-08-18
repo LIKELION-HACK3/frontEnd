@@ -9,8 +9,7 @@ import SignUp from './pages/SignUp/SignUp';
 import MapList from './pages/MapList/MapList';
 import CommunityPage from './pages/Community/CommunityPage/CommunityPage';
 import CommunityListPage from './pages/Community/CommunityListPage/CommunityListPage';
-// 변경된 파일 구조에 맞게 PropertyDetail 경로를 수정했습니다.
-import PropertyDetail from './pages/DetailPage/DetailPage';
+import DetailPage from './pages/DetailPage/DetailPage'; // ✅ 방 상세 페이지
 import MyRoom from './pages/MyRoom/MyRoom';
 
 function App() {
@@ -24,8 +23,7 @@ function App() {
                 <Route path="/map" element={<MapList />} />
                 <Route path="/community_list" element={<CommunityListPage />} />
                 <Route path="/community_news" element={<CommunityPage />} />
-                <Route path="/property/:id" element={<PropertyDetail />} />
-                {/* MyRoom 경로를 연결합니다. */}
+                <Route path="/property/:id" element={<DetailPage />} /> {/* ✅ 방 상세 페이지 */}
                 <Route path="/myroom" element={<MyRoom />} />
             </Routes>
             <Footer />

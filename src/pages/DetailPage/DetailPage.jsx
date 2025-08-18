@@ -1,31 +1,29 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
 import styles from './DetailPage.module.css';
 import { Sun, Volume2, Bug, Shield, Train, MapPin, Layers, DollarSign, Ruler } from 'lucide-react';
 
 const PropertyDetail = () => {
-    const propertyData = {
-        title: '1000/64',
-        address: '이문동 어디어디가 어느곳',
-        images: [
-            { id: 1, title: 'Living Room' },
-            { id: 2, title: 'Kitchen' },
-            { id: 3, title: 'Kitchen' },
-            { id: 4, title: 'Kitchen' },
-            { id: 5, title: 'Bedroom' },
-        ],
-        rating: {
-            채광: 2,
-            방음: 3,
-            벌레: 5,
-            보안: 4,
-            교통: 2,
-        },
-        reviews: [
-            { author: 'Alice', content: 'Lovely neighborhood, very peaceful.' },
-            { author: 'John', content: 'The amenities are fantastic!' },
-            { author: 'Sarah', content: 'Great schools nearby.' },
-        ],
-    };
+    const { id } = useParams();
+    const [propertyData, setPropertyData] = useState(null);
+    const [currentIndex, setCurrentIndex] = useState(0); // ✅ 현재 이미지 인덱스 상태 추가
+
+    useEffect(() => {
+        const fetchPropertyData = async () => {
+            try {
+                const response = await fetch(`https://www.uniroom.shop/api/rooms/${id}/`);
+                if (!response.ok) throw new Error('Failed to fetch');
+                const data = await response.json();
+                setPropertyData(data);
+            } catch (error) {
+                console.error('API error:', error);
+            }
+        };
+
+        if (id) fetchPropertyData();
+    }, [id]);
+
+    if (!propertyData) return <div>Loading...</div>;
 
     const iconMap = {
         채광: <Sun className={styles.icon} />,
@@ -47,6 +45,15 @@ const PropertyDetail = () => {
         return stars;
     };
 
+    // ✅ 좌우 버튼 클릭 함수
+    const handlePrev = () => {
+        setCurrentIndex((prev) => (prev === 0 ? propertyData.images.length - 1 : prev - 1));
+    };
+
+    const handleNext = () => {
+        setCurrentIndex((prev) => (prev === propertyData.images.length - 1 ? 0 : prev + 1));
+    };
+
     return (
         <div className={styles.detailPage}>
             {/* 헤더 섹션 */}
@@ -61,7 +68,15 @@ const PropertyDetail = () => {
                         </div>
                     </div>
                 </div>
-                <div className={styles.headerImage}></div>
+                <div
+                    className={styles.headerImage}
+                    style={{
+                        backgroundImage:
+                            propertyData.images?.length > 0 ? `url(${propertyData.images[0].image_url})` : 'none',
+                        backgroundSize: 'cover',
+                        backgroundPosition: 'center',
+                    }}
+                ></div>
             </div>
 
             {/* 내부 사진 섹션 */}
@@ -70,12 +85,26 @@ const PropertyDetail = () => {
                 <p className={styles.imageDisclaimer}>
                     위 사진들은 <span className={styles.highlightDate}>2023년 08월 05일</span>에 찍힌 사진들입니다.
                 </p>
-                <div className={styles.imageGallery}>
-                    {propertyData.images.map((image) => (
-                        <div key={image.id} className={styles.imagePlaceholder}>
-                            <p>{image.title}</p>
+
+                <div className={styles.sliderWrapper}>
+                    {/* ✅ 현재 선택된 이미지 하나만 보여줌 */}
+                    {propertyData.images?.length > 0 && (
+                        <div className={styles.imagePlaceholder}>
+                            <img
+                                src={propertyData.images[currentIndex].image_url}
+                                alt="room"
+                                style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '4px' }}
+                            />
                         </div>
-                    ))}
+                    )}
+
+                    {/* ✅ 좌우 화살표 버튼 */}
+                    <button className={styles.prevButton} onClick={handlePrev}>
+                        &lt;
+                    </button>
+                    <button className={styles.nextButton} onClick={handleNext}>
+                        &gt;
+                    </button>
                 </div>
             </div>
 
@@ -89,7 +118,9 @@ const PropertyDetail = () => {
                         </div>
                         <div className={styles.textBox}>
                             <p className={styles.cardLabel}>방 종류, 층수</p>
-                            <p className={styles.cardValue}>원룸, 2층/4층</p>
+                            <p className={styles.cardValue}>
+                                {propertyData.room_type}, {propertyData.floor}
+                            </p>
                         </div>
                     </div>
                     <div className={styles.detailCard}>
@@ -98,7 +129,7 @@ const PropertyDetail = () => {
                         </div>
                         <div className={styles.textBox}>
                             <p className={styles.cardLabel}>주소</p>
-                            <p className={styles.cardValue}>중랑구 묵동</p>
+                            <p className={styles.cardValue}>{propertyData.address}</p>
                         </div>
                     </div>
                     <div className={styles.detailCard}>
@@ -107,7 +138,10 @@ const PropertyDetail = () => {
                         </div>
                         <div className={styles.textBox}>
                             <p className={styles.cardLabel}>계약 형태, 보증금/월세/관리비</p>
-                            <p className={styles.cardValue}>월세, 1000/55/8</p>
+                            <p className={styles.cardValue}>
+                                {propertyData.contract_type}, {propertyData.deposit}/{propertyData.monthly_fee}/
+                                {propertyData.maintenance_cost}
+                            </p>
                         </div>
                     </div>
                     <div className={styles.detailCard}>
@@ -117,9 +151,9 @@ const PropertyDetail = () => {
                         <div className={styles.textBox}>
                             <p className={styles.cardLabel}>상세 면적</p>
                             <p className={styles.cardValue}>
-                                공급면적 · 18.55m²
+                                공급면적 · {propertyData.supply_area} m²
                                 <br />
-                                전용면적 · 16.25m² &nbsp;&nbsp;|&nbsp;&nbsp; 평수 : 4.8평
+                                전용면적 · {propertyData.real_area} m²
                             </p>
                         </div>
                     </div>
@@ -128,43 +162,48 @@ const PropertyDetail = () => {
 
             {/* 평점 & 리뷰 섹션 */}
             <div className={styles.footerSection}>
-                {/* 평점 */}
                 <div className={styles.ratingSection}>
                     <h2 className={styles.sectionTitle}>전체 평점</h2>
                     <div className={styles.ratingList}>
-                        {Object.keys(propertyData.rating).map((key) => (
-                            <div key={key} className={styles.ratingItem}>
-                                <div className={styles.ratingLabel}>
-                                    <div className={styles.iconCircle}>{iconMap[key]}</div>
-                                    <span className={styles.labelText}>{key}</span>
+                        {propertyData.rating ? (
+                            Object.keys(propertyData.rating).map((key) => (
+                                <div key={key} className={styles.ratingItem}>
+                                    <div className={styles.ratingLabel}>
+                                        <div className={styles.iconCircle}>{iconMap[key]}</div>
+                                        <span className={styles.labelText}>{key}</span>
+                                    </div>
+                                    <div className={styles.stars}>{renderStars(propertyData.rating[key])}</div>
                                 </div>
-                                <div className={styles.stars}>{renderStars(propertyData.rating[key])}</div>
-                            </div>
-                        ))}
+                            ))
+                        ) : (
+                            <p>평점 데이터 없음</p>
+                        )}
                     </div>
                 </div>
 
-                {/* 리뷰 */}
                 <div className={styles.reviewSection}>
                     <div className={styles.reviewHeader}>
                         <h2 className={styles.sectionTitle}>작성된 리뷰</h2>
                         <button className={styles.allReviewButton}>전체 보기</button>
                     </div>
                     <div className={styles.reviewList}>
-                        {propertyData.reviews.map((review, index) => (
-                            <div key={index} className={styles.reviewCard}>
-                                <div className={styles.reviewAuthor}>
-                                    <div className={styles.authorAvatar}></div>
-                                    <p>{review.author}</p>
+                        {propertyData.reviews ? (
+                            propertyData.reviews.map((review, index) => (
+                                <div key={index} className={styles.reviewCard}>
+                                    <div className={styles.reviewAuthor}>
+                                        <div className={styles.authorAvatar}></div>
+                                        <p>{review.author}</p>
+                                    </div>
+                                    <p className={styles.reviewContent}>{review.content}</p>
                                 </div>
-                                <p className={styles.reviewContent}>{review.content}</p>
-                            </div>
-                        ))}
+                            ))
+                        ) : (
+                            <p>리뷰가 없습니다.</p>
+                        )}
                     </div>
                 </div>
             </div>
 
-            {/* 리뷰 작성 버튼 */}
             <button className={styles.writeReviewButton}>리뷰 작성하기</button>
         </div>
     );
