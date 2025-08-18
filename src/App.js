@@ -9,7 +9,7 @@ import SignUp from './pages/SignUp/SignUp';
 import MapList from './pages/MapList/MapList';
 import CommunityPage from './pages/Community/CommunityPage/CommunityPage';
 import CommunityListPage from './pages/Community/CommunityListPage/CommunityListPage';
-import DetailPage from './pages/DetailPage/DetailPage'; // ✅ 방 상세 페이지
+import DetailPage from './pages/DetailPage/DetailPage';
 import MyRoom from './pages/MyRoom/MyRoom';
 
 function App() {
@@ -23,7 +23,7 @@ function App() {
                 <Route path="/map" element={<MapList />} />
                 <Route path="/community_list" element={<CommunityListPage />} />
                 <Route path="/community_news" element={<CommunityPage />} />
-                <Route path="/property/:id" element={<DetailPage />} /> {/* ✅ 방 상세 페이지 */}
+                <Route path="/property/:id" element={<DetailPage />} />
                 <Route path="/myroom" element={<MyRoom />} />
             </Routes>
             <Footer />

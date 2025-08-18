@@ -1,10 +1,12 @@
 import styles from './MapList.module.css';
 import KakaoMap from '../../components/KakaoMap/KakaoMap';
 import { useEffect, useState, useRef, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { fetchRooms } from '../../apis/roomsApi';
 import downArrow from '../../assets/pic/down_arrow.svg';
 
 const MapList = () => {
+    const navigate = useNavigate();
     const [rooms, setRooms] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -97,6 +99,11 @@ const MapList = () => {
     const resetAll = () => {
         setSel({ type:'', lease:'', price:'', size:'', floorLabel:'', floorNum:'' });
         setOpenDrop({ type:false, lease:false, price:false, size:false, floor:false });
+    };
+
+    const handleCardClick = (id) => {
+        setSelectedId(id);
+        navigate(`/property/${id}`);
     };
 
     return (
@@ -207,7 +214,12 @@ const MapList = () => {
                                         else itemRefs.current.delete(r.id);
                                     }}
                                     className={`${styles.map__showestates} ${isActive ? styles.isActive : ''}`}
-                                    onClick={() => setSelectedId(r.id)}
+                                    onClick={() => handleCardClick(r.id)}
+                                    onKeyDown={(e) => {
+                                        if (e.key === 'Enter' || e.key === ' ') handleCardClick(r.id);
+                                    }}
+                                    role="button"
+                                    tabIndex={0}
                                     aria-current={isActive ? 'true' : 'false'}>
                                     <div className={styles.map__pic} aria-label="room thumbnail">
                                         {firstImage && (
