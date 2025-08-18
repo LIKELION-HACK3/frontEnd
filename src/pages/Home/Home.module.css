@@ -127,61 +127,30 @@
     gap: 52px;
 }
 
-.home__list1 {
-    width: 326px;
-    height: 320px;
-    border: solid 1px #0000001a;
-    border-radius: 8px;
-    box-shadow: 4px 4px 8px 2px #00000005;
-}
-
-.home__list2 {
-    width: 326px;
-    height: 320px;
-    border: solid 1px #0000001a;
-    border-radius: 8px;
-    box-shadow: 4px 4px 8px 2px #00000005;
-}
-
+/* 모든 카드의 높이를 420px로 통일합니다. */
+.home__list1,
+.home__list2,
 .home__list3 {
     width: 326px;
-    height: 320px;
+    height: 420px;
     border: solid 1px #0000001a;
     border-radius: 8px;
     box-shadow: 4px 4px 8px 2px #00000005;
 }
 
-/* ===== 기존 레이아웃은 그대로, 필요한 것만 추가 ===== */
+/* ===== 카드 내부 스타일 ===== */
 
-/* 하트 버튼이 카드 내부 우하단에 정확히 위치하도록 - 레이아웃 영향 없음 */
+/* 카드 베이스 - 높이 통일 및 flex 속성 추가 */
 .room__card {
     position: relative;
-}
-
-/* 카테고리 버튼 활성화 상태 (hover/기존 색 유지) */
-.home__category.active,
-.active {
-    background-color: #0abab5;
-    color: #ffffff;
-}
-
-/* (선택) 모바일에서 검색창이 살짝 잘릴 때만 폭 보정 - 배경/높이 그대로 */
-@media (max-width: 640px) {
-    .home__searchbox {
-        width: 100%;
-    }
-}
-
-/* ===== 카드 내부만 예쁘게 (배치 변경 없음) ===== */
-
-/* 카드 베이스 */
-.room__card {
-    position: relative; /* 하트 오버레이용 */
     background: #fff;
     border-radius: 16px;
     overflow: hidden;
     box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
     transition: box-shadow 0.2s ease, transform 0.15s ease;
+    display: flex;
+    flex-direction: column;
+    height: 100%; /* 부모 요소(home__list)의 높이에 맞춥니다. */
 }
 
 .room__card:hover {
@@ -189,23 +158,24 @@
     box-shadow: 0 10px 24px rgba(0, 0, 0, 0.12);
 }
 
-/* 썸네일 */
+/* 썸네일 - 높이 고정 */
 .room__image {
     width: 100%;
-    height: 220px; /* 카드 비율만 살짝 통일 */
+    height: 240px; /* 이미지 높이를 240px로 고정합니다. */
     object-fit: cover;
     display: block;
 }
 
-/* 본문 박스 */
+/* 본문 박스 - 남은 공간 채우기 */
 .room__details {
+    flex: 1;
     padding: 14px 16px 16px;
     display: flex;
     flex-direction: column;
     gap: 6px;
 }
 
-/* 제목(한 줄 말줄임) */
+/* 텍스트 스타일 */
 .room__title {
     margin: 0;
     font-size: 18px;
@@ -214,26 +184,28 @@
     line-height: 1.3;
     display: -webkit-box;
     -webkit-box-orient: vertical;
-    -webkit-line-clamp: 1; /* 필요 시 2로 바꿔도 됨 */
+    -webkit-line-clamp: 1;
     overflow: hidden;
 }
 
-/* 타입/면적 */
 .room__info {
     margin: 0;
     font-size: 13px;
     color: #767676;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 1;
+    overflow: hidden;
 }
 
-/* 가격 강조 */
 .room__price {
     margin: 2px 0 0;
     font-size: 16px;
     font-weight: 800;
     color: #0abab5;
+    white-space: nowrap;
 }
 
-/* 주소(한 줄 말줄임) */
 .room__address {
     margin: 2px 0 0;
     font-size: 13px;
@@ -244,61 +216,39 @@
     overflow: hidden;
 }
 
-/* ===== 카드 높이 통일 (다른 스타일은 그대로) ===== */
-
-/* 카드 전체 높이 고정 + 세로 레이아웃 */
-.room__card {
-    display: flex;
-    flex-direction: column;
-    height: 420px; /* 필요하면 400~440 사이로 조정 */
-}
-
-/* 이미지 높이 고정 */
-.room__image {
-    flex: 0 0 240px; /* 위에서 240px로 사용 중 */
-    height: 240px;
-    object-fit: cover;
-}
-
-/* 본문 영역은 남은 공간을 동일하게 채움 */
-.room__details {
-    flex: 1;
-    padding: 14px 16px 16px;
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-}
-
-/* 텍스트 줄 수 고정해서 카드 높이가 달라지지 않도록 */
-.room__title {
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 1; /* 제목 한 줄 */
-    overflow: hidden;
-}
-
-.room__info,
-.room__address {
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 1; /* 한 줄 */
-    overflow: hidden;
-}
-
-/* 가격은 한 줄이므로 그대로 강조 */
-.room__price {
-    /* 기존 규칙 그대로 사용 */
-    white-space: nowrap; /* 숫자 줄바꿈 방지 (선택) */
-}
-
-/* 하트 버튼이 카드 우하단에 항상 같은 위치에 보이도록(이미 absolute면 무시됨) */
+/* 하트 버튼 - 절대 위치로 고정 */
 .room__card > button {
     position: absolute;
     right: 16px;
     bottom: 16px;
 }
 
-/* ===== 카드 제목 숨기기 ===== */
+.home__list1,
+.home__list2,
+.home__list3 {
+    width: 326px;
+    height: 420px;
+    display: flex; /* 안의 카드가 꽉 차도록 */
+}
+
+.home__list1 > .room__card,
+.home__list2 > .room__card,
+.home__list3 > .room__card {
+    width: 100%;
+    height: 100%;
+}
+
+/* 래퍼 없이 .room__card만 바로 쓰는 경우 대비 */
+.home__lists > .room__card {
+    width: 326px;
+    height: 420px;
+}
+
+/* 내용이 넘쳐서 높이가 늘어나는 것 방지 */
+.room__details {
+    overflow: hidden;
+}
+
 .room__title {
     display: none !important;
 }

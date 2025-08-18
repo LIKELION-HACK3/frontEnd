@@ -13,9 +13,9 @@ const formatPrice = (value) => {
     const eok = Math.floor(num / 100000000); // 억
     const man = Math.floor((num % 100000000) / 10000); // 만원
 
-    if (eok > 0 && man > 0) return `${eok}억 ${man}만원`;
+    if (eok > 0 && man > 0) return `${eok}억 ${man}`;
     if (eok > 0) return `${eok}억`;
-    return `${man}만원`;
+    return `${man}`;
 };
 
 /** 개별 방 카드 */
