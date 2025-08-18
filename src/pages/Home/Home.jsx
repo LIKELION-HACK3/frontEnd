@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import styles from './Home.module.css';
-import { useNavigate } from 'react-router-dom'; // 1. useNavigate import
+import { useNavigate } from 'react-router-dom';
 
 import FavoriteHeart from '../../pages/MyRoom/FavoriteHeart';
 import { fetchAllBookmarks, toggleBookmark } from '../../apis/bookmarks';
+import { loadAuth } from '../../apis/auth'; // 1. loadAuth 함수를 import 합니다.
 
-// ✅ 금액 변환 함수 (억/만원 단위)
+// 금액 변환 함수 (억/만원 단위)
 const formatPrice = (value) => {
     const num = Number(value);
     if (isNaN(num) || num === 0) return '0원';
@@ -21,7 +22,6 @@ const formatPrice = (value) => {
 
 /** 개별 방 카드 */
 const RoomCard = ({ room, isFav, onToggle, onClick }) => {
-    // 4. onClick 프롭 받기
     const imageUrl = room.images && room.images.length > 0 ? room.images[0].image_url : '';
 
     // 월세일 때: 보증금/월세, 전세일 때: 보증금만
@@ -72,7 +72,7 @@ const RoomCard = ({ room, isFav, onToggle, onClick }) => {
 };
 
 const Home = () => {
-    const navigate = useNavigate(); // 2. useNavigate 호출
+    const navigate = useNavigate();
     const [user, setUser] = useState(null);
     const [searchQuery, setSearchQuery] = useState('');
     const [roomType, setRoomType] = useState('');
@@ -106,26 +106,6 @@ const Home = () => {
         }
     };
 
-    // --- 내 프로필 ---
-    const fetchUserProfile = async () => {
-        const token = localStorage.getItem('access_token');
-        if (!token) {
-            setUser(null);
-            return;
-        }
-        try {
-            const res = await axios.get('https://www.uniroom.shop/api/users/me/', {
-                headers: { Authorization: `Bearer ${token}` },
-            });
-            setUser(res.data);
-        } catch (error) {
-            console.error('Error fetching user profile:', error);
-            localStorage.removeItem('access_token');
-            localStorage.removeItem('refresh_token');
-            setUser(null);
-        }
-    };
-
     // --- 서버 북마크 로드 ---
     const loadBookmarks = async () => {
         try {
@@ -138,8 +118,13 @@ const Home = () => {
     };
 
     useEffect(() => {
+        // 2. loadAuth 함수를 호출하여 사용자 정보를 가져옵니다.
+        const authData = loadAuth();
+        if (authData && authData.user) {
+            setUser(authData.user);
+        }
+
         fetchRooms();
-        fetchUserProfile();
         loadBookmarks();
     }, []);
 
@@ -224,15 +209,17 @@ const Home = () => {
                     {loading ? (
                         <p>추천 매물을 불러오는 중...</p>
                     ) : rooms.length > 0 ? (
-                        rooms.slice(0, 3).map((room) => (
-                            <RoomCard
-                                key={room.id}
-                                room={room}
-                                isFav={favoriteRoomIds.has(room.id)}
-                                onToggle={handleToggle}
-                                onClick={() => navigate(`/property/${room.id}`)} // 3. onClick 이벤트 추가
-                            />
-                        ))
+                        rooms
+                            .slice(0, 3)
+                            .map((room) => (
+                                <RoomCard
+                                    key={room.id}
+                                    room={room}
+                                    isFav={favoriteRoomIds.has(room.id)}
+                                    onToggle={handleToggle}
+                                    onClick={() => navigate(`/property/${room.id}`)}
+                                />
+                            ))
                     ) : (
                         <p>추천 매물이 없습니다.</p>
                     )}
