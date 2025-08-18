@@ -13,6 +13,8 @@ const MapList = () => {
     const [selectedId, setSelectedId] = useState(null);
     const [visibleSet, setVisibleSet] = useState(null);
     const itemRefs = useRef(new Map());
+    const listRef = useRef(null);
+    const pendingScrollId = useRef(null);
 
     useEffect(() => {
         (async () => {
@@ -42,11 +44,44 @@ const MapList = () => {
 
     const handleMarkerClick = useCallback((id) => {
         setSelectedId(id);
-        const el = itemRefs.current.get(id);
-        if (el && typeof el.scrollIntoView === 'function') {
-            el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }
+        pendingScrollId.current = id;
     }, []);
+
+    const centerCardNow = (id) => {
+        const container = listRef.current;
+        const el = itemRefs.current.get(id);
+        if (!container || !el) return false;
+
+        const cRect = container.getBoundingClientRect();
+        const eRect = el.getBoundingClientRect();
+
+        const targetTop = container.scrollTop + (eRect.top - cRect.top) - (container.clientHeight - el.clientHeight) / 2;
+        container.scrollTop = Math.max(0, targetTop);
+
+        const afterERect = el.getBoundingClientRect();
+        const centerDiff = Math.abs((afterERect.top + afterERect.height / 2) - (cRect.top + cRect.height / 2));
+        return centerDiff <= 2;
+    };
+
+    useEffect(() => {
+        const id = selectedId;
+        if (!id || !visibleSet || pendingScrollId.current !== id) return;
+        if (!visibleSet.has(id)) return;
+
+        let attempts = 0;
+        const MAX_ATTEMPTS = 6;
+
+        const tick = () => {
+            attempts += 1;
+            const ok = centerCardNow(id);
+            if (ok || attempts >= MAX_ATTEMPTS) {
+                pendingScrollId.current = null;
+                return;
+            }
+            requestAnimationFrame(tick);
+        };
+        requestAnimationFrame(tick);
+    }, [visibleSet, selectedId]);
 
     const handleVisibleChange = useCallback((ids) => {
         setVisibleSet(new Set(ids));
@@ -201,7 +236,7 @@ const MapList = () => {
             <div className={styles.map__canvas}>
                 <KakaoMap rooms={rooms} selectedId={selectedId} onMarkerClick={handleMarkerClick} onVisibleChange={handleVisibleChange} />
                 <div className={styles.map__showestate}>
-                    <div className={styles.map__scrollarea}>
+                    <div className={styles.map__scrollarea} ref={listRef}>
                         {loading && <div>불러오는 중...</div>}
                         {error && <div>목록을 불러오지 못했습니다.</div>}
 

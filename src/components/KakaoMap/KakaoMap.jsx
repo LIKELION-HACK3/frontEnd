@@ -79,7 +79,7 @@ export default function KakaoMap({ rooms = [], selectedId = null, onMarkerClick,
     /* 카카오 맵 출력 */
     return (
         <div className={styles.map__wrapper}>
-            <Map center={center} isPanto className={styles.kakaoMap} level={4} onCreate={setMap} onCenterChanged={updateVisible} onZoomChanged={updateVisible}>
+            <Map center={center} isPanto className={styles.kakaoMap} level={4} onCreate={setMap} onIdle={updateVisible}  >
                 {markers.map((m) => (
                     <MapMarker
                         key={m.id}
