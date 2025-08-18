@@ -1,115 +1,141 @@
-import React from 'react';
-import styles from './MyRoom.module.css';
+import React, { useEffect, useMemo, useState } from 'react';
+import styles from './DetailPage.module.css';
+import FavoriteHeart from './FavoriteHeart'; // 하트 컴포넌트(이전 제공 코드)
+import { fetchAllBookmarks, toggleBookmark } from '../../apis/bookmarks';
 
+/**
+ * 모크데이터 없음.
+ * - 초기 렌더: GET /api/bookmarks/ 로 서버 북마크(room)만으로 카드/목록 구성
+ * - 하트 클릭: POST /api/bookmarks/{room_id}/toggle/ 호출 후, 목록 재조회로 동기화
+ */
 const MyPage = () => {
-    const favoriteProperties = [
-        {
-            id: 1,
-            title: '월세 1000/55',
-            type: '국민대 원룸',
-            details: '원룸 · 2층 · 5평\n풀옵션 · 깔끔하고 조용한 환경',
-            imageUrl: '/images/room1.jpg',
-        },
-        {
-            id: 2,
-            title: '월세 700/60',
-            type: '건대역 투룸',
-            details: '투룸 · 4층 · 7평\n역세권 · 엘리베이터 있음',
-            imageUrl: '/images/room2.jpg',
-        },
-        {
-            id: 3,
-            title: '월세 500/70',
-            type: '고려대역 투룸',
-            details: '투룸 · 5층 · 8평\n직장인 선호지역 · 깔끔한 내부',
-            imageUrl: '/images/room3.jpg',
-        },
-        {
-            id: 4,
-            title: '월세 650/50',
-            type: '한양대 오피스텔',
-            details: '오피스텔 · 3층 · 6평\n신축급 인테리어 · 채광 좋음',
-            imageUrl: '/images/room4.jpg',
-        },
-        {
-            id: 5,
-            title: '월세 600/65',
-            type: '상도역 풀옵션',
-            details: '원룸 · 1층 · 5평\n편의점 근접 · 여성 전용',
-            imageUrl: '/images/room5.jpg',
-        },
-        {
-            id: 6,
-            title: '월세 800/70',
-            type: '숭실대 투룸',
-            details: '투룸 · 6층 · 9평\n보안 철저 · CCTV 설치',
-            imageUrl: '/images/room6.jpg',
-        },
-    ];
+    const [bookmarks, setBookmarks] = useState([]); // [{id, room:{...}, created_at}]
+    const [favoriteRoomIds, setFavoriteRoomIds] = useState(new Set()); // room.id 집합
+    const [loading, setLoading] = useState(true);
+    const [toggling, setToggling] = useState(new Set()); // 토글 중 표시용(중복 클릭 방지)
 
-    const aiReports = [
-        {
-            id: 1,
-            title: '월세 1000/55',
-            details: '중화역3분 근처당x 초저가 지상층 풀옵션 원룸',
-            imageUrl: '/images/room1.jpg',
-        },
-        {
-            id: 2,
-            title: '월세 500/70',
-            details: '초초역세권! 오피스텔 리모델링 완료',
-            imageUrl: '/images/room3.jpg',
-        },
-    ];
+    // 서버에서 북마크 로드
+    const loadBookmarks = async () => {
+        setLoading(true);
+        try {
+            const list = await fetchAllBookmarks();
+            setBookmarks(list);
+            setFavoriteRoomIds(new Set(list.map((bm) => bm?.room?.id).filter((id) => id !== null && id !== undefined)));
+        } catch (e) {
+            console.error(e);
+            alert(e.message || '북마크를 불러오지 못했습니다.');
+            setBookmarks([]);
+            setFavoriteRoomIds(new Set());
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        loadBookmarks();
+    }, []);
+
+    // 화면에 사용할 room 배열
+    const rooms = useMemo(() => bookmarks.map((bm) => bm.room).filter(Boolean), [bookmarks]);
+
+    // 하트 토글: 서버 호출 → 재조회
+    const onToggle = async (roomId) => {
+        if (toggling.has(roomId)) return; // 중복 클릭 방지
+        const next = new Set(toggling);
+        next.add(roomId);
+        setToggling(next);
+
+        try {
+            // 낙관적 UI(살짝) – 먼저 토글 표시
+            const optimistic = new Set(favoriteRoomIds);
+            if (optimistic.has(roomId)) optimistic.delete(roomId);
+            else optimistic.add(roomId);
+            setFavoriteRoomIds(optimistic);
+
+            // 서버 토글
+            await toggleBookmark(roomId);
+
+            // 서버 상태로 재동기화
+            await loadBookmarks();
+        } catch (e) {
+            console.error(e);
+            alert(e.message || '찜 처리에 실패했습니다.');
+            // 실패 시 전면 재동기화
+            await loadBookmarks();
+        } finally {
+            const done = new Set(toggling);
+            done.delete(roomId);
+            setToggling(done);
+        }
+    };
 
     return (
         <div className={styles.myPage}>
-            {/* 상단 제목 영역 (회색 배경) */}
+            {/* 상단 제목 영역 */}
             <div className={styles.topHeader}>
                 <h1 className={styles.title}>MY 룸 목록</h1>
                 <p className={styles.subtitle}>관심 있는 집들을 한번에 확인해보세요.</p>
             </div>
 
-            {/* 카드 리스트 (흰색 배경) */}
+            {/* 카드 리스트: 서버 북마크 기반 */}
             <div className={styles.section}>
-                <div className={styles.propertyGrid}>
-                    {favoriteProperties.map((item) => (
-                        <div key={item.id} className={styles.cardWrapper}>
-                            <div className={styles.propertyCard}>
-                                <img src={item.imageUrl} alt={item.type} className={styles.cardImage} />
-                                <span className={styles.heart}>♡</span>
-                                <div className={styles.cardBody}>
-                                    <p className={styles.cardTitle}>{item.title}</p>
-                                    <p className={styles.cardType}>{item.type}</p>
-                                    <pre className={styles.cardDetails}>{item.details}</pre>
+                {loading ? (
+                    <p className={styles.subtitle}>불러오는 중…</p>
+                ) : rooms.length === 0 ? (
+                    <p className={styles.subtitle}>아직 찜한 집이 없어요.</p>
+                ) : (
+                    <div className={styles.propertyGrid}>
+                        {rooms.map((room) => (
+                            <div key={room.id} className={styles.cardWrapper}>
+                                <div className={styles.propertyCard}>
+                                    <img src={room.thumbnail_url} alt={room.title} className={styles.cardImage} />
+
+                                    {/* 하트: 서버 토글 */}
+                                    <FavoriteHeart
+                                        filled={favoriteRoomIds.has(room.id)}
+                                        onToggle={() => onToggle(room.id)}
+                                    />
+
+                                    <div className={styles.cardBody}>
+                                        <p className={styles.cardTitle}>{room.price_label ?? room.title}</p>
+                                        <p className={styles.cardType}>{room.address}</p>
+                                        <pre className={styles.cardDetails}>
+                                            보증금 {room.deposit} / 월세 {room.monthly_fee}
+                                            {'\n'}관리비 {room.maintenance_cost}
+                                        </pre>
+                                    </div>
                                 </div>
+
+                                <button className={styles.selectButton}>AI 리포트 선택</button>
                             </div>
-                            <button className={styles.selectButton}>AI 리포트 선택</button>
-                        </div>
-                    ))}
-                </div>
+                        ))}
+                    </div>
+                )}
             </div>
 
-            {/* AI 리포트 섹션 (회색 배경) */}
+            {/* 하단: MY 찜 목록(같은 데이터의 요약 카드) */}
             <div className={`${styles.section} ${styles.aiSectionWrapper}`}>
                 <div className={styles.aiSection}>
                     <div className={styles.aiLeft}>
-                        <h1 className={styles.title}>AI 리포트 받아보기</h1>
-                        <p className={styles.subtitle}>2개의 집을 골라 AI에게 분석을 맡겨보세요.</p>
-                        <button className={styles.button}>AI 리포트 생성하기</button>
+                        <h1 className={styles.title}>MY 찜 목록</h1>
+                        <p className={styles.subtitle}>하트를 누르면 추가/해제되고, 여기에서 바로 확인됩니다.</p>
                     </div>
 
                     <div className={styles.aiRight}>
-                        {aiReports.map((report, index) => (
-                            <div key={report.id} className={styles.reportCard}>
-                                <img src={report.imageUrl} alt={report.title} className={styles.reportImage} />
-                                <div className={styles.reportText}>
-                                    <p className={styles.reportLabel}>선택{index + 1}</p>
-                                    <p className={styles.reportTitle}>{report.title}</p>
-                                    <p className={styles.reportDetail}>{report.details}</p>
+                        {rooms.length === 0 ? (
+                            <p className={styles.subtitle}>선택된 찜이 없습니다.</p>
+                        ) : (
+                            rooms.map((room) => (
+                                <div key={room.id} className={styles.reportCard}>
+                                    <img src={room.thumbnail_url} alt={room.title} className={styles.reportImage} />
+                                    <div className={styles.reportText}>
+                                        <p className={styles.reportLabel}>찜</p>
+                                        <p className={styles.reportTitle}>{room.price_label ?? room.title}</p>
+                                        <p className={styles.reportDetail}>{room.address}</p>
+                                    </div>
                                 </div>
-                            </div>
-                        ))}
+                            ))
+                        )}
                     </div>
                 </div>
             </div>

@@ -1,7 +1,7 @@
-import styles from './Login.module.css';
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { login } from '../../apis/auth';
+import { login } from '../../apis/auth'; // auth.js에서 정의된 로그인 함수를 사용합니다.
+import styles from './Login.module.css';
 
 const Login = () => {
     const navigate = useNavigate();
@@ -30,13 +30,17 @@ const Login = () => {
 
         setPending(true);
         try {
+            // 🌟 수정된 부분: auth.js 파일의 login 함수를 호출합니다.
+            // 이 함수는 내부적으로 토큰을 올바른 키(uniroom_auth)로 저장합니다.
             await login({
                 username: form.username.trim(),
                 password: form.password,
             });
+
+            // 로그인 성공 시 홈 화면으로 이동
             navigate('/', { replace: true });
-        } catch (error) {
-            setError(error?.message || '로그인에 실패했습니다. 다시 시도해 주세요.');
+        } catch (err) {
+            setError(err?.message || '로그인에 실패했습니다. 다시 시도해 주세요.');
         } finally {
             setPending(false);
         }
@@ -50,18 +54,48 @@ const Login = () => {
                 {error ? <p className={styles.login__error}>{error}</p> : null}
 
                 <form className={styles.login__form} onSubmit={onSubmit} aria-busy={pending}>
-                    <input type="text" name="username" placeholder="아이디" className={styles.login__id} value={form.username} onChange={onChange} autoComplete="username" readOnly={pending} />
-                    <input type="password" name="password" placeholder="비밀번호" className={styles.login__pw} value={form.password} onChange={onChange} autoComplete="current-password" readOnly={pending} />
-                    <button className={styles.login__button} type="submit" disabled={pending}>{pending ? '처리 중...' : '로그인'}</button>
+                    <input
+                        type="text"
+                        name="username"
+                        placeholder="아이디"
+                        className={styles.login__id}
+                        value={form.username}
+                        onChange={onChange}
+                        autoComplete="username"
+                        readOnly={pending}
+                    />
+                    <input
+                        type="password"
+                        name="password"
+                        placeholder="비밀번호"
+                        className={styles.login__pw}
+                        value={form.password}
+                        onChange={onChange}
+                        autoComplete="current-password"
+                        readOnly={pending}
+                    />
+                    <button className={styles.login__button} type="submit" disabled={pending}>
+                        {pending ? '처리 중...' : '로그인'}
+                    </button>
                 </form>
                 <div className={styles.text__box}>
                     <span className={styles.login__findpw}>비밀번호 찾기</span>
                     <span className={styles.login__text2}>|</span>
-                    <span className={styles.login__signup} role="button" tabIndex={0} onClick={() => navigate('/join')} onKeyDown={(e) => {if (e.key === 'Enter' || e.key === ' ') navigate('/join');}}>회원가입</span>
+                    <span
+                        className={styles.login__signup}
+                        role="button"
+                        tabIndex={0}
+                        onClick={() => navigate('/join')}
+                        onKeyDown={(e) => {
+                            if (e.key === 'Enter' || e.key === ' ') navigate('/join');
+                        }}
+                    >
+                        회원가입
+                    </span>
                 </div>
             </div>
         </div>
     );
-}
+};
 
 export default Login;
