@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import styles from './Home.module.css';
+import { useNavigate } from 'react-router-dom'; // 1. useNavigate import
 
 import FavoriteHeart from '../../pages/MyRoom/FavoriteHeart';
 import { fetchAllBookmarks, toggleBookmark } from '../../apis/bookmarks';
@@ -19,7 +20,8 @@ const formatPrice = (value) => {
 };
 
 /** 개별 방 카드 */
-const RoomCard = ({ room, isFav, onToggle }) => {
+const RoomCard = ({ room, isFav, onToggle, onClick }) => {
+    // 4. onClick 프롭 받기
     const imageUrl = room.images && room.images.length > 0 ? room.images[0].image_url : '';
 
     // 월세일 때: 보증금/월세, 전세일 때: 보증금만
@@ -29,11 +31,26 @@ const RoomCard = ({ room, isFav, onToggle }) => {
             : `월세 ${formatPrice(room.deposit)} / ${formatPrice(room.monthly_fee)}`;
 
     return (
-        <div className={styles.room__card} style={{ position: 'relative' }}>
+        <div
+            className={styles.room__card}
+            style={{ position: 'relative' }}
+            onClick={onClick}
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') onClick();
+            }}
+        >
             <img src={imageUrl} alt={room.title} className={styles.room__image} />
 
             {/* 하트 버튼 */}
-            <FavoriteHeart filled={isFav} onToggle={() => onToggle(room.id)} />
+            <FavoriteHeart
+                filled={isFav}
+                onToggle={(e) => {
+                    e.stopPropagation();
+                    onToggle(room.id);
+                }}
+            />
 
             <div className={styles.room__details}>
                 {/* 제목은 유지(숨기고 싶으면 CSS에서 .room__title {display:none;} ) */}
@@ -55,6 +72,7 @@ const RoomCard = ({ room, isFav, onToggle }) => {
 };
 
 const Home = () => {
+    const navigate = useNavigate(); // 2. useNavigate 호출
     const [user, setUser] = useState(null);
     const [searchQuery, setSearchQuery] = useState('');
     const [roomType, setRoomType] = useState('');
@@ -206,16 +224,15 @@ const Home = () => {
                     {loading ? (
                         <p>추천 매물을 불러오는 중...</p>
                     ) : rooms.length > 0 ? (
-                        rooms
-                            .slice(0, 3)
-                            .map((room) => (
-                                <RoomCard
-                                    key={room.id}
-                                    room={room}
-                                    isFav={favoriteRoomIds.has(room.id)}
-                                    onToggle={handleToggle}
-                                />
-                            ))
+                        rooms.slice(0, 3).map((room) => (
+                            <RoomCard
+                                key={room.id}
+                                room={room}
+                                isFav={favoriteRoomIds.has(room.id)}
+                                onToggle={handleToggle}
+                                onClick={() => navigate(`/property/${room.id}`)} // 3. onClick 이벤트 추가
+                            />
+                        ))
                     ) : (
                         <p>추천 매물이 없습니다.</p>
                     )}
