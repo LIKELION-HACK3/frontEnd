@@ -1,40 +1,30 @@
-// src/apis/bookmarks.js
-const BASE_URL = 'https://www.uniroom.shop';
+import api from './api';
+import { loadAuth } from './auth';
 
-/**
- * ✅ 수정된 부분
- * 로컬 스토리지의 'uniroom_auth' 키에서 access 토큰을 읽어와 인증 헤더를 생성합니다.
- * 기존에는 'accessToken'이라는 잘못된 키를 사용하고 있었습니다.
- */
-function authHeaders() {
+// 인증 헤더를 가져오는 헬퍼 함수
+function getAuthHeaders() {
+    const auth = loadAuth();
+    if (auth && auth.access) {
+        return { Authorization: `Bearer ${auth.access}` };
+    }
+    return {};
+}
+
+// GET /api/bookmarks/
+export async function fetchBookmarks({ page = 1, page_size = 50 } = {}) {
     try {
-        const raw = localStorage.getItem('uniroom_auth');
-        if (!raw) return {};
-
-        const authData = JSON.parse(raw);
-        const token = authData?.access;
-
-        return token ? { Authorization: `Bearer ${token}` } : {};
-    } catch {
-        return {};
+        const response = await api.get('/api/bookmarks/', {
+            params: { page: String(page), page_size: String(page_size) },
+            headers: getAuthHeaders(), // 요청 시점에 헤더를 직접 설정
+        });
+        return response.data;
+    } catch (error) {
+        console.error('fetchBookmarks failed:', error.response || error);
+        throw new Error('북마크 목록을 불러오지 못했습니다.');
     }
 }
 
-// GET /api/bookmarks/  (페이지네이션 + 합치기)
-export async function fetchBookmarks({ page = 1, page_size = 50 } = {}) {
-    const url = new URL('/api/bookmarks/', BASE_URL);
-    url.searchParams.set('page', String(page));
-    url.searchParams.set('page_size', String(page_size));
-
-    const res = await fetch(url, {
-        method: 'GET',
-        headers: { 'Content-Type': 'application/json', ...authHeaders() },
-        credentials: 'include',
-    });
-    if (!res.ok) throw new Error('북마크 목록을 불러오지 못했습니다.');
-    return res.json(); // {count, next, previous, results:[{id, room:{...}, created_at}]}
-}
-
+// 모든 북마크를 가져오는 함수
 export async function fetchAllBookmarks() {
     let page = 1;
     const all = [];
@@ -49,16 +39,24 @@ export async function fetchAllBookmarks() {
 
 // POST /api/bookmarks/{room_id}/toggle/
 export async function toggleBookmark(roomId) {
-    const res = await fetch(`${BASE_URL}/api/bookmarks/${roomId}/toggle/`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', ...authHeaders() },
-        credentials: 'include',
-    });
+    try {
+        // POST 요청 시 빈 객체 {}를 두 번째 인자로 전달해야 headers를 세 번째 인자로 설정할 수 있습니다.
+        const response = await api.post(
+            `/api/bookmarks/${roomId}/toggle/`,
+            {},
+            {
+                headers: getAuthHeaders(), // 요청 시점에 헤더를 직접 설정
+            }
+        );
 
-    // 스웨거 명세: 201=추가됨, 200=해제됨, 404=방 없음
-    if (res.status === 201) return { action: 'added' };
-    if (res.status === 200) return { action: 'removed' };
-    if (res.status === 404) throw new Error('방을 찾을 수 없습니다.');
-    if (!res.ok) throw new Error('북마크 토글 실패');
-    return { action: 'unknown' };
+        if (response.status === 201) return { action: 'added' };
+        if (response.status === 200) return { action: 'removed' };
+        return { action: 'unknown' };
+    } catch (error) {
+        if (error.response?.status === 404) {
+            throw new Error('방을 찾을 수 없습니다.');
+        }
+        console.error('toggleBookmark failed:', error.response || error);
+        throw new Error('북마크 토글에 실패했습니다.');
+    }
 }

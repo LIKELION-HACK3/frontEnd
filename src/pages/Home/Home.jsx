@@ -1,3 +1,4 @@
+// src/pages/Home/Home.jsx
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import styles from './Home.module.css';
@@ -5,7 +6,7 @@ import { useNavigate } from 'react-router-dom';
 
 import FavoriteHeart from '../../pages/MyRoom/FavoriteHeart';
 import { fetchAllBookmarks, toggleBookmark } from '../../apis/bookmarks';
-import { loadAuth } from '../../apis/auth'; // 1. loadAuth 함수를 import 합니다.
+import { loadAuth } from '../../apis/auth';
 
 // 금액 변환 함수 (억/만원 단위)
 const formatPrice = (value) => {
@@ -79,11 +80,9 @@ const Home = () => {
     const [rooms, setRooms] = useState([]);
     const [loading, setLoading] = useState(true);
 
-    // ✅ 서버 북마크 상태
     const [favoriteRoomIds, setFavoriteRoomIds] = useState(new Set());
     const [syncing, setSyncing] = useState(false);
 
-    // --- 추천/검색 방 불러오기 ---
     const fetchRooms = async (query = '', type = '') => {
         setLoading(true);
         try {
@@ -106,7 +105,6 @@ const Home = () => {
         }
     };
 
-    // --- 서버 북마크 로드 ---
     const loadBookmarks = async () => {
         try {
             const list = await fetchAllBookmarks();
@@ -118,17 +116,17 @@ const Home = () => {
     };
 
     useEffect(() => {
-        // 2. loadAuth 함수를 호출하여 사용자 정보를 가져옵니다.
         const authData = loadAuth();
         if (authData && authData.user) {
             setUser(authData.user);
         }
 
         fetchRooms();
-        loadBookmarks();
+        if (authData && authData.access) {
+            loadBookmarks();
+        }
     }, []);
 
-    // --- 검색/필터 ---
     const handleSearch = (e) => {
         e.preventDefault();
         fetchRooms(searchQuery, roomType);
@@ -140,8 +138,15 @@ const Home = () => {
         fetchRooms(searchQuery, nextType);
     };
 
-    // --- 하트 토글 ---
+    // --- 하트 토글 (수정된 부분) ---
     const handleToggle = async (roomId) => {
+        const authData = loadAuth();
+        if (!authData || !authData.access) {
+            alert('로그인이 필요한 기능입니다.');
+            navigate('/login');
+            return;
+        }
+
         if (syncing) return;
         setSyncing(true);
 
@@ -158,7 +163,7 @@ const Home = () => {
             await loadBookmarks();
         } catch (e) {
             console.error(e);
-            await loadBookmarks();
+            await loadBookmarks(); // 에러 발생 시 상태를 다시 동기화
             alert(e.message || '찜 처리에 실패했습니다.');
         } finally {
             setSyncing(false);
