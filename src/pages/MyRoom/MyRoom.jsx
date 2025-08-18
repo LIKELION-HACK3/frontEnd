@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import styles from './DetailPage.module.css';
+import styles from './MyRoom.module.css';
 import FavoriteHeart from './FavoriteHeart'; // 하트 컴포넌트(이전 제공 코드)
 import { fetchAllBookmarks, toggleBookmark } from '../../apis/bookmarks';
 

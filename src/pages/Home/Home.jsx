@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import styles from './Home.module.css';
 
-import FavoriteHeart from '../../components/DetailPage/FavoriteHeart';
+import FavoriteHeart from '../../pages/MyRoom/FavoriteHeart';
 import { fetchAllBookmarks, toggleBookmark } from '../../apis/bookmarks';
 
 // ✅ 금액 변환 함수 (억/만원 단위)
