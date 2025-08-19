@@ -1,8 +1,26 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
 import styles from './DetailPage.module.css';
-import { Sun, Volume2, Bug, Shield, Train, MapPin, Layers, DollarSign, Ruler } from 'lucide-react';
+import { useParams } from 'react-router-dom';
+import { Map, MapMarker } from 'react-kakao-maps-sdk';
 import { createReview, fetchReviewsForRoom, fetchReviewStats } from '../../apis/roomsApi';
+
+import leftArrow from '../../assets/pic/left_arrow.svg';
+import rightArrow from '../../assets/pic/right_arrow.svg';
+import stairsIcon from '../../assets/pic/property_stairs.svg';
+import locationIcon from '../../assets/pic/property_location.svg';
+import moneyIcon from '../../assets/pic/property_money.svg';
+import roomsIcon from '../../assets/pic/property_rooms.svg';
+import sunIcon from '../../assets/pic/detail_sun.svg';
+import muteIcon from '../../assets/pic/detail_mute.svg';
+import bugIcon from '../../assets/pic/detail_bug.svg';
+import shieldIcon from '../../assets/pic/detail_shield.svg';
+import trainIcon from '../../assets/pic/detail_train.svg';
+
+const toMan = (value) => {
+    const n = Number(value);
+    if (!Number.isFinite(n)) return '-';
+    return Math.round(n / 10000).toLocaleString();
+};
 
 // 금액을 '억'과 '만원' 단위로 변환하는 함수
 const formatPrice = (value) => {
@@ -19,9 +37,7 @@ const formatPrice = (value) => {
         return `${eok}억`;
     }
 
-    if (num >= 10000) {
-        return `${(num / 10000).toLocaleString()}`;
-    }
+    if (num >= 10000) return `${(num / 10000).toLocaleString()}`;
 
     return `${num.toLocaleString()}원`;
 };
@@ -29,7 +45,7 @@ const formatPrice = (value) => {
 const DetailPage = () => {
     const { id } = useParams();
     const [propertyData, setPropertyData] = useState(null);
-    const [currentPage, setCurrentPage] = useState(0);
+    const [startIndex, setStartIndex] = useState(0);
 
     // 평점과 리뷰를 위한 state
     const [ratingStats, setRatingStats] = useState(null);
@@ -41,29 +57,28 @@ const DetailPage = () => {
         rating_noise: 0,
         rating_light: 0,
         rating_traffic: 0,
-        rating_clean: 0,
+        rating_bug: 0,
     });
     const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
     const [isClosing, setIsClosing] = useState(false);
 
-    // ✅ [수정] 새 API의 key에 맞게 매핑 객체를 수정합니다.
     const ratingCategories = {
-        safety: { label: '보안', icon: <Shield className={styles.icon} /> },
-        noise: { label: '방음', icon: <Volume2 className={styles.icon} /> },
-        light: { label: '채광', icon: <Sun className={styles.icon} /> },
-        traffic: { label: '교통', icon: <Train className={styles.icon} /> },
-        bug: { label: '벌레', icon: <Bug className={styles.icon} /> },
+        light: { label: '채광', icon: <img src={sunIcon}    alt="채광" className={styles.icon} /> },
+        noise: { label: '방음', icon: <img src={muteIcon}   alt="방음" className={styles.icon} /> },
+        bug: { label: '벌레', icon: <img src={bugIcon}    alt="벌레" className={styles.icon} /> },
+        safety: { label: '보안', icon: <img src={shieldIcon} alt="보안" className={styles.icon} /> },
+        traffic: { label: '교통', icon: <img src={trainIcon}  alt="교통" className={styles.icon} /> },
     };
 
     const newReviewRatingCategories = {
-        rating_safety: { label: '안전' },
-        rating_noise: { label: '소음' },
         rating_light: { label: '채광' },
+        rating_noise: { label: '방음' },
+        rating_bug: { label: '벌레' },
+        rating_safety: { label: '보안' },
         rating_traffic: { label: '교통' },
-        rating_clean: { label: '청결' },
+        
     };
 
-    // ✅ [수정] 데이터를 각각 안전하게 불러오도록 로직을 변경합니다.
     useEffect(() => {
         if (!id) return;
 
@@ -108,7 +123,7 @@ const DetailPage = () => {
             await createReview(id, reviewData);
             alert('리뷰가 성공적으로 등록되었습니다.');
             setNewReviewContent('');
-            setRatings({ rating_safety: 0, rating_noise: 0, rating_light: 0, rating_traffic: 0, rating_clean: 0 });
+            setRatings({ rating_safety: 0, rating_noise: 0, rating_light: 0, rating_traffic: 0, rating_bug: 0 });
             // 리뷰와 평점만 새로고침
             fetchReviewsForRoom(id)
                 .then((data) => setReviews(data || []))
@@ -136,14 +151,8 @@ const DetailPage = () => {
         const roundedScore = Math.round(Number(score) * 2) / 2;
         for (let i = 1; i <= 5; i++) {
             let starClass = styles.emptyStar;
-            if (i <= roundedScore) {
-                starClass = styles.filledStar;
-            }
-            stars.push(
-                <span key={i} className={starClass}>
-                    ★
-                </span>
-            );
+            if (i <= roundedScore) starClass = styles.filledStar;
+            stars.push(<span key={i} className={starClass}>★</span>);
         }
         return stars;
     };
@@ -172,18 +181,28 @@ const DetailPage = () => {
 
     const IMAGES_PER_PAGE = 5;
     const imageCount = propertyData.images?.length || 0;
-    const totalPages = Math.ceil(imageCount / IMAGES_PER_PAGE);
+    const maxStart = Math.max(0, imageCount - IMAGES_PER_PAGE);
+    const isPrevDisabled = startIndex === 0;
+    const isNextDisabled = startIndex >= maxStart;
 
     const handlePrev = () => {
-        setCurrentPage((prev) => (prev > 0 ? prev - 1 : prev));
+        if (!isPrevDisabled) setStartIndex((i) => i - 1);
     };
 
     const handleNext = () => {
-        setCurrentPage((prev) => (prev < totalPages - 1 ? prev + 1 : prev));
+        if (!isNextDisabled) setStartIndex((i) => i + 1);
     };
 
-    const visibleImages =
-        propertyData.images?.slice(currentPage * IMAGES_PER_PAGE, (currentPage + 1) * IMAGES_PER_PAGE) || [];
+    const visibleImages = propertyData.images?.slice(startIndex, startIndex + IMAGES_PER_PAGE) || [];
+
+    const hasValidCoord = 
+        Number.isFinite(Number(propertyData.latitude)) &&
+        Number.isFinite(Number(propertyData.longitude)) &&
+        !(Number(propertyData.latitude) === 0 && Number(propertyData.longitude) === 0);
+
+    const mapCenter = hasValidCoord
+        ? { lat: Number(propertyData.latitude), lng: Number(propertyData.longitude) }
+        : { lat: 37.5665, lng: 126.9780 };
 
     return (
         <div className={styles.detailPage}>
@@ -191,60 +210,43 @@ const DetailPage = () => {
             <div className={styles.headerSection}>
                 <div className={styles.headerContent}>
                     <div className={styles.contentGroup}>
-                        <p className={styles.title}>{propertyData.title}</p>
-                        <p className={styles.address}>{propertyData.address}</p>
+                        <div className={styles.external_id}>매물번호 {propertyData.external_id ?? id}</div>
+                        <p className={styles.title}>월세 {toMan(propertyData.deposit)}/{toMan(propertyData.monthly_fee)}</p>
+                        <p className={styles.address}>{propertyData.title}</p>
                         <div className={styles.headerButtons}>
                             <button className={`${styles.actionButton} ${styles.lightButton}`}>문의하기</button>
                             <button className={`${styles.actionButton} ${styles.darkButton}`}>MY 홈 담기</button>
                         </div>
                     </div>
                 </div>
-                <div
-                    className={styles.headerImage}
-                    style={{
-                        backgroundImage:
-                            propertyData.images?.length > 0 ? `url(${propertyData.images[0].image_url})` : 'none',
-                        backgroundSize: 'cover',
-                        backgroundPosition: 'center',
-                    }}
-                ></div>
+                <div className={styles.headerImage}>
+                    <Map center={mapCenter} level={1} className={styles.headerImageMap} draggable={false} zoomable={false} onCreate={(map) => map.setDraggable(false)}>
+                        {hasValidCoord && <MapMarker position={mapCenter} />}
+                    </Map>
+                </div>
             </div>
 
             <div className={styles.imageSection}>
                 <h2 className={styles.sectionTitle}>내부 사진</h2>
                 <p className={styles.imageDisclaimer}>
-                    위 사진들은 <span className={styles.highlightDate}>2023년 08월 05일</span>에 찍힌 사진들입니다.
+                    해당 사진들은 <span className={styles.highlightDate}>2023년 08월 05일</span>에 찍힌 사진들입니다.
                 </p>
-
                 <div className={styles.sliderWrapper}>
+                    <img src={leftArrow} alt="이전" className={`${styles.slider} ${isPrevDisabled ? styles.sliderDisabled : ''}`} onClick={handlePrev} />
                     <div className={styles.imageGallery}>
                         {Array.from({ length: IMAGES_PER_PAGE }).map((_, index) => (
                             <div key={index} className={styles.imagePlaceholder}>
                                 {visibleImages[index] ? (
                                     <img
                                         src={visibleImages[index].image_url}
-                                        alt={`room-${currentPage * IMAGES_PER_PAGE + index}`}
+                                        alt={`room-${startIndex + index}`}
                                         className={styles.galleryImage}
                                     />
                                 ) : null}
                             </div>
                         ))}
                     </div>
-
-                    {totalPages > 1 && (
-                        <>
-                            <button className={styles.prevButton} onClick={handlePrev} disabled={currentPage === 0}>
-                                &lt;
-                            </button>
-                            <button
-                                className={styles.nextButton}
-                                onClick={handleNext}
-                                disabled={currentPage >= totalPages - 1}
-                            >
-                                &gt;
-                            </button>
-                        </>
-                    )}
+                    <img src={rightArrow} alt="다음" className={`${styles.slider} ${isNextDisabled ? styles.sliderDisabled : ''}`} onClick={handleNext} />
                 </div>
             </div>
 
@@ -253,7 +255,7 @@ const DetailPage = () => {
                 <div className={styles.detailsGrid}>
                     <div className={styles.detailCard}>
                         <div className={styles.iconBox}>
-                            <Layers size={32} />
+                            <img src={stairsIcon} alt="방/층 아이콘" width={32} height={32} />
                         </div>
                         <div className={styles.textBox}>
                             <p className={styles.cardLabel}>방 종류, 층수</p>
@@ -264,7 +266,7 @@ const DetailPage = () => {
                     </div>
                     <div className={styles.detailCard}>
                         <div className={styles.iconBox}>
-                            <MapPin size={32} />
+                            <img src={locationIcon} alt="주소 아이콘" width={32} height={32} />
                         </div>
                         <div className={styles.textBox}>
                             <p className={styles.cardLabel}>주소</p>
@@ -273,7 +275,7 @@ const DetailPage = () => {
                     </div>
                     <div className={styles.detailCard}>
                         <div className={styles.iconBox}>
-                            <DollarSign size={32} />
+                            <img src={moneyIcon} alt="가격 아이콘" width={32} height={32} />
                         </div>
                         <div className={styles.textBox}>
                             <p className={styles.cardLabel}>계약 형태, 보증금/월세/관리비</p>
@@ -285,7 +287,7 @@ const DetailPage = () => {
                     </div>
                     <div className={styles.detailCard}>
                         <div className={styles.iconBox}>
-                            <Ruler size={32} />
+                            <img src={roomsIcon} alt="면적 아이콘" width={32} height={32} />
                         </div>
                         <div className={styles.textBox}>
                             <p className={styles.cardLabel}>상세 면적</p>
@@ -302,9 +304,8 @@ const DetailPage = () => {
             {/* 평점 & 리뷰 섹션 */}
             <div className={styles.footerSection}>
                 <div className={styles.ratingSection}>
-                    <h2 className={styles.sectionTitle}>전체 평점</h2>
+                    <span className={styles.sectionTitle}>전체 평점</span>
                     <div className={styles.ratingList}>
-                        {/* ✅ 6. ratingStats state와 averages 객체를 사용하여 평점을 렌더링합니다. */}
                         {ratingStats && ratingStats.averages ? (
                             Object.entries(ratingCategories).map(([key, { label, icon }]) => (
                                 <div key={key} className={styles.ratingItem}>
@@ -319,12 +320,14 @@ const DetailPage = () => {
                             <p>평점 데이터를 불러오는 중...</p>
                         )}
                     </div>
+                    <button className={styles.writeReviewButton} onClick={() => setIsReviewModalOpen(true)}>
+                        리뷰 작성하기
+                    </button>
                 </div>
 
                 <div className={styles.reviewSection}>
                     <div className={styles.reviewHeader}>
                         <h2 className={styles.sectionTitle}>작성된 리뷰</h2>
-                        <button className={styles.allReviewButton}>전체 보기</button>
                     </div>
                     <div className={styles.reviewList}>
                         {reviews.length > 0 ? (
@@ -338,16 +341,13 @@ const DetailPage = () => {
                                 </div>
                             ))
                         ) : (
-                            <p>리뷰가 없습니다.</p>
+                            <div className={styles.noReviewsBox}>
+                                <p className={styles.noReviewsText}>리뷰가 없습니다.</p>
+                            </div>
                         )}
                     </div>
                 </div>
             </div>
-
-            {/* 리뷰 작성 버튼 */}
-            <button className={styles.writeReviewButton} onClick={() => setIsReviewModalOpen(true)}>
-                리뷰 작성하기
-            </button>
 
             {/* 모달 */}
             {isReviewModalOpen && (

@@ -1,23 +1,13 @@
 .headerSection {
     /*헤더 감싸는 컨테이너*/
-    background-color: #555;
-    color: #fff;
-    padding: 30px;
-    margin-bottom: 30px;
+    background-color: #00000099;
+    width: 100%;
+    height: 450px;
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    height: 300px;
-    gap: 40px;
-    margin-bottom: 70px;
-}
-
-.headerContent {
-    /*제목, 주소, 버튼 포함하는 왼쪽 컨테이너 */
-    flex: 1;
-    display: flex;
+    flex-direction: row;
     justify-content: center;
-    align-items: flex-start;
+    align-items: center;
+    gap: 80px;
 }
 
 .contentGroup {
@@ -26,20 +16,32 @@
     flex-direction: column;
 
     align-items: flex-start;
+    gap: 12px;
+}
+
+.external_id {
+    font-size: 14px;
+    font-weight: 300;
+    color: #E0E0E0;
+    padding: 8px 14px 8px 14px;
+    border: solid 0.8px #E0E0E0;
+    border-radius: 40px;
 }
 
 .title {
     /*1000/64 부분 */
-    font-size: 32px;
-    font-weight: bold;
+    font-size: 36px;
+    font-weight: 700;
     margin: 0;
+    color: #FFFFFF;
 }
 
 .address {
     /*이문동어쩌구 */
-    font-size: 18px;
-    margin: 0px 0px 20px 0px;
-    opacity: 0.8;
+    font-size: 16px;
+    font-weight: 400;
+    color: #FFFFFF;
+    margin-bottom: 30px;
 }
 
 .headerButtons {
@@ -50,10 +52,9 @@
 
 .actionButton {
     /*액션 버튼 공통 스타일*/
-    padding: 10px 20px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
     cursor: pointer;
+    border-radius: 12px;
+    font-family: 'Pretendard Variable';
     font-size: 16px;
     font-weight: 500;
 }
@@ -62,92 +63,114 @@
     /*MY 찜 담기*/
     background-color: #0abab5;
     color: #fff;
-    border: 1px solid;
-    padding: 15px 45px;
+    border: none;
+    padding: 14px 70px;
 }
 
 .darkButton {
     /*문의하기*/
-    background-color: #555;
+    background-color: transparent;
     border: 1px solid #fff;
     color: #fff;
-    padding: 15px 40px;
+    padding: 14px 70px;
 }
 
 .headerImage {
     /*매물 상세페이지 대표이미지*/
-    flex: 1;
-    height: 250px;
-    background-color: #aaa;
-    border-radius: 6px;
+    width: 500px;
+    height: 300px;
+    border-radius: 12px;
+    overflow: hidden; 
+}
+
+.headerImageMap {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+.sliderDisabled {
+    opacity: 0.3;
+    pointer-events: none;
 }
 
 .detailPage {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 20px;
-    font-family: 'Pretendard Variable', sans-serif;
-    color: #333;
+    margin: 0;
 }
 
 .sectionTitle {
     /*페이지 각 섹션 공통 스타일 (내부 사진,세부 정보, 전체 평점 등)*/
-    font-size: 35px;
-    font-weight: bold;
-    margin-bottom: 40px;
+    font-size: 32px;
+    font-weight: 700;
 }
 
 .imageSection {
-    /*내부 사진 섹션 감싸는 컨테이너 */
-    margin-bottom: 40px; /*구분선이랑 사진 - (구분선 위 간격)*/
-    border-bottom: 1px solid #e0e0e0;
-    padding-bottom: 70px; /*사진- 구분선 사이 간격*/
-    margin-top: 50px; /*내부 사진 제목이랑 회색 박스 사이이*/
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 24px;
+    margin-top: 80px;
 }
 
 .detailsSection {
-    margin-bottom: 70px; /*세부 정보 아래 구분선- 전체평점 사이 아래부분 간격*/
-    border-bottom: 1px solid #e0e0e0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding-top: 60px;
+    gap: 60px;
+    position: relative;
+    margin-bottom: 80px;
+}
 
-    padding-bottom: 70px; /*세부 정보 상자-구분선 사이 간격*/
+.detailsSection::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 80px;
+    right: 80px;
+    height: 1px;
+    background: #00000033;
 }
 
 .imageDisclaimer {
-    /*위 사진들은..*/
-    font-size: 14px;
-    color: #888;
-    margin-bottom: 30px;
+    font-size: 16px;
+    color: #777777;
+    margin-bottom: 40px;
 }
 
 .highlightDate {
-    /*날짜 강조*/
-    color: #f35588;
+    color: #F35588;
+    font-weight: 500;
+}
+
+.sliderWrapper {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 80px;
 }
 
 .imageGallery {
-    /*이미지 격자 배치 컨테이너 */
     display: grid;
     grid-template-columns: repeat(5, 1fr);
-    gap: 16px;
-    width: 100%;
+    gap: 20px;
 }
 
-.imagePlaceholder {
-    height: 150px;
-    background-color: #f0f0f0;
-    border-radius: 4px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 14px;
-    color: #666;
+.slider {
+    padding: 6px 12px 6px 12px;
+    border-radius: 50px;
+    cursor: pointer
 }
 
 .galleryImage {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    border-radius: 4px;
+    width: 220px;
+    height: 220px;
+    object-fit: fill;
+    border-radius: 6px;
 }
 
 .detailsSubtitle {
@@ -162,23 +185,23 @@
     display: grid;
     /*grid-template-columns: 1fr 1fr;*/
     grid-template-columns: repeat(2, 1fr); /* 2열 */
-    gap: 10px;
+    gap: 26px;
 }
 
 .detailCard {
-    background-color: #e0e0e0; /* 카드 배경 */
-    border: 1px solid #e0e0e0;
-    border-radius: 8px;
-    padding: 10px;
+    background-color: #f4f4f4;
+    border: 1px solid #0000001A;
+    border-radius: 6px;
     display: flex;
     align-items: center;
-    gap: 30px;
+    padding: 16px 220px 16px 16px;
+    gap: 24px;
 }
 
 .iconBox {
     width: 60px;
     height: 60px;
-    background-color: rgba(10, 186, 181, 0.2);
+    background-color: #0ABAB533;
     border-radius: 8px;
     display: flex;
     align-items: center;
@@ -228,16 +251,23 @@
 }
 
 .footerSection {
-    display: grid;
-    grid-template-columns: 1fr 2fr;
-    gap: 30px;
-    margin-bottom: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 100px;
+    margin-bottom: 120px;
+    padding-top: 60px;
+    position: relative;
 }
 
-.ratingSection {
-    background-color: #f7f7f7;
-    padding: 20px;
-    border-radius: 8px;
+.footerSection::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 80px;
+    right: 80px;
+    height: 1px;
+    background: #00000033;
 }
 
 .ratingLoginText {
@@ -248,121 +278,115 @@
 }
 
 .ratingList {
-    /*개별 평점 항목 세로 정렬*/
     display: flex;
     flex-direction: column;
-    gap: 10px;
-}
-
-.ratingItem {
-    /*개별 평점 항목*/
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.stars {
-    /*별 표시 컨테이너*/
-    display: flex;
-    gap: 2px;
+    gap: 24px;
+    background-color: #F0F0F0;
+    border-radius: 12px;
+    padding: 36px 42px;
 }
 
 .filledStar {
-    /*채워진 별 색상*/
-    color: #ffd700;
+    color: #56DFCF;
+    display: inline-block; 
 }
 
 .emptyStar {
-    /*빈 별*/
-    color: #ccc;
+    color: #dddddd;
+    display: inline-block; 
+}
+
+.labelText {
+    font-size: 16px;
+    font-weight: 500;
 }
 
 .writeReviewButton {
     /*리뷰 작성하기 버튼 스타일*/
     display: block;
-    margin: 20px auto 0 auto;
-    padding: 12px 24px;
-    background-color: #000;
-    color: #fff;
+    padding: 14px 70px;
+    background-color: #1B818C;
+    color: #FFFFFF;
     border: none;
     border-radius: 8px;
     cursor: pointer;
-    font-weight: bold;
+    font-weight: 600;
     font-size: 14px;
     transition: background-color 0.2s ease;
-}
-
-.writeReviewButton:hover {
-    background-color: #333;
-}
-
-.ratingSection {
-    margin-bottom: 10px; /* 카드와 버튼 사이 여백 */
 }
 
 .reviewHeader {
     /*리뷰 헤더-전체보기 버튼 포함*/
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    margin-bottom: 15px;
-}
-
-.allReviewButton {
-    /*전체 보기 버튼 스타일*/
-    padding: 8px 16px;
-    border: 1px solid #ccc;
-    background-color: #fff;
-    border-radius: 4px;
-    cursor: pointer;
+    margin-bottom: 30px;
 }
 
 .reviewList {
     /*개별 리뷰 카드 컨테이너*/
     display: flex;
     flex-direction: column;
-    gap: 15px;
+    gap: 20px;
+
+    height: 465px;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    width: calc(100% + 16px);
+}
+
+.reviewList::-webkit-scrollbar { width: 10px; }
+.reviewList::-webkit-scrollbar-track {
+    background: #efefef;
+    border-radius: 8px;
+}
+.reviewList::-webkit-scrollbar-thumb {
+    background: #d3d3d3;
+    border-radius: 8px;
+    background-clip: content-box;
 }
 
 .reviewCard {
-    /*리뷰 하나하나 스타일*/
-    border: 1px solid #ccc;
-    padding: 15px;
-    border-radius: 4px;
-    background-color: #fff;
+    width: 600px;
+    height: auto;
+    padding: 24px 26px;
+    border-radius: 10px;
+    background-color: #D4E7E380;
 }
 
 .reviewAuthor {
     /*리뷰 작성자 프로필 이름름*/
     display: flex;
     align-items: center;
-    font-weight: bold;
-    margin-bottom: 5px;
+    font-size: 16px;
+    font-weight: 600;
 }
 
 .authorAvatar {
     /*뷰 작성자 프로필 동그라미*/
-    width: 24px;
-    height: 24px;
-    background-color: #d9d9d9;
+    width: 36px;
+    height: 36px;
+    background-color: #0000001A;
     border-radius: 50%;
-    margin-right: 8px;
+    margin-right: 12px;
 }
 
 .reviewContent {
     /*리뷰 내용 나타내는 텍스트*/
-    margin: 0;
+    padding-top: 10px;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1.7;
 }
 
 .ratingLabel {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 14px;
 }
 
 .iconCircle {
-    width: 36px;
-    height: 36px;
+    width: 44px;
+    height: 44px;
     background-color: #e0e0e0;
     border-radius: 50%;
     display: flex;
@@ -376,66 +400,12 @@
     color: #333;
 }
 
-/* 슬라이더 */
-.sliderWrapper {
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 20px 40px;
-}
-
-/* 버튼 공통 */
-.sliderButton {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    background: rgba(255, 255, 255, 0.8);
-    border: 1px solid #ddd;
-    width: 40px;
-    height: 40px;
-    cursor: pointer;
-    font-size: 20px;
-    font-weight: bold;
-    border-radius: 50%;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
-    transition: background 0.2s, opacity 0.2s;
-    color: #333;
-    z-index: 10;
-}
-
-.sliderButton:hover {
-    background: #fff;
-}
-
-.sliderButton:disabled {
-    opacity: 0.3;
-    cursor: not-allowed;
-}
-
-.prevButton {
-    composes: sliderButton;
-    left: -20px;
-}
-
-.nextButton {
-    composes: sliderButton;
-    right: -20px;
-}
-
-/* ... 기존 CSS ... */
-
-.footerSection {
-    display: grid;
-    grid-template-columns: 1fr 2fr;
-    gap: 30px;
-    margin-bottom: 40px;
-}
-
 .ratingSection {
-    background-color: #f7f7f7;
-    padding: 20px;
-    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 30px;
 }
 
 .ratingLoginText {
@@ -445,127 +415,23 @@
     margin-bottom: 15px;
 }
 
-.ratingList {
-    /*개별 평점 항목 세로 정렬*/
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-
 .ratingItem {
     /*개별 평점 항목*/
     display: flex;
-    justify-content: space-between;
     align-items: center;
+    gap: 24px;
 }
 
 .stars {
     /*별 표시 컨테이너*/
     display: flex;
     gap: 2px;
-}
-
-.filledStar {
-    /*채워진 별 색상*/
-    color: #ffd700;
-}
-
-.emptyStar {
-    /*빈 별*/
-    color: #ccc;
-}
-
-.writeReviewButton {
-    /*리뷰 작성하기 버튼 스타일*/
-    display: block;
-    margin: 20px auto 0 auto;
-    padding: 12px 24px;
-    background-color: #000;
-    color: #fff;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    font-weight: bold;
-    font-size: 14px;
-    transition: background-color 0.2s ease;
-}
-
-.writeReviewButton:hover {
-    background-color: #333;
-}
-
-.ratingSection {
-    margin-bottom: 10px; /* 카드와 버튼 사이 여백 */
-}
-
-.reviewHeader {
-    /*리뷰 헤더-전체보기 버튼 포함*/
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 15px;
-}
-
-.allReviewButton {
-    /*전체 보기 버튼 스타일*/
-    padding: 8px 16px;
-    border: 1px solid #ccc;
-    background-color: #fff;
-    border-radius: 4px;
-    cursor: pointer;
-}
-
-.reviewList {
-    /*개별 리뷰 카드 컨테이너*/
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-}
-
-.reviewCard {
-    /*리뷰 하나하나 스타일*/
-    border: 1px solid #ccc;
-    padding: 15px;
-    border-radius: 4px;
-    background-color: #fff;
-}
-
-.reviewAuthor {
-    /*리뷰 작성자 프로필 이름름*/
-    display: flex;
-    align-items: center;
-    font-weight: bold;
-    margin-bottom: 5px;
-}
-
-.authorAvatar {
-    /*뷰 작성자 프로필 동그라미*/
-    width: 24px;
-    height: 24px;
-    background-color: #d9d9d9;
-    border-radius: 50%;
-    margin-right: 8px;
+    font-size: 18px;
 }
 
 .reviewContent {
     /*리뷰 내용 나타내는 텍스트*/
     margin: 0;
-}
-
-.ratingLabel {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.iconCircle {
-    width: 36px;
-    height: 36px;
-    background-color: #e0e0e0;
-    border-radius: 50%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
 }
 
 .icon {
@@ -574,51 +440,23 @@
     color: #333;
 }
 
-/* 슬라이더 */
-.sliderWrapper {
-    position: relative;
+.noReviewsBox {
+    width: 652px;
+    height: 465px;
+    background-color: #F0F0F0;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin: 20px 40px;
+    margin: 0 auto;
+    border-radius: 12px;
+    box-sizing: border-box;
 }
 
-/* 버튼 공통 */
-.sliderButton {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    background: rgba(255, 255, 255, 0.8);
-    border: 1px solid #ddd;
-    width: 40px;
-    height: 40px;
-    cursor: pointer;
-    font-size: 20px;
-    font-weight: bold;
-    border-radius: 50%;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
-    transition: background 0.2s, opacity 0.2s;
-    color: #333;
-    z-index: 10;
-}
-
-.sliderButton:hover {
-    background: #fff;
-}
-
-.sliderButton:disabled {
-    opacity: 0.3;
-    cursor: not-allowed;
-}
-
-.prevButton {
-    composes: sliderButton;
-    left: -20px;
-}
-
-.nextButton {
-    composes: sliderButton;
-    right: -20px;
+.noReviewsText {
+    font-size: 16px;
+    font-weight: 400;
+    color: #777777;
+    text-align: center;
 }
 
 /* 추가된 스타일 */

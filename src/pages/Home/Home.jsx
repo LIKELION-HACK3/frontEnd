@@ -21,6 +21,14 @@ const formatPrice = (value) => {
     return `${man}`;
 };
 
+const getRandomUniqueIds = (count, min, max) => {
+    const s = new Set();
+    while (s.size < count) {
+        s.add(Math.floor(Math.random() * (max - min + 1)) + min);
+    }
+    return [...s];
+};
+
 /** 개별 방 카드 */
 const RoomCard = ({ room, isFav, onToggle, onClick }) => {
     const imageUrl = room.images && room.images.length > 0 ? room.images[0].image_url : '';
@@ -83,23 +91,42 @@ const Home = () => {
     const [favoriteRoomIds, setFavoriteRoomIds] = useState(new Set());
     const [syncing, setSyncing] = useState(false);
 
+    const [randomRooms, setRandomRooms] = useState([]);
+    const RANDOM_MIN_ID = 1;
+    const RANDOM_MAX_ID = 209;
+
+    const fetchRoomById = async (id) => {
+        try {
+            const res = await axios.get(`https://www.uniroom.shop/api/rooms/${id}/`);
+            return res.data;
+        } catch (e) {
+            if (e?.response?.status !== 404) console.error('fetchRoomById error:', id, e);
+            return null;
+        }
+    }
+
     const fetchRooms = async (query = '', type = '') => {
         setLoading(true);
         try {
-            const params = {};
-            if (query) params.q = query;
-            if (type) params.room_type = type;
+            const picked = getRandomUniqueIds(3, RANDOM_MIN_ID, RANDOM_MAX_ID);
+            const first = await Promise.all(picked.map(fetchRoomById));
+            let valid = first.filter(Boolean);
 
-            if (query || type) {
-                const res = await axios.get('https://www.uniroom.shop/api/rooms/search/', { params });
-                setRooms(res.data.rooms);
-            } else {
-                const res = await axios.get('https://www.uniroom.shop/api/rooms/');
-                setRooms(res.data);
+            let attempts = 0;
+            const tried = new Set(picked);
+            while (valid.length < 3 && attempts < 30) {
+                const [nextId] = getRandomUniqueIds(1, RANDOM_MIN_ID, RANDOM_MAX_ID);
+                if (tried.has(nextId)) { attempts++; continue; }
+                tried.add(nextId);
+                const r = await fetchRoomById(nextId);
+                if (r) valid.push(r);
+                attempts++;
             }
-        } catch (error) {
-            console.error('Error fetching rooms:', error);
-            setRooms([]);
+
+            setRandomRooms(valid.slice(0, 3));
+        } catch (e) {
+            console.error('fetchRandomRooms error:', e);
+            setRandomRooms([]);
         } finally {
             setLoading(false);
         }
@@ -207,25 +234,23 @@ const Home = () => {
             <div className={styles.home__container2}>
                 <p className={styles.home__text2}>
                     <span className={styles.home__text2__highlight}>{user ? user.username : '멋쟁이사자'}</span>
-                    님께, AI가 추천드려요.
+                    님께 주변 매물을 추천드려요.
                 </p>
 
                 <div className={styles.home__lists}>
                     {loading ? (
                         <p>추천 매물을 불러오는 중...</p>
-                    ) : rooms.length > 0 ? (
-                        rooms
-                            .slice(0, 3)
-                            .map((room) => (
-                                <RoomCard
-                                    key={room.id}
-                                    room={room}
-                                    isFav={favoriteRoomIds.has(room.id)}
-                                    onToggle={handleToggle}
-                                    onClick={() => navigate(`/property/${room.id}`)}
-                                />
-                            ))
-                    ) : (
+                    ) : randomRooms.length > 0 ? (
+                        randomRooms.map((room) => (
+                            <RoomCard
+                                key={room.id}
+                                room={room}
+                                isFav={favoriteRoomIds.has(room.id)}
+                                onToggle={handleToggle}
+                                onClick={() => navigate(`/property/${room.id}`)}
+                            />
+                        ))
+                        ) : (
                         <p>추천 매물이 없습니다.</p>
                     )}
                 </div>
