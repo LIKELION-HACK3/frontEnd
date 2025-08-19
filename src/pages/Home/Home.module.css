@@ -169,10 +169,10 @@
 /* 본문 박스 - 남은 공간 채우기 */
 .room__details {
     flex: 1;
-    padding: 14px 16px 16px;
+    padding: 20px 20px;
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 8px;
 }
 
 /* 텍스트 스타일 */
@@ -191,7 +191,7 @@
 .room__info {
     margin: 0;
     font-size: 13px;
-    color: #767676;
+    color: #5E5E5E;
     display: -webkit-box;
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 1;
@@ -199,17 +199,14 @@
 }
 
 .room__price {
-    margin: 2px 0 0;
-    font-size: 16px;
-    font-weight: 800;
-    color: #0abab5;
+    font-size: 20px;
+    font-weight: 600;
     white-space: nowrap;
 }
 
 .room__address {
-    margin: 2px 0 0;
     font-size: 13px;
-    color: #5a5a5a;
+    color: #5E5E5E;
     display: -webkit-box;
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 1;
@@ -241,7 +238,8 @@
 /* 래퍼 없이 .room__card만 바로 쓰는 경우 대비 */
 .home__lists > .room__card {
     width: 326px;
-    height: 420px;
+    height: 350px;
+    cursor: pointer;
 }
 
 /* 내용이 넘쳐서 높이가 늘어나는 것 방지 */
