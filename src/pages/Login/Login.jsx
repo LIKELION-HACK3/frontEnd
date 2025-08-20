@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { login } from '../../apis/auth'; // auth.js에서 정의된 로그인 함수를 사용합니다.
+import { login } from '../../apis/auth';
 import styles from './Login.module.css';
 
 const Login = () => {

@@ -256,3 +256,15 @@
   color: #5E5E5E;
   margin-left: 8px;
 }
+
+.bookmarkBtnSm {
+    width: 22px;
+    height: 22px;
+    display: grid;
+    place-items: center;
+}
+
+.bookmarkIconSm {
+    width: 16px;
+    height: 16px;
+}

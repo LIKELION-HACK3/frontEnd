@@ -403,11 +403,11 @@ const MapList = () => {
                                     aria-current={isActive ? 'true' : 'false'}>
                                     <button
                                         type="button"
-                                        className={styles.bookmarkBtn}
+                                        className={`${styles.bookmarkBtn} ${styles.bookmarkBtnSm}`}
                                         onClick={(e) => onClickBookmark(e, r.id)}
                                         aria-pressed={pressed}
                                         aria-label={pressed ? '북마크 해제' : '북마크 추가'}>
-                                        <span className={`${styles.bookmarkIcon} ${pressed ? styles.bookmarkActive : ''}`} />
+                                        <span className={`${styles.bookmarkIcon} ${styles.bookmarkIconSm} ${pressed ? styles.bookmarkActive : ''}`} />
                                     </button>
                                     <div className={styles.map__pic} aria-label="room thumbnail">
                                         {firstImage && (

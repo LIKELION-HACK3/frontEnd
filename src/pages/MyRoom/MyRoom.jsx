@@ -185,7 +185,7 @@ const MyRoom = () => {
                 {loading ? (
                     <p className={styles.subtitle}>불러오는 중…</p>
                 ) : rooms.length === 0 ? (
-                    <p className={styles.subtitle}>아직 찜한 집이 없어요.</p>
+                    <p className={styles.subtitle}>아직 북마크한 집이 없어요.</p>
                 ) : (
                     <div className={styles.propertyGrid}>
                         {rooms.map((room) => {
