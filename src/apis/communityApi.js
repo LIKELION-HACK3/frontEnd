@@ -86,4 +86,22 @@ export const createCommunityPost = async (postData) => {
     }
 };
 
-// --- 필요에 따라 다른 API 함수들 (댓글, 좋아요 등)을 여기에 추가 ---
+/**
+ * 특정 게시글을 삭제합니다. (DELETE /api/community/posts/{post_id}/)
+ * @param {string | number} postId - 삭제할 게시글의 ID
+ */
+export const deleteCommunityPost = async (postId) => {
+    try {
+        const headers = getAuthHeaders();
+        if (!headers) throw new Error('게시글을 삭제하려면 로그인이 필요합니다.');
+
+        const response = await api.delete(`/api/community/posts/${postId}/`, { headers });
+
+        if (response.status === 204) {
+            return { success: true, message: '게시글이 삭제되었습니다.' };
+        }
+        return response.data;
+    } catch (error) {
+        normalizeError(error);
+    }
+};

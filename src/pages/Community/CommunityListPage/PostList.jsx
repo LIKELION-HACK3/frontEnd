@@ -2,7 +2,7 @@ import React from 'react';
 import styles from './CommunityListPage.module.css';
 import PostCard from './PostCard';
 
-const PostList = ({ posts, loading, error, onWritePostClick }) => {
+const PostList = ({ posts, loading, error, onWritePostClick, onDelete, currentUser }) => {
     const formatTimeAgo = (dateString) => {
         const now = new Date();
         const postDate = new Date(dateString);
@@ -36,11 +36,12 @@ const PostList = ({ posts, loading, error, onWritePostClick }) => {
                             posts.map((post) => (
                                 <PostCard
                                     key={post.id}
-                                    title={post.title}
-                                    author={`${post.author.username} · ${formatTimeAgo(post.created_at)} · ${
-                                        post.region_display
-                                    }`}
-                                    thumbnail={'https://via.placeholder.com/64x64.png?text=Post'}
+                                    post={post}
+                                    meta={`${post.region_display} · ${post.category || '기타'} · 💬 ${
+                                        post.views || 0
+                                    } · 🗨️ ${post.comments_count || 0}`}
+                                    currentUser={currentUser}
+                                    onDelete={onDelete}
                                 />
                             ))
                         ) : (

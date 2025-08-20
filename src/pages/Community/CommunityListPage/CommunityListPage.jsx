@@ -4,19 +4,26 @@ import styles from './CommunityListPage.module.css';
 import TabSelector from './TabSelector';
 import FilterSidebar from './FilterSidebar';
 import PostList from './PostList';
-import CommunityWriteModal from './CommunityWriteModal'; // 모달 컴포넌트 import
-import { fetchCommunityPosts } from '../../../apis/communityApi'; // API 함수 import
+import CommunityWriteModal from './CommunityWriteModal';
+import { fetchCommunityPosts, deleteCommunityPost } from '../../../apis/communityApi';
+import { loadAuth } from '../../../apis/auth';
 
 const CommunityListPage = () => {
     const [activeTab, setActiveTab] = useState('함께해요');
     const navigate = useNavigate();
-
-    const [isModalOpen, setIsModalOpen] = useState(false); // 모달 상태 추가
+    const [isModalOpen, setIsModalOpen] = useState(false);
     const [posts, setPosts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [currentUser, setCurrentUser] = useState(null);
 
-    // 게시글 데이터를 불러오는 함수
+    useEffect(() => {
+        const auth = loadAuth();
+        if (auth && auth.user) {
+            setCurrentUser(auth.user);
+        }
+    }, []);
+
     const loadPosts = useCallback(async () => {
         if (activeTab !== '함께해요') {
             setPosts([]);
@@ -37,7 +44,6 @@ const CommunityListPage = () => {
         }
     }, [activeTab]);
 
-    // 컴포넌트가 로드되거나 탭이 바뀔 때 게시글 로드
     useEffect(() => {
         loadPosts();
     }, [loadPosts]);
@@ -49,6 +55,18 @@ const CommunityListPage = () => {
         }
     };
 
+    const handleDelete = async (postId) => {
+        if (window.confirm('정말로 이 게시글을 삭제하시겠습니까?')) {
+            try {
+                await deleteCommunityPost(postId);
+                loadPosts();
+            } catch (err) {
+                alert(err.message || '게시글 삭제에 실패했습니다.');
+                console.error(err);
+            }
+        }
+    };
+
     return (
         <>
             <div className={styles.pageContainer}>
@@ -57,21 +75,17 @@ const CommunityListPage = () => {
 
                 <div className={styles.contentContainer}>
                     <FilterSidebar />
-                    {/* PostList에 데이터와 모달 열기 함수를 props로 전달 */}
                     <PostList
                         posts={posts}
                         loading={loading}
                         error={error}
                         onWritePostClick={() => setIsModalOpen(true)}
+                        onDelete={handleDelete}
+                        currentUser={currentUser}
                     />
                 </div>
             </div>
-            {/* 페이지 하단에 모달 렌더링 */}
-            <CommunityWriteModal
-                isOpen={isModalOpen}
-                onClose={() => setIsModalOpen(false)}
-                onPostCreated={loadPosts} // 새 글 작성 후 목록을 다시 불러옴
-            />
+            <CommunityWriteModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} onPostCreated={loadPosts} />
         </>
     );
 };
