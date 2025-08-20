@@ -4,7 +4,11 @@ import styles from './MyRoom.module.css';
 import BookMark from '../../components/BookMark/BookMark';
 import { fetchAllBookmarks, toggleBookmark } from '../../apis/bookmarks';
 import { createAiReport } from '../../apis/aiApi';
-import { Star } from 'lucide-react';
+
+import moneyIcon from '../../assets/pic/property_money.svg';
+import locationIcon from '../../assets/pic/property_location.svg';
+import roomsIcon from '../../assets/pic/property_rooms.svg';
+import plusIcon from '../../assets/pic/myroom_plus.svg';
 
 // Helper functions (formatPriceSimple, formatManwon, toPyeong) remain the same
 const formatPriceSimple = (value) => {
@@ -40,11 +44,11 @@ const MyRoom = () => {
     const [selectedForReport, setSelectedForReport] = useState([null, null]);
     const [additionalCriteria, setAdditionalCriteria] = useState('지도');
     const [weights, setWeights] = useState({
-        price: 3,
-        location: 3,
-        area: 3,
+        price: 0,
+        location: 0,
+        area: 0,
     });
-    const [userPreference, setUserPreference] = useState('가격이 중요하고, 교통편이 좋았으면 좋겠어요');
+    const [userPreference, setUserPreference] = useState('');
     const [isGenerating, setIsGenerating] = useState(false);
 
     const loadBookmarks = async () => {
@@ -111,13 +115,21 @@ const MyRoom = () => {
     };
 
     const renderStars = (ratingKey) => (
-        <div className={styles.stars}>
-            {[1, 2, 3, 4, 5].map((star) => (
-                <Star
-                    key={star}
-                    className={star <= weights[ratingKey] ? styles.filledStar : styles.emptyStar}
-                    onClick={() => handleWeightChange(ratingKey, star)}
-                />
+        <div className={styles.stars} role="radiogroup" aria-label={`${ratingKey} 가중치`}>
+            {[1, 2, 3, 4, 5].map((n) => (
+                <span
+                    key={n}
+                    className={n <= weights[ratingKey] ? styles.filledStar : styles.emptyStar}
+                    onClick={() => handleWeightChange(ratingKey, n)}
+                    role="radio"
+                    aria-checked={n <= weights[ratingKey]}
+                    tabIndex={0}
+                    onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') handleWeightChange(ratingKey, n);
+                    }}
+                >
+                    ★
+                </span>
             ))}
         </div>
     );
@@ -227,7 +239,7 @@ const MyRoom = () => {
                         <div className={styles.reportSelectionGrid}>
                             {[0, 1].map((index) => (
                                 <div key={index} className={styles.reportSelectionCard}>
-                                    <p className={styles.selectionTitle}>선택{index + 1}</p>
+                                    <p className={styles.selectionTitle}>선택 {index + 1}</p>
                                     {selectedForReport[index] ? (
                                         <div className={styles.selectedRoomInfo}>
                                             <img
@@ -254,8 +266,8 @@ const MyRoom = () => {
                                             </div>
                                         </div>
                                     ) : (
-                                        <div className={styles.emptySelection}>
-                                            <p>선택된 집이 없습니다.</p>
+                                        <div className={styles.emptySelection} aria-label="집을 선택해 주세요">
+                                            <img src={plusIcon} alt="추가" className={styles.emptyIcon} />
                                         </div>
                                     )}
                                 </div>
@@ -263,6 +275,38 @@ const MyRoom = () => {
                         </div>
                     </div>
                     <div className={styles.aiRight}>
+                        <div className={styles.criteriaGroup}>  
+                            <h4 className={styles.groupTitle}>가중치 설정</h4>
+                            <div className={styles.weightGroup}>
+                                <div className={styles.weightItem}>
+                                    <div className={styles.ratingLabel}>
+                                        <div className={styles.iconCircle}>
+                                            <img src={moneyIcon} alt="가격" className={styles.icon} />
+                                        </div>
+                                        <span className={styles.labelText}>가격</span>
+                                    </div>
+                                    {renderStars('price')}
+                                </div>
+                                <div className={styles.weightItem}>
+                                    <div className={styles.ratingLabel}>
+                                        <div className={styles.iconCircle}>
+                                            <img src={locationIcon} alt="위치" className={styles.icon} />
+                                        </div>
+                                        <span className={styles.labelText}>위치</span>
+                                    </div>
+                                    {renderStars('location')}
+                                </div>
+                                <div className={styles.weightItem}>
+                                    <div className={styles.ratingLabel}>
+                                        <div className={styles.iconCircle}>
+                                            <img src={roomsIcon} alt="면적" className={styles.icon} />
+                                        </div>
+                                        <span className={styles.labelText}>면적</span>
+                                    </div>
+                                    {renderStars('area')}
+                                </div>
+                            </div>
+                        </div>
                         <div className={styles.criteriaGroup}>
                             <h4 className={styles.groupTitle}>추가 기준</h4>
                             <div className={styles.radioGroup}>
@@ -275,26 +319,9 @@ const MyRoom = () => {
                                             checked={additionalCriteria === item}
                                             onChange={(e) => setAdditionalCriteria(e.target.value)}
                                         />
-                                        {item}
+                                        <span className={styles.radioText}>{item}</span>
                                     </label>
                                 ))}
-                            </div>
-                        </div>
-                        <div className={styles.criteriaGroup}>
-                            <h4 className={styles.groupTitle}>가중치 설정</h4>
-                            <div className={styles.weightGroup}>
-                                <div className={styles.weightItem}>
-                                    <span>가격</span>
-                                    {renderStars('price')}
-                                </div>
-                                <div className={styles.weightItem}>
-                                    <span>위치</span>
-                                    {renderStars('location')}
-                                </div>
-                                <div className={styles.weightItem}>
-                                    <span>면적</span>
-                                    {renderStars('area')}
-                                </div>
                             </div>
                         </div>
                     </div>
