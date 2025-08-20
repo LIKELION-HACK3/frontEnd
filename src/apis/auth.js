@@ -2,10 +2,6 @@ import api from './api';
 
 const STORAGE_KEY = 'uniroom_auth';
 
-/**
- * 서버 응답 데이터에서 토큰을 올바르게 추출하여 저장하고,
- * axios의 기본 헤더에 인증 토큰을 설정합니다.
- */
 function setAuth(data) {
     // 서버 응답에 'tokens' 객체가 있거나, 토큰이 최상위에 있는 경우 모두 처리
     const accessToken = data?.tokens?.access || data?.access;
@@ -27,10 +23,6 @@ function setAuth(data) {
     );
 }
 
-/**
- * 저장된 인증 정보를 로드하고, axios 기본 헤더를 설정합니다.
- * 페이지가 새로고침될 때마다 호출됩니다.
- */
 export function loadAuth() {
     try {
         const raw = localStorage.getItem(STORAGE_KEY);
@@ -103,9 +95,34 @@ export async function login({ username, password }) {
     }
 }
 
+export async function getMyInfo() {
+    try {
+        loadAuth();
+        const { data } = await api.get('/api/users/me/', {
+            headers: { Accept: 'application/json' },
+        });
+        return data;
+    } catch (error) {
+        normalizeError(error);
+    }
+}
+
+export async function getUserPublic(userId) {
+    try {
+        const { data } = await api.get(`/api/users/${userId}/`, {
+            headers: { Accept: 'application/json' },
+        });
+        return data;
+    } catch (error) {
+        return null;
+    }
+}
+
 export default {
     signUp,
     login,
     loadAuth,
     clearAuth,
+    getMyInfo,
+    getUserPublic,
 };

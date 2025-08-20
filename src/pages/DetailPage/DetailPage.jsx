@@ -3,6 +3,7 @@ import styles from './DetailPage.module.css';
 import { useParams } from 'react-router-dom';
 import { Map, MapMarker } from 'react-kakao-maps-sdk';
 import { createReview, fetchReviewsForRoom, fetchReviewStats } from '../../apis/roomsApi';
+import { getMyInfo, loadAuth, getUserPublic } from '../../apis/auth';
 
 import leftArrow from '../../assets/pic/left_arrow.svg';
 import rightArrow from '../../assets/pic/right_arrow.svg';
@@ -46,6 +47,30 @@ const DetailPage = () => {
     const { id } = useParams();
     const [propertyData, setPropertyData] = useState(null);
     const [startIndex, setStartIndex] = useState(0);
+    const [me, setMe] = useState(null);
+    const [authorMap, setAuthorMap] = useState({});
+
+    const hydrateAuthors = async (items) => {
+        const ids = Array.from(
+            new Set(
+                (items || [])
+                    .map(r => (typeof r.user === 'object' ? r.user?.id : r.user))
+                    .filter(Boolean)
+            )
+        );
+
+        if (ids.length === 0) return;
+        const nextMap = { ...authorMap };
+        await Promise.all(
+            ids
+                .filter(id => !nextMap[id])
+                .map(async (uid) => {
+                    const u = await getUserPublic(uid);
+                    nextMap[uid] = u?.username || `사용자 ${uid}`;
+                })
+        );
+        setAuthorMap(nextMap);
+    };
 
     // 평점과 리뷰를 위한 state
     const [ratingStats, setRatingStats] = useState(null);
@@ -83,7 +108,14 @@ const DetailPage = () => {
 
         const loadAllData = async () => {
             try {
-                const propData = await fetch(`https://www.uniroom.shop/api/rooms/${id}/`).then((res) => res.json());
+                loadAuth();
+                try {
+                    const meData = await getMyInfo();
+                    if (meData) setMe(meData);
+                } catch (e) {
+                    console.warn('정보 조회 실패:', e?.message || e);
+                }
+                const propData = await fetch(`https://app.uniroom.shop/api/rooms/${id}/`).then((res) => res.json());
                 setPropertyData(propData);
             } catch (e) {
                 console.error('방 정보를 불러오는데 실패했습니다:', e);
@@ -92,6 +124,7 @@ const DetailPage = () => {
             try {
                 const reviewData = await fetchReviewsForRoom(id);
                 setReviews(reviewData || []);
+                await hydrateAuthors(reviewData || []);
             } catch (e) {
                 console.error('리뷰 목록을 불러오는데 실패했습니다:', e);
             }
@@ -100,7 +133,18 @@ const DetailPage = () => {
                 const statsData = await fetchReviewStats(id);
                 setRatingStats(statsData);
             } catch (e) {
-                console.error('평점 통계를 불러오는데 실패했습니다:', e);
+                try {
+                    const res = await fetch(`/api/rooms/${id}/reviews/`, { headers: { Accept: 'application/json' } });
+                    if (res.ok) {
+                        const data = await res.json();
+                        setReviews(data || []);
+                        await hydrateAuthors(data || []);
+                    } else {
+                        console.error('리뷰(공개) 요청 실패:', res.status);
+                    }
+                } catch (e2) {
+                    console.error('리뷰 목록을 불러오는데 실패했습니다:', e2);
+                }
             }
         };
 
@@ -202,6 +246,18 @@ const DetailPage = () => {
     const mapCenter = hasValidCoord
         ? { lat: Number(propertyData.latitude), lng: Number(propertyData.longitude) }
         : { lat: 37.5665, lng: 126.9780 };
+
+    const displayReviewAuthor = (review) => {
+        if (review?.username) return review.username;
+        if (typeof review?.user === 'object' && review.user?.username) return review.user.username;
+
+        const uid = typeof review?.user === 'object' ? review.user?.id : review?.user;
+
+        if (uid && authorMap[uid]) return authorMap[uid];
+        if (me && uid === me.id) return me.username;
+
+        return uid ? `사용자 ${uid}` : '익명';
+    };
 
     return (
         <div className={styles.detailPage}>
@@ -334,7 +390,7 @@ const DetailPage = () => {
                                 <div key={review.id} className={styles.reviewCard}>
                                     <div className={styles.reviewAuthor}>
                                         <div className={styles.authorAvatar}></div>
-                                        <p>{`사용자 ${review.user}` || '익명'}</p>
+                                        <p>{displayReviewAuthor(review)}</p>
                                     </div>
                                     <p className={styles.reviewContent}>{review.content}</p>
                                 </div>

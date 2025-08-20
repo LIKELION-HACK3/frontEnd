@@ -213,11 +213,11 @@
     overflow: hidden;
 }
 
-/* 하트 버튼 - 절대 위치로 고정 */
 .room__card > button {
-    position: absolute;
-    right: 16px;
-    bottom: 16px;
+    position:absolute;
+    right: 12px;
+    bottom: 12px;
+    top: auto;
 }
 
 .home__list1,

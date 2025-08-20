@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-    baseURL: 'https://www.uniroom.shop/',
+    baseURL: 'https://app.uniroom.shop/',
     headers: {
         'Content-Type': 'application/json',
     }

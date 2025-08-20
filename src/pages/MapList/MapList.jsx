@@ -3,6 +3,7 @@ import KakaoMap from '../../components/KakaoMap/KakaoMap';
 import { useEffect, useState, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { fetchRooms } from '../../apis/roomsApi';
+import { fetchAllBookmarks, toggleBookmark } from '../../apis/bookmarks';
 import downArrow from '../../assets/pic/down_arrow.svg';
 
 const MapList = () => {
@@ -15,6 +16,7 @@ const MapList = () => {
     const itemRefs = useRef(new Map());
     const listRef = useRef(null);
     const pendingScrollId = useRef(null);
+    const [bookmarked, setBookmarked] = useState(new Set())
 
     const [filters, setFilters] = useState({
         type: '',
@@ -60,6 +62,22 @@ const MapList = () => {
                 console.error(error);
             } finally {
                 setLoading(false);
+            }
+        })();
+    }, []);
+
+    useEffect(() => {
+        (async () => {
+            try {
+                const all = await fetchAllBookmarks();
+                const ids = new Set(
+                    (all || []).map((b) => 
+                        typeof b.room === 'object' ? b.room?.id : b.room
+                    ).filter(Boolean)
+                );  
+                setBookmarked(ids);
+            } catch (e) {
+                console.warn('bookmark init failed', e);
             }
         })();
     }, []);
@@ -232,6 +250,41 @@ const MapList = () => {
 
     const roomsToShow = visibleSet ? filteredRooms.filter(r => visibleSet.has(r.id)) : filteredRooms;
 
+    const onClickBookmark = async (e, roomId) => {
+        e.stopPropagation();
+        e.preventDefault();
+
+        setBookmarked((prev) => {
+            const next = new Set(prev);
+            if (next.has(roomId)) next.delete(roomId);
+            else next.add(roomId);
+            return next;
+        });
+
+        try {
+            const res = await toggleBookmark(roomId);
+            if (res.action === 'added') {
+                setBookmarked((prev) => new Set(prev).add(roomId));
+            } else if (res.action === 'removed') {
+                setBookmarked((prev) => {
+                    const next = new Set(prev);
+                    next.delete(roomId);
+                    return next;
+                });
+            }
+        } catch (err) {
+            setBookmarked((prev) => {
+                const next = new Set(prev);
+                if (next.has(roomId)) next.delete(roomId);
+                else next.add(roomId);
+                return next;
+            });
+            alert(err.message || '북마크 처리에 실패했습니다.');
+        }
+    };
+
+    const isBookmarked = (id) => bookmarked.has(id);
+
     return (
         <div className={styles.main__wrapper}>
             <div className={styles.map__categorybox}>
@@ -334,6 +387,7 @@ const MapList = () => {
                         {!loading && !error && roomsToShow.map((r) => {
                             const firstImage = r?.images?.[0]?.image_url;
                             const isActive = selectedId === r.id;
+                            const pressed = isBookmarked(r.id);
                             return (
                                 <div key={r.id} ref={(el) => {
                                         if (el) itemRefs.current.set(r.id, el);
@@ -347,6 +401,14 @@ const MapList = () => {
                                     role="button"
                                     tabIndex={0}
                                     aria-current={isActive ? 'true' : 'false'}>
+                                    <button
+                                        type="button"
+                                        className={styles.bookmarkBtn}
+                                        onClick={(e) => onClickBookmark(e, r.id)}
+                                        aria-pressed={pressed}
+                                        aria-label={pressed ? '북마크 해제' : '북마크 추가'}>
+                                        <span className={`${styles.bookmarkIcon} ${pressed ? styles.bookmarkActive : ''}`} />
+                                    </button>
                                     <div className={styles.map__pic} aria-label="room thumbnail">
                                         {firstImage && (
                                             <img src={firstImage} alt="" className={styles.map__img} />

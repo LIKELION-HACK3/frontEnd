@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styles from './MyRoom.module.css';
-import FavoriteHeart from './FavoriteHeart';
+import BookMark from '../../components/BookMark/BookMark';
 import { fetchAllBookmarks, toggleBookmark } from '../../apis/bookmarks';
 import { createAiReport } from '../../apis/aiApi';
 import { Star } from 'lucide-react';
@@ -136,8 +136,6 @@ const MyRoom = () => {
 
         setIsGenerating(true);
 
-        // ✅ API 명세에 맞게 가중치 계산 로직을 수정했습니다.
-        // 각 별점을 전체 별점의 합으로 나누어 0과 1 사이의 값으로 정규화합니다.
         const apiData = {
             room_a_id: selectedForReport[0].id,
             room_b_id: selectedForReport[1].id,
@@ -194,7 +192,7 @@ const MyRoom = () => {
                                         />
                                         <div className={styles.cardBody}>
                                             <div className={styles.heartWrapper}>
-                                                <FavoriteHeart
+                                                <BookMark
                                                     filled={favoriteRoomIds.has(room.id)}
                                                     onToggle={() => onToggle(room.id)}
                                                 />

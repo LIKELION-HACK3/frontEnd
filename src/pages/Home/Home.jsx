@@ -1,11 +1,11 @@
 // src/pages/Home/Home.jsx
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import axios from 'axios';
 import styles from './Home.module.css';
 import { useNavigate } from 'react-router-dom';
 
-import FavoriteHeart from '../../pages/MyRoom/FavoriteHeart';
-import { fetchAllBookmarks, toggleBookmark } from '../../apis/bookmarks';
+import BookMark from '../../components/BookMark/BookMark';
+import { fetchAllBookmarks } from '../../apis/bookmarks';
 import { loadAuth } from '../../apis/auth';
 
 // 금액 변환 함수 (억/만원 단위)
@@ -53,12 +53,12 @@ const RoomCard = ({ room, isFav, onToggle, onClick }) => {
             <img src={imageUrl} alt={room.title} className={styles.room__image} />
 
             {/* 하트 버튼 */}
-            <FavoriteHeart
+            <BookMark
+                roomId={room.id}
                 filled={isFav}
-                onToggle={(e) => {
-                    e.stopPropagation();
-                    onToggle(room.id);
-                }}
+                onToggle={(next) => onToggle(room.id, next)}
+                stopPropagation
+                placement="bottom-right"
             />
 
             <div className={styles.room__details}>
@@ -97,7 +97,7 @@ const Home = () => {
 
     const fetchRoomById = async (id) => {
         try {
-            const res = await axios.get(`https://www.uniroom.shop/api/rooms/${id}/`);
+            const res = await axios.get(`https://app.uniroom.shop/api/rooms/${id}/`);
             return res.data;
         } catch (e) {
             if (e?.response?.status !== 404) console.error('fetchRoomById error:', id, e);
@@ -165,37 +165,14 @@ const Home = () => {
         fetchRooms(searchQuery, nextType);
     };
 
-    // --- 하트 토글 (수정된 부분) ---
-    const handleToggle = async (roomId) => {
-        const authData = loadAuth();
-        if (!authData || !authData.access) {
-            alert('로그인이 필요한 기능입니다.');
-            navigate('/login');
-            return;
-        }
-
-        if (syncing) return;
-        setSyncing(true);
-
-        // 낙관적 업데이트
+    const handleToggle = (roomId, nextChecked) => {
         setFavoriteRoomIds((prev) => {
             const next = new Set(prev);
-            if (next.has(roomId)) next.delete(roomId);
-            else next.add(roomId);
+            if (nextChecked) next.add(roomId);
+            else next.delete(roomId);
             return next;
-        });
-
-        try {
-            await toggleBookmark(roomId);
-            await loadBookmarks();
-        } catch (e) {
-            console.error(e);
-            await loadBookmarks(); // 에러 발생 시 상태를 다시 동기화
-            alert(e.message || '찜 처리에 실패했습니다.');
-        } finally {
-            setSyncing(false);
-        }
-    };
+        })
+    }
 
     return (
         <div className={styles.main__wrapper}>
