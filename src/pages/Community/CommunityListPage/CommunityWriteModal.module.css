@@ -1,118 +1,264 @@
+/* CommunityWriteModal.module.css */
+
+/* 모달 오버레이 */
 .modalOverlay {
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: rgba(0, 0, 0, 0.6);
+    background-color: rgba(0, 0, 0, 0.5);
     display: flex;
     justify-content: center;
     align-items: center;
     z-index: 1000;
 }
 
+/* 모달 컨텐츠 기본 박스 */
 .modalContent {
     background: white;
-    padding: 24px;
-    border-radius: 12px;
-    width: 90%;
-    max-width: 600px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    border-radius: 16px;
+    width: 850px;
+    height: 500px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    display: flex;
+    overflow: hidden;
+    position: relative; /* closeButton absolute positioning 기준 */
 }
 
-.title {
+/* 닫기 버튼 */
+.closeButton {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    background: none;
+    border: none;
     font-size: 24px;
-    font-weight: 700;
-    margin: 0 0 24px;
-    text-align: center;
+    color: #888;
+    cursor: pointer;
+    padding: 0;
+    line-height: 1;
+}
+
+.closeButton:hover {
+    color: #333;
+}
+
+/* 왼쪽 사이드바 */
+.sidebar {
+    width: 220px;
+    padding: 24px;
+    border-right: 1px solid #f0f0f0;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.sidebarTitle {
+    font-size: 14px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 4px;
+}
+
+.sidebarSubtitle {
+    font-size: 14px;
+    color: #007bff;
+    margin-bottom: 20px;
+    cursor: pointer;
+}
+
+.sidebarSubtitle:after {
+    content: ' 🔍';
+}
+
+.regionList {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    flex-grow: 1;
+}
+
+.radioLabel {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 15px;
+    cursor: pointer;
+    color: #555;
+}
+
+.radioLabel input [type='radio'] {
+    appearance: none;
+    width: 16px;
+    height: 16px;
+    border: 1px solid #ccc;
+    border-radius: 50%;
+    outline: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.radioLabel input:checked {
+    border-color: #00b4b3;
+}
+
+.radioLabel input:checked::before {
+    content: '';
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: #00b4b3;
+    display: block;
+}
+
+/* 오른쪽 메인 컨텐츠 */
+.mainContent {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 24px;
+}
+
+.mainTitle {
+    font-size: 20px;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 16px;
 }
 
 .form {
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    height: 100%;
 }
 
-.input,
+.titleInput {
+    border: none;
+    border-bottom: 1px solid #e0e0e0;
+    font-size: 16px;
+    padding: 12px 0;
+    margin-bottom: 16px;
+    outline: none;
+    color: #333;
+}
+
+.titleInput::placeholder {
+    color: #aaa;
+}
+
 .textarea {
-    width: 100%;
-    padding: 12px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    font-size: 15px;
+    flex-grow: 1;
+    border: none;
+    resize: none;
+    outline: none;
+    font-size: 16px;
+    line-height: 1.6;
     font-family: inherit;
-    box-sizing: border-box;
+    color: #333;
 }
 
-.textarea {
-    resize: vertical;
-    min-height: 150px;
+.textarea::placeholder {
+    color: #aaa;
+}
+
+.bottomBar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 24px;
+    padding-top: 24px;
+    border-top: 1px solid #f0f0f0;
 }
 
 .categorySection {
     display: flex;
     align-items: center;
     gap: 16px;
-    padding: 8px 0;
-    border-top: 1px solid #eee;
-    border-bottom: 1px solid #eee;
 }
 
 .categoryLabel {
     font-weight: 600;
-    font-size: 14px;
+    font-size: 15px;
+    color: #555;
 }
 
-.radioGroup {
+.radioGroupHorizontal {
     display: flex;
-    gap: 12px;
-    font-size: 14px;
+    gap: 20px; /* 카테고리 간 간격 조정 */
+    font-size: 15px;
 }
 
-.radioGroup label {
+.radioGroupHorizontal label {
     display: flex;
     align-items: center;
-    gap: 4px;
+    gap: 6px;
     cursor: pointer;
+    color: #555;
 }
 
-.radioGroup input {
-    accent-color: #00b4b3;
-}
-
-.buttonGroup {
+.radioGroupHorizontal input [type='radio'] {
+    appearance: none;
+    width: 16px;
+    height: 16px;
+    border: 1px solid #ccc;
+    border-radius: 50%;
+    outline: none;
+    cursor: pointer;
     display: flex;
-    justify-content: flex-end;
-    gap: 12px;
-    margin-top: 8px;
+    align-items: center;
+    justify-content: center;
 }
 
-.submitButton,
-.cancelButton {
-    padding: 10px 20px;
-    font-size: 15px;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    font-weight: 500;
+.radioGroupHorizontal input:checked {
+    border-color: #00b4b3;
+}
+
+.radioGroupHorizontal input:checked::before {
+    content: '';
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: #00b4b3;
+    display: block;
 }
 
 .submitButton {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
     background-color: #00b4b3;
-    color: white;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: background-color 0.2s;
+}
+
+.submitButton:hover {
+    background-color: #009a95;
 }
 
 .submitButton:disabled {
     background-color: #ccc;
+    cursor: not-allowed;
 }
 
-.cancelButton {
-    background-color: #f1f1f1;
+.submitButton svg {
+    width: 24px;
+    height: 24px;
+}
+
+.submitButton svg path {
+    stroke: white;
 }
 
 .error {
     color: #e11d48;
     font-size: 14px;
     text-align: center;
-    margin: 0;
+    margin-top: 16px;
 }

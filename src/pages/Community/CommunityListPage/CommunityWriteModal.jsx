@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { createCommunityPost } from '../../../apis/communityApi';
 import styles from './CommunityWriteModal.module.css';
 
-// 1. 실제 존재하는 카테고리 목록으로 수정합니다. ('자유' 제거)
 const CATEGORY_OPTIONS = [
     { value: '구해요', label: '구해요' },
     { value: '동네 소식', label: '동네 소식' },
@@ -21,7 +20,7 @@ const REGION_OPTIONS = [
 const CommunityWriteModal = ({ isOpen, onClose, onPostCreated }) => {
     const [title, setTitle] = useState('');
     const [content, setContent] = useState('');
-    const [category, setCategory] = useState('구해요'); // 2. 기본값을 '구해요'로 변경
+    const [category, setCategory] = useState('구해요');
     const [region, setRegion] = useState('이문동');
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
@@ -30,7 +29,7 @@ const CommunityWriteModal = ({ isOpen, onClose, onPostCreated }) => {
         if (!isOpen) {
             setTitle('');
             setContent('');
-            setCategory('구해요'); // 모달이 닫힐 때도 '구해요'로 초기화
+            setCategory('구해요');
             setRegion('이문동');
             setError('');
         }
@@ -62,88 +61,128 @@ const CommunityWriteModal = ({ isOpen, onClose, onPostCreated }) => {
     return (
         <div className={styles.modalOverlay} onClick={onClose}>
             <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+                <button type="button" className={styles.closeButton} onClick={onClose}>
+                    &times;
+                </button>
                 <div className={styles.sidebar}>
                     <h3 className={styles.sidebarTitle}>나의 지역</h3>
-                    <p className={styles.sidebarSubtitle}>서울특별시 동대문구</p>
+                    <p className={styles.sidebarSubtitle}>서울특별시 동대문구 🔍</p>
                     <div className={styles.regionList}>
-                        {REGION_OPTIONS.map((opt) => (
-                            <label key={opt.value} className={styles.radioLabel}>
-                                <input
-                                    type="radio"
-                                    name="region"
-                                    value={opt.value}
-                                    checked={region === opt.value}
-                                    onChange={(e) => setRegion(e.target.value)}
-                                />
-                                {opt.label}
-                            </label>
-                        ))}
+                        <label className={styles.radioLabel}>
+                            <input
+                                type="radio"
+                                name="region"
+                                value="이문동"
+                                checked={region === '이문동'}
+                                onChange={(e) => setRegion(e.target.value)}
+                            />
+                            이문동
+                        </label>
+                        <label className={styles.radioLabel}>
+                            <input
+                                type="radio"
+                                name="region"
+                                value="회기동"
+                                checked={region === '회기동'}
+                                onChange={(e) => setRegion(e.target.value)}
+                            />
+                            회기동
+                        </label>
+                        <label className={styles.radioLabel}>
+                            <input
+                                type="radio"
+                                name="region"
+                                value="휘경동"
+                                checked={region === '휘경동'}
+                                onChange={(e) => setRegion(e.target.value)}
+                            />
+                            휘경동
+                        </label>
+                        <label className={styles.radioLabel}>
+                            <input
+                                type="radio"
+                                name="region"
+                                value="청량리동"
+                                checked={region === '청량리동'}
+                                onChange={(e) => setRegion(e.target.value)}
+                            />
+                            청량리동
+                        </label>
+                        <label className={styles.radioLabel}>
+                            <input
+                                type="radio"
+                                name="region"
+                                value="제기동"
+                                checked={region === '제기동'}
+                                onChange={(e) => setRegion(e.target.value)}
+                            />
+                            제기동
+                        </label>
                     </div>
-                    <a href="#more" className={styles.moreLink}>
-                        더보기
-                    </a>
+                    {/* 더보기 링크 제거 */}
                 </div>
 
                 <div className={styles.mainContent}>
-                    <form onSubmit={handleSubmit} className={styles.form}>
-                        <input
-                            type="text"
-                            value={title}
-                            onChange={(e) => setTitle(e.target.value)}
-                            className={styles.titleInput}
-                            placeholder="글 제목"
-                        />
-                        <textarea
-                            value={content}
-                            onChange={(e) => setContent(e.target.value)}
-                            className={styles.textarea}
-                            placeholder="본문 글을 이곳에 작성해보세요."
-                        />
-                        {error && <p className={styles.error}>{error}</p>}
-                        <div className={styles.bottomBar}>
-                            <div className={styles.categorySection}>
-                                <span className={styles.categoryLabel}>카테고리</span>
-                                <div className={styles.radioGroup}>
-                                    {CATEGORY_OPTIONS.map((opt) => (
-                                        <label key={opt.value}>
-                                            <input
-                                                type="radio"
-                                                name="category"
-                                                value={opt.value}
-                                                checked={category === opt.value}
-                                                onChange={(e) => setCategory(e.target.value)}
-                                            />
-                                            {opt.label}
-                                        </label>
-                                    ))}
-                                </div>
+                    <h2 className={styles.mainTitle}>글 제목</h2>
+                    <input
+                        type="text"
+                        value={title}
+                        onChange={(e) => setTitle(e.target.value)}
+                        className={styles.titleInput}
+                        placeholder="본문 글을 이곳에 작성해보세요."
+                    />
+                    <textarea
+                        value={content}
+                        onChange={(e) => setContent(e.target.value)}
+                        className={styles.textarea}
+                        placeholder="본문 글을 이곳에 작성해보세요."
+                    />
+                    {error && <p className={styles.error}>{error}</p>}
+                    <div className={styles.bottomBar}>
+                        <div className={styles.categorySection}>
+                            <span className={styles.categoryLabel}>카테고리</span>
+                            <div className={styles.radioGroupHorizontal}>
+                                {' '}
+                                {/* 가로 레이아웃 적용 */}
+                                {CATEGORY_OPTIONS.map((opt) => (
+                                    <label key={opt.value}>
+                                        <input
+                                            type="radio"
+                                            name="category"
+                                            value={opt.value}
+                                            checked={category === opt.value}
+                                            onChange={(e) => setCategory(e.target.value)}
+                                        />
+                                        {opt.label}
+                                    </label>
+                                ))}
                             </div>
-                            <button type="submit" disabled={loading} className={styles.submitButton}>
-                                <svg
-                                    width="24"
-                                    height="24"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                >
-                                    <path
-                                        d="M16.4745 5.40801L18.5917 7.52524M17.8358 3.54288L12.1086 9.27005C11.8131 9.56562 11.61 9.94206 11.5298 10.352L11 13L13.648 12.4702C14.058 12.3901 14.4344 12.187 14.7299 11.8914L20.4571 6.16422C21.181 5.44037 21.181 4.26676 20.4571 3.54291L19.4571 2.54291C18.7332 1.81906 17.5596 1.81906 16.8358 2.54291L17.8358 3.54288Z"
-                                        stroke="white"
-                                        strokeWidth="2"
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                    />
-                                    <path
-                                        d="M19 12C19 16.4183 15.4183 20 11 20H5C3.89543 20 3 19.1046 3 18V7C3 5.89543 3.89543 5 5 5H8"
-                                        stroke="white"
-                                        strokeWidth="2"
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                    />
-                                </svg>
-                            </button>
                         </div>
-                    </form>
+                        <button type="submit" disabled={loading} className={styles.submitButton}>
+                            <svg
+                                width="24"
+                                height="24"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                xmlns="http://www.w3.org/2000/svg"
+                            >
+                                <path
+                                    d="M16.4745 5.40801L18.5917 7.52524M17.8358 3.54288L12.1086 9.27005C11.8131 9.56562 11.61 9.94206 11.5298 10.352L11 13L13.648 12.4702C14.058 12.3901 14.4344 12.187 14.7299 11.8914L20.4571 6.16422C21.181 5.44037 21.181 4.26676 20.4571 3.54291L19.4571 2.54291C18.7332 1.81906 17.5596 1.81906 16.8358 2.54291L17.8358 3.54288Z"
+                                    stroke="white"
+                                    strokeWidth="2"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                />
+                                <path
+                                    d="M19 12C19 16.4183 15.4183 20 11 20H5C3.89543 20 3 19.1046 3 18V7C3 5.89543 3.89543 5 5 5H8"
+                                    stroke="white"
+                                    strokeWidth="2"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                />
+                            </svg>
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
