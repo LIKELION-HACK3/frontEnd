@@ -63,20 +63,19 @@ const DetailPage = () => {
     const [isClosing, setIsClosing] = useState(false);
 
     const ratingCategories = {
-        light: { label: '채광', icon: <img src={sunIcon}    alt="채광" className={styles.icon} /> },
-        noise: { label: '방음', icon: <img src={muteIcon}   alt="방음" className={styles.icon} /> },
-        bug: { label: '벌레', icon: <img src={bugIcon}    alt="벌레" className={styles.icon} /> },
+        light: { label: '채광', icon: <img src={sunIcon} alt="채광" className={styles.icon} /> },
+        noise: { label: '방음', icon: <img src={muteIcon} alt="방음" className={styles.icon} /> },
+        bug: { label: '벌레', icon: <img src={bugIcon} alt="벌레" className={styles.icon} /> },
         safety: { label: '보안', icon: <img src={shieldIcon} alt="보안" className={styles.icon} /> },
-        traffic: { label: '교통', icon: <img src={trainIcon}  alt="교통" className={styles.icon} /> },
+        traffic: { label: '교통', icon: <img src={trainIcon} alt="교통" className={styles.icon} /> },
     };
 
     const newReviewRatingCategories = {
-        rating_light: { label: '채광' },
-        rating_noise: { label: '방음' },
-        rating_bug: { label: '벌레' },
-        rating_safety: { label: '보안' },
-        rating_traffic: { label: '교통' },
-        
+        rating_light:   { label: '채광', icon: <img src={sunIcon} alt="채광" className={styles.icon} /> },
+        rating_noise:   { label: '방음', icon: <img src={muteIcon} alt="방음" className={styles.icon} /> },
+        rating_bug:     { label: '벌레', icon: <img src={bugIcon} alt="벌레" className={styles.icon} /> },
+        rating_safety:  { label: '보안', icon: <img src={shieldIcon} alt="보안" className={styles.icon} /> },
+        rating_traffic: { label: '교통', icon: <img src={trainIcon} alt="교통" className={styles.icon} /> },
     };
 
     useEffect(() => {
@@ -359,9 +358,12 @@ const DetailPage = () => {
                         <form onSubmit={handleReviewSubmit} className={styles.reviewForm}>
                             <h3 className={styles.sectionTitle}>리뷰 작성하기</h3>
                             <div className={styles.ratingList}>
-                                {Object.entries(newReviewRatingCategories).map(([key, { label }]) => (
+                                {Object.entries(newReviewRatingCategories).map(([key, { label, icon }]) => (
                                     <div className={styles.ratingItem} key={key}>
-                                        <span className={styles.labelText}>{label}</span>
+                                        <div className={styles.ratingLabel}>
+                                            <div className={styles.iconCircle}>{icon}</div>
+                                            <span className={styles.labelText}>{label}</span>
+                                        </div>
                                         {renderNewReviewStars(key)}
                                     </div>
                                 ))}
@@ -370,7 +372,8 @@ const DetailPage = () => {
                                 className={styles.reviewTextarea}
                                 value={newReviewContent}
                                 onChange={(e) => setNewReviewContent(e.target.value)}
-                                placeholder="이 집에 대한 리뷰를 남겨주세요."
+                                placeholder="리뷰를 이곳에 작성해주세요. (최대 400자)"
+                                maxLength={400}
                             />
                             <button type="submit" className={styles.writeReviewButton}>
                                 리뷰 등록하기
