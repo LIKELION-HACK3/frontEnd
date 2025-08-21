@@ -79,3 +79,68 @@ export const deleteCommunityPost = async (postId) => {
         normalizeError(error);
     }
 };
+
+// --- 좋아요 (Like) API ---
+export const togglePostLike = async (postId) => {
+    const auth = loadAuth();
+    if (!auth?.access) {
+        throw new Error('좋아요는 로그인이 필요합니다.');
+    }
+    try {
+        const response = await api.post(`/api/community/posts/${postId}/like/`);
+        return response.data; // { liked: boolean, like_count: number }
+    } catch (error) {
+        normalizeError(error);
+    }
+};
+
+export const toggleCommentLike = async (commentId) => {
+    const auth = loadAuth();
+    if (!auth?.access) {
+        throw new Error('좋아요는 로그인이 필요합니다.');
+    }
+    try {
+        const response = await api.post(`/api/community/comments/${commentId}/like/`);
+        return response.data; // { liked: boolean, count: number }
+    } catch (error) {
+        normalizeError(error);
+    }
+};
+
+// --- 댓글 (Comment) API ---
+export const fetchComments = async (postId) => {
+    try {
+        const response = await api.get(`/api/community/posts/${postId}/comments/`);
+        return response.data; // array with replies
+    } catch (error) {
+        normalizeError(error);
+    }
+};
+
+export const createComment = async (postId, content, parent = null) => {
+    const auth = loadAuth();
+    if (!auth?.access) {
+        throw new Error('댓글 작성은 로그인이 필요합니다.');
+    }
+    try {
+        const payload = parent ? { parent, content } : { content };
+        const response = await api.post(`/api/community/posts/${postId}/comments/`, payload);
+        return response.data;
+    } catch (error) {
+        normalizeError(error);
+    }
+};
+
+// --- 신고 (Report) API ---
+export const reportCommunityPost = async (postId, reason) => {
+    const auth = loadAuth();
+    if (!auth?.access) {
+        throw new Error('신고는 로그인이 필요합니다.');
+    }
+    try {
+        const response = await api.post(`/api/community/posts/${postId}/report/`, { reason });
+        return response.data; // 201 기대
+    } catch (error) {
+        normalizeError(error);
+    }
+};

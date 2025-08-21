@@ -1,20 +1,27 @@
-import React, { useState } from 'react';
+import React from 'react';
 import styles from './FilterSidebar.module.css';
 
-const FilterSidebar = () => {
-    const [selectedRegion, setSelectedRegion] = useState('이문동');
-    const [selectedCategory, setSelectedCategory] = useState('전체');
-    const [selectedSort, setSelectedSort] = useState('최근');
-
-    const regionOptions = ['이문동', '회기동', '휘경동', '청량리동', '제기동', '신설동'];
+const FilterSidebar = ({ selectedRegion, setSelectedRegion, selectedCategory, setSelectedCategory, selectedSort, setSelectedSort }) => {
+    const regionOptions = ['전체', '이문동', '회기동', '휘경동', '청량리동', '제기동'];
     const categoryOptions = ['전체', '구해요', '동네 소식', '자취 꿀팁', '기타'];
     const sortOptions = ['최근', '인기'];
+
+    const handleReset = () => {
+        setSelectedRegion('전체');
+        setSelectedCategory('전체');
+        setSelectedSort('최근');
+    };
 
     return (
         <div className={styles.sidebar}>
             <div className={styles.section}>
-                <h4 className={styles.sectionTitle}>지역</h4>
-                <p className={styles.subTitle}>서울특별시 동대문구</p>
+                <h4 className={styles.sectionTitle}>
+                    필터
+                    <button className={styles.resetButton} onClick={handleReset}>
+                        초기화
+                    </button>
+                </h4>
+                <div className={styles.subTitle}>서울특별시 동대문구</div>
                 {regionOptions.map((region) => (
                     <label key={region} className={styles.radioLabel}>
                         <input
@@ -24,7 +31,7 @@ const FilterSidebar = () => {
                             checked={selectedRegion === region}
                             onChange={() => setSelectedRegion(region)}
                         />
-                        {region}
+                        <span>{region}</span>
                     </label>
                 ))}
                 <button className={styles.moreButton}>더보기</button>
@@ -41,7 +48,7 @@ const FilterSidebar = () => {
                             checked={selectedCategory === cat}
                             onChange={() => setSelectedCategory(cat)}
                         />
-                        {cat}
+                        <span>{cat}</span>
                     </label>
                 ))}
             </div>
@@ -57,7 +64,7 @@ const FilterSidebar = () => {
                             checked={selectedSort === sort}
                             onChange={() => setSelectedSort(sort)}
                         />
-                        {sort}
+                        <span>{sort}</span>
                     </label>
                 ))}
             </div>

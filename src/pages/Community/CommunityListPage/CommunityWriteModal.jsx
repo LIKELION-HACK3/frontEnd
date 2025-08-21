@@ -24,6 +24,7 @@ const CommunityWriteModal = ({ isOpen, onClose, onPostCreated }) => {
     const [region, setRegion] = useState('이문동');
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
+    const [attemptedSubmit, setAttemptedSubmit] = useState(false);
 
     useEffect(() => {
         if (!isOpen) {
@@ -32,19 +33,40 @@ const CommunityWriteModal = ({ isOpen, onClose, onPostCreated }) => {
             setCategory('구해요');
             setRegion('이문동');
             setError('');
+            setAttemptedSubmit(false);
         }
     }, [isOpen]);
 
+    const handleRegionChange = (e) => {
+        console.log('Region changed to:', e.target.value);
+        setRegion(e.target.value);
+    };
+
+    const handleCategoryChange = (e) => {
+        console.log('Category changed to:', e.target.value);
+        setCategory(e.target.value);
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (!title.trim()) return setError('제목을 입력해주세요.');
-        if (!content.trim()) return setError('내용을 입력해주세요.');
+        setAttemptedSubmit(true);
+
+        if (!title.trim()) {
+            setError('제목을 입력해주세요.');
+            return;
+        }
+        if (!content.trim()) {
+            setError('내용을 입력해주세요.');
+            return;
+        }
 
         setLoading(true);
         setError('');
 
         try {
-            const postData = { title, content, region, category };
+            // 공백 포함 카테고리 값을 백엔드 호환을 위해 공백 제거하여 전송
+            const normalizedCategory = category.replace(/\s+/g, '');
+            const postData = { title: title.trim(), content: content.trim(), region, category: normalizedCategory };
             await createCommunityPost(postData);
             alert('게시글이 성공적으로 등록되었습니다.');
             onPostCreated();
@@ -57,6 +79,9 @@ const CommunityWriteModal = ({ isOpen, onClose, onPostCreated }) => {
     };
 
     if (!isOpen) return null;
+
+    const titleInvalid = attemptedSubmit && !title.trim();
+    const contentInvalid = attemptedSubmit && !content.trim();
 
     return (
         <div className={styles.modalOverlay} onClick={onClose}>
@@ -75,7 +100,8 @@ const CommunityWriteModal = ({ isOpen, onClose, onPostCreated }) => {
                                     name="region"
                                     value={opt.value}
                                     checked={region === opt.value}
-                                    onChange={(e) => setRegion(e.target.value)}
+                                    onChange={handleRegionChange}
+                                    style={{ accentColor: '#00b4b3' }}
                                 />
                                 {opt.label}
                             </label>
@@ -89,13 +115,13 @@ const CommunityWriteModal = ({ isOpen, onClose, onPostCreated }) => {
                         type="text"
                         value={title}
                         onChange={(e) => setTitle(e.target.value)}
-                        className={styles.titleInput}
+                        className={`${styles.titleInput} ${titleInvalid ? styles.invalid : ''}`}
                         placeholder="제목을 입력하세요."
                     />
                     <textarea
                         value={content}
                         onChange={(e) => setContent(e.target.value)}
-                        className={styles.textarea}
+                        className={`${styles.textarea} ${contentInvalid ? styles.invalid : ''}`}
                         placeholder="본문 글을 이곳에 작성해보세요."
                     />
                     {error && <p className={styles.error}>{error}</p>}
@@ -110,36 +136,47 @@ const CommunityWriteModal = ({ isOpen, onClose, onPostCreated }) => {
                                             name="category"
                                             value={opt.value}
                                             checked={category === opt.value}
-                                            onChange={(e) => setCategory(e.target.value)}
+                                            onChange={handleCategoryChange}
+                                            style={{ accentColor: '#00b4b3' }}
                                         />
                                         {opt.label}
                                     </label>
                                 ))}
                             </div>
                         </div>
-                        <button type="button" onClick={handleSubmit} disabled={loading} className={styles.submitButton}>
-                            <svg
-                                width="24"
-                                height="24"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                xmlns="http://www.w3.org/2000/svg"
-                            >
-                                <path
-                                    d="M16.4745 5.40801L18.5917 7.52524M17.8358 3.54288L12.1086 9.27005C11.8131 9.56562 11.61 9.94206 11.5298 10.352L11 13L13.648 12.4702C14.058 12.3901 14.4344 12.187 14.7299 11.8914L20.4571 6.16422C21.181 5.44037 21.181 4.26676 20.4571 3.54291L19.4571 2.54291C18.7332 1.81906 17.5596 1.81906 16.8358 2.54291L17.8358 3.54288Z"
-                                    stroke="white"
-                                    strokeWidth="2"
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                />
-                                <path
-                                    d="M19 12C19 16.4183 15.4183 20 11 20H5C3.89543 20 3 19.1046 3 18V7C3 5.89543 3.89543 5 5 5H8"
-                                    stroke="white"
-                                    strokeWidth="2"
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                />
-                            </svg>
+                        <button
+                            type="button"
+                            onClick={handleSubmit}
+                            disabled={loading}
+                            className={styles.submitButton}
+                            aria-busy={loading}
+                        >
+                            {loading ? (
+                                <span className={styles.spinner} aria-hidden="true" />
+                            ) : (
+                                <svg
+                                    width="24"
+                                    height="24"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                >
+                                    <path
+                                        d="M16.4745 5.40801L18.5917 7.52524M17.8358 3.54288L12.1086 9.27005C11.8131 9.56562 11.61 9.94206 11.5298 10.352L11 13L13.648 12.4702C14.058 12.3901 14.4344 12.187 14.7299 11.8914L20.4571 6.16422C21.181 5.44037 21.181 4.26676 20.4571 3.54291L19.4571 2.54291C18.7332 1.81906 17.5596 1.81906 16.8358 2.54291L17.8358 3.54288Z"
+                                        stroke="white"
+                                        strokeWidth="2"
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                    />
+                                    <path
+                                        d="M19 12C19 16.4183 15.4183 20 11 20H5C3.89543 20 3 19.1046 3 18V7C3 5.89543 3.89543 5 5 5H8"
+                                        stroke="white"
+                                        strokeWidth="2"
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                    />
+                                </svg>
+                            )}
                         </button>
                     </div>
                 </div>
