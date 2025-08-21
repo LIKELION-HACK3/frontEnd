@@ -11,7 +11,6 @@ import CommunityPage from './pages/Community/CommunityPage/CommunityPage';
 import CommunityListPage from './pages/Community/CommunityListPage/CommunityListPage';
 import DetailPage from './pages/DetailPage/DetailPage';
 import MyRoom from './pages/MyRoom/MyRoom';
-import Home from './pages/Home/Home';
 
 function App() {
     return (
@@ -28,9 +27,6 @@ function App() {
                 <Route path="/myroom" element={<MyRoom />} />
             </Routes>
             <Footer />
-            <Routes>
-                <Route path="/" element={<Home/>} />
-            </Routes>
         </>
     );
 }
