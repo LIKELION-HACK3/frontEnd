@@ -1,0 +1,98 @@
+.container {
+    max-width: 800px;
+    margin: 40px auto;
+    padding: 24px;
+    font-family: 'Pretendard Variable', sans-serif;
+    color: #333;
+}
+
+.backButton {
+    background: none;
+    border: 1px solid #ddd;
+    padding: 8px 16px;
+    border-radius: 20px;
+    cursor: pointer;
+    margin-bottom: 24px;
+}
+
+.postHeader {
+    border-bottom: 1px solid #eee;
+    padding-bottom: 16px;
+    margin-bottom: 24px;
+}
+
+.postTitle {
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 16px;
+}
+
+.authorInfo {
+    display: flex;
+    align-items: center;
+}
+
+.avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: #f0f0f0;
+    margin-right: 12px;
+}
+
+.authorMeta {
+    display: flex;
+    flex-direction: column;
+}
+
+.authorName {
+    font-weight: 600;
+}
+
+.postTimestamp {
+    font-size: 12px;
+    color: #888;
+}
+
+.postContent {
+    font-size: 16px;
+    line-height: 1.8;
+    min-height: 200px;
+    margin-bottom: 32px;
+}
+
+.postActions {
+    display: flex;
+    gap: 16px;
+    color: #888;
+    font-size: 14px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #eee;
+    margin-bottom: 24px;
+}
+
+.commentSection {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.comment {
+    font-size: 14px;
+}
+
+.commentContent {
+    margin-top: 8px;
+    padding-left: 52px; /* Avatar width + margin */
+}
+
+.loading,
+.error {
+    text-align: center;
+    padding: 50px;
+    font-size: 18px;
+}
+
+.error {
+    color: red;
+}

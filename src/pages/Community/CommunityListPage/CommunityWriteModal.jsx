@@ -68,58 +68,19 @@ const CommunityWriteModal = ({ isOpen, onClose, onPostCreated }) => {
                     <h3 className={styles.sidebarTitle}>나의 지역</h3>
                     <p className={styles.sidebarSubtitle}>서울특별시 동대문구 🔍</p>
                     <div className={styles.regionList}>
-                        <label className={styles.radioLabel}>
-                            <input
-                                type="radio"
-                                name="region"
-                                value="이문동"
-                                checked={region === '이문동'}
-                                onChange={(e) => setRegion(e.target.value)}
-                            />
-                            이문동
-                        </label>
-                        <label className={styles.radioLabel}>
-                            <input
-                                type="radio"
-                                name="region"
-                                value="회기동"
-                                checked={region === '회기동'}
-                                onChange={(e) => setRegion(e.target.value)}
-                            />
-                            회기동
-                        </label>
-                        <label className={styles.radioLabel}>
-                            <input
-                                type="radio"
-                                name="region"
-                                value="휘경동"
-                                checked={region === '휘경동'}
-                                onChange={(e) => setRegion(e.target.value)}
-                            />
-                            휘경동
-                        </label>
-                        <label className={styles.radioLabel}>
-                            <input
-                                type="radio"
-                                name="region"
-                                value="청량리동"
-                                checked={region === '청량리동'}
-                                onChange={(e) => setRegion(e.target.value)}
-                            />
-                            청량리동
-                        </label>
-                        <label className={styles.radioLabel}>
-                            <input
-                                type="radio"
-                                name="region"
-                                value="제기동"
-                                checked={region === '제기동'}
-                                onChange={(e) => setRegion(e.target.value)}
-                            />
-                            제기동
-                        </label>
+                        {REGION_OPTIONS.map((opt) => (
+                            <label key={opt.value} className={styles.radioLabel}>
+                                <input
+                                    type="radio"
+                                    name="region"
+                                    value={opt.value}
+                                    checked={region === opt.value}
+                                    onChange={(e) => setRegion(e.target.value)}
+                                />
+                                {opt.label}
+                            </label>
+                        ))}
                     </div>
-                    {/* 더보기 링크 제거 */}
                 </div>
 
                 <div className={styles.mainContent}>
@@ -129,7 +90,7 @@ const CommunityWriteModal = ({ isOpen, onClose, onPostCreated }) => {
                         value={title}
                         onChange={(e) => setTitle(e.target.value)}
                         className={styles.titleInput}
-                        placeholder="본문 글을 이곳에 작성해보세요."
+                        placeholder="제목을 입력하세요."
                     />
                     <textarea
                         value={content}
@@ -142,8 +103,6 @@ const CommunityWriteModal = ({ isOpen, onClose, onPostCreated }) => {
                         <div className={styles.categorySection}>
                             <span className={styles.categoryLabel}>카테고리</span>
                             <div className={styles.radioGroupHorizontal}>
-                                {' '}
-                                {/* 가로 레이아웃 적용 */}
                                 {CATEGORY_OPTIONS.map((opt) => (
                                     <label key={opt.value}>
                                         <input
@@ -158,7 +117,7 @@ const CommunityWriteModal = ({ isOpen, onClose, onPostCreated }) => {
                                 ))}
                             </div>
                         </div>
-                        <button type="submit" disabled={loading} className={styles.submitButton}>
+                        <button type="button" onClick={handleSubmit} disabled={loading} className={styles.submitButton}>
                             <svg
                                 width="24"
                                 height="24"
