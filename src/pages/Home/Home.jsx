@@ -1,5 +1,3 @@
-<<<<<<< Updated upstream
-// src/pages/Home/Home.jsx
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import styles from './Home.module.css';
@@ -298,4 +296,3 @@ const Home = () => {
 }
 
 export default Home;
->>>>>>> Stashed changes
