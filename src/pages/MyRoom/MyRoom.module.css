@@ -1,3 +1,7 @@
+.myPage {
+    width: 100%;
+}
+
 .topHeader {
     display: flex;
     flex-direction: column;
@@ -31,11 +35,36 @@
     padding: 140px 0px 140px 0px;
 }
 
-/* --- 카드 디자인 --- */
+.carousel {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    column-gap: 20px;
+    width: 100%;
+}
+
+.viewport {
+    width: 100%;
+    overflow: hidden;
+}
+
+.track {
+    display: flex;
+    width: 100%;
+    transition: transform 0.4s ease;
+}
+
+.page {
+    flex: 0 0 100%;
+    display: flex;
+    justify-content: center;
+}
+
 .propertyGrid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 48px 24px;
+    width: 100%;
 }
 
 .cardWrapper {
@@ -45,81 +74,81 @@
 }
 
 .propertyCard {
-    background-color: #fff;
-    border-radius: 12px;
-    border: 1px solid #e9ecef;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
-    overflow: hidden;
-    width: 100%;
     display: flex;
-    height: 160px;
+    flex-direction: row;
+    align-items: center;
+    gap: 20px;
+    width: 100%;
+    min-height: 200px;
+    border: 1px solid #0000001A;
+    border-radius: 10px;
+    background-color: #fff;
+    position: relative;
+    overflow: hidden;
 }
 
-.cardImage {
+.cardPic {
     width: 160px;
     height: 160px;
-    object-fit: cover;
-    flex-shrink: 0;
-    border-radius: 11px;
-    margin: -1px 0 -1px -1px;
+    flex: 0 0 160px;
+    min-width: 160px;
+    min-height: 160px;
+    border-radius: 12px;
+    margin-left: 18px;
+    overflow: hidden;
+}
+
+.cardImg {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: fill;
 }
 
 .cardBody {
-    position: relative;
-    padding: 18px 16px;
-    text-align: left;
     display: flex;
     flex-direction: column;
-    flex-grow: 1;
-    overflow: hidden;
+    gap: 6px;
+    padding-right: 18px;
+    flex: 1;
+    position: relative;
+    text-align: left;
 }
 
-.heartWrapper {
-    position: absolute;
-    top: 10px;
-    right: 10px;
+.info1 {
+    font-size: 22px;
+    font-weight: 600;
 }
 
-/* FavoriteHeart 컴포넌트의 기본 스타일을 덮어씁니다. */
-.heartWrapper > button {
-    position: static !important;
-    width: 32px !important;
-    height: 32px !important;
-    box-shadow: none !important;
-    background: transparent !important;
+.info2 {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 20px;
 }
 
-.priceMain {
-    font-size: 18px;
-    font-weight: 700;
-    color: #212529;
-    margin: 0 0 4px;
+.info3 {
+    font-size: 16px;
+    font-weight: 400;
+    color: #1B818C;
 }
 
-.maintenanceFee {
+.info4 {
     font-size: 14px;
-    color: #212529;
-    font-weight: 700;
-    margin: 0 0 14px;
+    font-weight: 400;
+    line-height: 1.4;
+    color: #5E5E5E;
 }
 
-.roomDetails {
-    font-size: 13px;
-    color: #00b4b3;
-    margin: 0 0 6px;
-}
-
-.description {
-    font-size: 13px;
-    color: #495057;
+.text1 {}
+.deposit {}
+.text2 {}
+.monthlyFee {}
+.text3 {}
+.maintenance {}
+.dot {
     margin: 0;
-    line-height: 1.5;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
 }
+.titleText {}
 
 .selectButton {
     background-color: #00b4b3;
@@ -143,7 +172,6 @@
     color: #fff;
 }
 
-/* --- AI 리포트 섹션 --- */
 .aiSectionWrapper {
     width: 100%;
     height: 800px;
@@ -244,7 +272,6 @@
     color: #999;
 }
 
-/* 추가 기준 & 가중치 설정 */
 .criteriaGroup {
     display: flex;
     flex-direction: column;
@@ -267,7 +294,7 @@
 }
 
 .radioLabel {
-    display: inline-flex; 
+    display: inline-flex;
     align-items: center;
     gap: 8px;
     line-height: 1;
@@ -362,7 +389,6 @@
     color: #DDDDDD;
 }
 
-/* 사용자 선호 입력 */
 .preferenceSection {
     display: flex;
     flex-direction: column;
@@ -427,4 +453,15 @@
     width: 24px;
     height: 24px;
     display: block;
+}
+
+.slider {
+    padding: 6px 12px 6px 12px;
+    border-radius: 50px;
+    cursor: pointer;
+}
+
+.sliderDisabled {
+    opacity: 0.3;
+    pointer-events: none;
 }

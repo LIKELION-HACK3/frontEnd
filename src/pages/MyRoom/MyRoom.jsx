@@ -5,33 +5,32 @@ import BookMark from '../../components/BookMark/BookMark';
 import { fetchAllBookmarks, toggleBookmark } from '../../apis/bookmarks';
 import { createAiReport } from '../../apis/aiApi';
 
+import leftArrow from '../../assets/pic/left_arrow.svg';
+import rightArrow from '../../assets/pic/right_arrow.svg';
 import moneyIcon from '../../assets/pic/property_money.svg';
 import locationIcon from '../../assets/pic/property_location.svg';
 import roomsIcon from '../../assets/pic/property_rooms.svg';
 import plusIcon from '../../assets/pic/myroom_plus.svg';
 
-// Helper functions (formatPriceSimple, formatManwon, toPyeong) remain the same
-const formatPriceSimple = (value) => {
-    const num = Number(value);
-    if (isNaN(num) || value === null || value === '') return '-';
-    if (num >= 10000) {
-        return (num / 10000).toLocaleString();
-    }
-    return num;
-};
-
-const formatManwon = (value) => {
-    const num = Number(value);
-    if (isNaN(num) || value === null || value === '') return '-';
-    if (num >= 10000) {
-        return `${(num / 10000).toLocaleString()}만원`;
-    }
-    return `${num.toLocaleString()}원`;
+const fmtMoney = (v) => {
+    if (v == null || v === '') return '-';
+    const n = Number(v);
+    if (!Number.isFinite(n)) return String(v);
+    return n >= 10000 ? `${Math.round(n / 10000).toLocaleString()}` : `${n.toLocaleString()}`;
 };
 
 const toPyeong = (sqm) => {
+    if (sqm === '' || sqm == null) return '-';
     const n = Number(sqm);
-    return Number.isFinite(n) ? `${Math.round(n / 3.305785)}평` : '-';
+    if (!Number.isFinite(n)) return '-';
+    if (n === 0) return '0평';
+    return `${Math.floor(n / 3.305785)}평`;
+};
+
+const safeString = (v, fallback = '-') => {
+    if (v == null) return fallback;
+    const s = String(v).trim();
+    return s === '' ? fallback : s;
 };
 
 const MyRoom = () => {
@@ -43,22 +42,21 @@ const MyRoom = () => {
 
     const [selectedForReport, setSelectedForReport] = useState([null, null]);
     const [additionalCriteria, setAdditionalCriteria] = useState('지도');
-    const [weights, setWeights] = useState({
-        price: 0,
-        location: 0,
-        area: 0,
-    });
+    const [weights, setWeights] = useState({ price: 0, location: 0, area: 0 });
     const [userPreference, setUserPreference] = useState('');
     const [isGenerating, setIsGenerating] = useState(false);
+
+    const [pageIndex, setPageIndex] = useState(0);
 
     const loadBookmarks = async () => {
         setLoading(true);
         try {
             const list = await fetchAllBookmarks();
             setBookmarks(list);
-            setFavoriteRoomIds(new Set(list.map((bm) => bm?.room?.id).filter((id) => id !== null && id !== undefined)));
+            setFavoriteRoomIds(
+                new Set(list.map((bm) => bm?.room?.id).filter((id) => id !== null && id !== undefined))
+            );
         } catch (e) {
-            console.error(e);
             alert(e.message || '북마크를 불러오지 못했습니다.');
             setBookmarks([]);
             setFavoriteRoomIds(new Set());
@@ -73,6 +71,31 @@ const MyRoom = () => {
 
     const rooms = useMemo(() => bookmarks.map((bm) => bm.room).filter(Boolean), [bookmarks]);
 
+    const pages = useMemo(() => {
+        const chunked = [];
+        for (let i = 0; i < rooms.length; i += 6) {
+            chunked.push(rooms.slice(i, i + 6));
+        }
+        return chunked;
+    }, [rooms]);
+
+    useEffect(() => {
+        const maxIdx = Math.max(0, pages.length - 1);
+        if (pageIndex > maxIdx) setPageIndex(0);
+    }, [pages.length]);
+
+    const maxPageIndex = Math.max(0, pages.length - 1);
+    const isPrevDisabled = pageIndex === 0;
+    const isNextDisabled = pageIndex >= maxPageIndex;
+
+    const handlePrevPage = () => {
+        if (!isPrevDisabled) setPageIndex((i) => i - 1);
+    };
+
+    const handleNextPage = () => {
+        if (!isNextDisabled) setPageIndex((i) => i + 1);
+    };
+
     const onToggle = async (roomId) => {
         if (toggling.has(roomId)) return;
         setToggling(new Set(toggling).add(roomId));
@@ -84,7 +107,6 @@ const MyRoom = () => {
             await toggleBookmark(roomId);
             await loadBookmarks();
         } catch (e) {
-            console.error(e);
             alert(e.message || '찜 처리에 실패했습니다.');
             await loadBookmarks();
         } finally {
@@ -101,9 +123,9 @@ const MyRoom = () => {
             }
             const emptyIndex = prev.indexOf(null);
             if (emptyIndex !== -1) {
-                const newSelection = [...prev];
-                newSelection[emptyIndex] = room;
-                return newSelection;
+                const next = [...prev];
+                next[emptyIndex] = room;
+                return next;
             }
             alert('최대 2개의 집만 선택할 수 있습니다.');
             return prev;
@@ -139,15 +161,12 @@ const MyRoom = () => {
             alert('비교할 집 2개를 모두 선택해주세요.');
             return;
         }
-
         const totalWeight = weights.price + weights.location + weights.area;
         if (totalWeight === 0) {
             alert('가중치를 하나 이상 설정해주세요.');
             return;
         }
-
         setIsGenerating(true);
-
         const apiData = {
             room_a_id: selectedForReport[0].id,
             room_b_id: selectedForReport[1].id,
@@ -158,16 +177,11 @@ const MyRoom = () => {
             },
             user_preferences: userPreference,
         };
-
         try {
             const reportResult = await createAiReport(apiData);
             const reportId = reportResult.id;
-            if (reportId) {
-                navigate(`/report/${reportId}`);
-            } else {
-                console.error("Received data doesn't contain a report ID:", reportResult);
-                alert('리포트 ID를 받지 못했습니다. 다시 시도해주세요.');
-            }
+            if (reportId) navigate(`/report/${reportId}`);
+            else alert('리포트 ID를 받지 못했습니다. 다시 시도해주세요.');
         } catch (error) {
             alert(error.message);
         } finally {
@@ -187,47 +201,107 @@ const MyRoom = () => {
                 ) : rooms.length === 0 ? (
                     <p className={styles.subtitle}>아직 북마크한 집이 없어요.</p>
                 ) : (
-                    <div className={styles.propertyGrid}>
-                        {rooms.map((room) => {
-                            const priceMain =
-                                room.contract_type === '전세'
-                                    ? `전세 ${formatPriceSimple(room.deposit)}`
-                                    : `월세 ${formatPriceSimple(room.deposit)}/${formatPriceSimple(room.monthly_fee)}`;
-                            const isSelected = selectedForReport.some((r) => r?.id === room.id);
-                            return (
-                                <div key={room.id} className={styles.cardWrapper}>
-                                    <div className={styles.propertyCard}>
-                                        <img
-                                            src={room.thumbnail_url || 'https://via.placeholder.com/160'}
-                                            alt={room.title}
-                                            className={styles.cardImage}
-                                        />
-                                        <div className={styles.cardBody}>
-                                            <div className={styles.heartWrapper}>
-                                                <BookMark
-                                                    filled={favoriteRoomIds.has(room.id)}
-                                                    onToggle={() => onToggle(room.id)}
-                                                />
-                                            </div>
-                                            <p className={styles.priceMain}>{priceMain}</p>
-                                            <p className={styles.maintenanceFee}>
-                                                관리비 {formatManwon(room.maintenance_cost)}
-                                            </p>
-                                            <p className={styles.roomDetails}>
-                                                {room.room_type} · {room.floor} · {toPyeong(room.real_area)}
-                                            </p>
-                                            <p className={styles.description}>{room.title}</p>
+                    <div className={styles.carousel}>
+                        <img
+                            src={leftArrow}
+                            alt="이전"
+                            className={`${styles.slider} ${isPrevDisabled ? styles.sliderDisabled : ''}`}
+                            onClick={handlePrevPage}
+                        />
+                        <div className={styles.viewport}>
+                            <div
+                                className={styles.track}
+                                style={{ transform: `translateX(-${pageIndex * 100}%)` }}
+                            >
+                                {pages.map((pageRooms, idx) => (
+                                    <div className={styles.page} key={idx}>
+                                        <div className={styles.propertyGrid}>
+                                            {pageRooms.map((room) => {
+                                                const isSelected = selectedForReport.some((r) => r?.id === room.id);
+                                                const isJeonse =
+                                                    room.contract_type === '전세' ||
+                                                    Number(room?.monthly_fee) === 0 ||
+                                                    room?.monthly_fee == null;
+                                                return (
+                                                    <div key={room.id} className={styles.cardWrapper}>
+                                                        <div className={styles.propertyCard}>
+                                                            <BookMark
+                                                                filled={favoriteRoomIds.has(room.id)}
+                                                                onToggle={() => onToggle(room.id)}
+                                                            />
+                                                            <div className={styles.cardPic}>
+                                                                <img
+                                                                    src={room.thumbnail_url || 'https://via.placeholder.com/160'}
+                                                                    alt={room.title}
+                                                                    className={styles.cardImg}
+                                                                />
+                                                            </div>
+                                                            <div className={styles.cardBody}>
+                                                                <div className={styles.info1}>
+                                                                    {isJeonse ? (
+                                                                        <>
+                                                                            <span className={styles.text1}>전세 </span>
+                                                                            <span className={styles.deposit}>{fmtMoney(room.deposit)}</span>
+                                                                        </>
+                                                                    ) : (
+                                                                        <>
+                                                                            <span className={styles.text1}>월세 </span>
+                                                                            <span className={styles.deposit}>{fmtMoney(room.deposit)}</span>
+                                                                            <span className={styles.text2}>/</span>
+                                                                            <span className={styles.monthlyFee}>{fmtMoney(room.monthly_fee)}</span>
+                                                                        </>
+                                                                    )}
+                                                                </div>
+                                                                <div className={styles.info2}>
+                                                                    <span className={styles.text3}>관리비 </span>
+                                                                    <span className={styles.maintenance}>{fmtMoney(room.maintenance_cost)}</span>
+                                                                </div>
+                                                                <div className={styles.info3}>
+                                                                    <span>{safeString(room?.room_type)}</span>
+                                                                    <span className={styles.dot}>ㆍ</span>
+                                                                    <span>{room?.floor ?? '-'}</span>
+                                                                    <span className={styles.dot}>ㆍ</span>
+                                                                    <span>{toPyeong(room?.real_area)}</span>
+                                                                </div>
+                                                                <div className={styles.info4}>
+                                                                    <div className={styles.titleText}>{room.title || ''}</div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <button
+                                                            className={`${styles.selectButton} ${isSelected ? styles.selected : ''}`}
+                                                            onClick={() =>
+                                                                setSelectedForReport((prev) => {
+                                                                    if (prev.some((r) => r?.id === room.id)) {
+                                                                        return prev.map((r) => (r?.id === room.id ? null : r));
+                                                                    }
+                                                                    const i = prev.indexOf(null);
+                                                                    if (i !== -1) {
+                                                                        const next = [...prev];
+                                                                        next[i] = room;
+                                                                        return next;
+                                                                    }
+                                                                    alert('최대 2개의 집만 선택할 수 있습니다.');
+                                                                    return prev;
+                                                                })
+                                                            }
+                                                        >
+                                                            {isSelected ? '✓ 선택됨' : 'AI 리포트 선택'}
+                                                        </button>
+                                                    </div>
+                                                );
+                                            })}
                                         </div>
                                     </div>
-                                    <button
-                                        className={`${styles.selectButton} ${isSelected ? styles.selected : ''}`}
-                                        onClick={() => handleSelectForReport(room)}
-                                    >
-                                        {isSelected ? '✓ 선택됨' : 'AI 리포트 선택'}
-                                    </button>
-                                </div>
-                            );
-                        })}
+                                ))}
+                            </div>
+                        </div>
+                        <img
+                            src={rightArrow}
+                            alt="다음"
+                            className={`${styles.slider} ${isNextDisabled ? styles.sliderDisabled : ''}`}
+                            onClick={handleNextPage}
+                        />
                     </div>
                 )}
             </div>
@@ -252,16 +326,19 @@ const MyRoom = () => {
                                             />
                                             <div className={styles.selectedRoomText}>
                                                 <p className={styles.selectedRoomPrice}>
-                                                    {selectedForReport[index].contract_type === '전세'
-                                                        ? `전세 ${formatPriceSimple(selectedForReport[index].deposit)}`
-                                                        : `월세 ${formatPriceSimple(
-                                                              selectedForReport[index].deposit
-                                                          )}/${formatPriceSimple(
-                                                              selectedForReport[index].monthly_fee
-                                                          )}`}
+                                                    {(() => {
+                                                        const s = selectedForReport[index];
+                                                        const isJeonse =
+                                                            s.contract_type === '전세' ||
+                                                            Number(s?.monthly_fee) === 0 ||
+                                                            s?.monthly_fee == null;
+                                                        return isJeonse
+                                                            ? `전세 ${fmtMoney(s.deposit)}`
+                                                            : `월세 ${fmtMoney(s.deposit)}/${fmtMoney(s.monthly_fee)}`;
+                                                    })()}
                                                 </p>
                                                 <p className={styles.selectedRoomTitle}>
-                                                    {selectedForReport[index].address}
+                                                    {safeString(selectedForReport[index].address, '')}
                                                 </p>
                                             </div>
                                         </div>
@@ -275,7 +352,7 @@ const MyRoom = () => {
                         </div>
                     </div>
                     <div className={styles.aiRight}>
-                        <div className={styles.criteriaGroup}>  
+                        <div className={styles.criteriaGroup}>
                             <h4 className={styles.groupTitle}>가중치 설정</h4>
                             <div className={styles.weightGroup}>
                                 <div className={styles.weightItem}>

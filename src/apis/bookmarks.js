@@ -1,7 +1,5 @@
 import api from './api';
 
-// GET /api/bookmarks/
-// 더 이상 수동으로 헤더를 설정할 필요가 없으므로 getAuthHeaders 함수와 headers 객체를 제거합니다.
 export async function fetchBookmarks({ page = 1, page_size = 50 } = {}) {
     try {
         const response = await api.get('/api/bookmarks/', {
@@ -14,7 +12,12 @@ export async function fetchBookmarks({ page = 1, page_size = 50 } = {}) {
     }
 }
 
-// 모든 북마크를 가져오는 함수
+// 방 상세 데이터 조회
+async function fetchRoomDetail(roomId) {
+    const res = await api.get(`/api/rooms/${roomId}/`);
+    return res.data;
+}
+
 export async function fetchAllBookmarks() {
     let page = 1;
     const all = [];
@@ -24,16 +27,52 @@ export async function fetchAllBookmarks() {
         if (!data.next) break;
         page += 1;
     }
+
+    const needDetailIds = Array.from(
+        new Set(
+            all
+                .map((bm) => bm?.room?.id)
+                .filter((id, idx) => {
+                    const r = all[idx]?.room;
+                    return (
+                        id != null &&
+                        (r?.room_type === undefined ||
+                            r?.floor === undefined ||
+                            r?.real_area === undefined)
+                    );
+                })
+        )
+    );
+
+    if (needDetailIds.length > 0) {
+        const pairs = await Promise.all(
+            needDetailIds.map(async (id) => {
+                try {
+                    const detail = await fetchRoomDetail(id);
+                    return [id, detail];
+                } catch (e) {
+                    console.error('fetchRoomDetail failed:', id, e?.response || e);
+                    return null;
+                }
+            })
+        );
+
+        const detailMap = new Map(pairs.filter(Boolean));
+        for (const bm of all) {
+            const rid = bm?.room?.id;
+            const d = rid != null ? detailMap.get(rid) : null;
+            if (d) {
+                bm.room = { ...bm.room, ...d };
+            }
+        }
+    }
+
     return all;
 }
 
-// POST /api/bookmarks/{room_id}/toggle/
-// 여기에서도 수동 헤더 설정을 제거합니다.
 export async function toggleBookmark(roomId) {
     try {
-        // POST 요청 시 빈 객체 {}를 두 번째 인자로 전달합니다.
         const response = await api.post(`/api/bookmarks/${roomId}/toggle/`, {});
-
         if (response.status === 201) return { action: 'added' };
         if (response.status === 200) return { action: 'removed' };
         return { action: 'unknown' };
