@@ -130,3 +130,17 @@ export const createComment = async (postId, content, parent = null) => {
         normalizeError(error);
     }
 };
+
+// --- 신고 (Report) API ---
+export const reportCommunityPost = async (postId, reason) => {
+    const auth = loadAuth();
+    if (!auth?.access) {
+        throw new Error('신고는 로그인이 필요합니다.');
+    }
+    try {
+        const response = await api.post(`/api/community/posts/${postId}/report/`, { reason });
+        return response.data; // 201 기대
+    } catch (error) {
+        normalizeError(error);
+    }
+};

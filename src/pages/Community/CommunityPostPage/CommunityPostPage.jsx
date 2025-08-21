@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { fetchCommunityPostDetail, fetchComments, createComment, togglePostLike, toggleCommentLike } from '../../../apis/communityApi';
+import { fetchCommunityPostDetail, fetchComments, createComment, togglePostLike, toggleCommentLike, reportCommunityPost } from '../../../apis/communityApi';
 import styles from './CommunityPostPage.module.css';
 
 const CommunityPostPage = () => {
@@ -12,6 +12,8 @@ const CommunityPostPage = () => {
     const [comments, setComments] = useState([]);
     const [newComment, setNewComment] = useState('');
     const [replyTargetId, setReplyTargetId] = useState(null);
+    const [isReportOpen, setIsReportOpen] = useState(false);
+    const [reportReason, setReportReason] = useState('');
 
     useEffect(() => {
         const loadPost = async () => {
@@ -44,6 +46,27 @@ const CommunityPostPage = () => {
         try {
             const res = await togglePostLike(id);
             setPost((prev) => (prev ? { ...prev, like_count: res.like_count } : prev));
+        } catch (e) {
+            alert(e.message);
+        }
+    };
+
+    const handleOpenReport = () => {
+        setReportReason('');
+        setIsReportOpen(true);
+    };
+
+    const handleSubmitReport = async () => {
+        const reason = reportReason.trim();
+        if (!reason) {
+            alert('신고 사유를 입력해 주세요.');
+            return;
+        }
+        try {
+            await reportCommunityPost(id, reason);
+            alert('신고가 접수되었습니다. 감사합니다.');
+            setIsReportOpen(false);
+            setReportReason('');
         } catch (e) {
             alert(e.message);
         }
@@ -115,6 +138,7 @@ const CommunityPostPage = () => {
                     ❤️ 공감 {post.like_count}
                 </button>
                 <span>댓글 {post.comment_count}</span>
+                <button type="button" className={styles.reportButton} onClick={handleOpenReport}>신고</button>
             </div>
 
             <div className={styles.commentSection}>
@@ -174,6 +198,24 @@ const CommunityPostPage = () => {
                     </div>
                 ))}
             </div>
+
+            {isReportOpen && (
+                <div className={styles.modalBackdrop} onClick={() => setIsReportOpen(false)}>
+                    <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
+                        <h3 className={styles.modalTitle}>게시글 신고</h3>
+                        <textarea
+                            value={reportReason}
+                            onChange={(e) => setReportReason(e.target.value)}
+                            placeholder="신고 사유를 입력해 주세요"
+                            className={styles.modalTextarea}
+                        />
+                        <div className={styles.modalActions}>
+                            <button type="button" className={styles.modalCancel} onClick={() => setIsReportOpen(false)}>취소</button>
+                            <button type="button" className={styles.modalSubmit} onClick={handleSubmitReport}>신고하기</button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

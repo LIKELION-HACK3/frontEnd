@@ -88,31 +88,7 @@
     color: #555;
 }
 
-.radioLabel input [type='radio'] {
-    appearance: none;
-    width: 16px;
-    height: 16px;
-    border: 1px solid #ccc;
-    border-radius: 50%;
-    outline: none;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.radioLabel input:checked {
-    border-color: #00b4b3;
-}
-
-.radioLabel input:checked::before {
-    content: '';
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    background-color: #00b4b3;
-    display: block;
-}
+/* 기본 라디오 사용 - 체크 표시 보장 */
 
 /* 오른쪽 메인 컨텐츠 */
 .mainContent {
@@ -158,6 +134,8 @@
     line-height: 1.6;
     font-family: inherit;
     color: #333;
+    position: relative;
+    z-index: 0; /* 하단 카테고리 영역보다 뒤로 */
 }
 
 .textarea::placeholder {
@@ -171,6 +149,8 @@
     margin-top: 24px;
     padding-top: 24px;
     border-top: 1px solid #f0f0f0;
+    position: relative;
+    z-index: 1; /* 텍스트영역 위로 올려 클릭 보장 */
 }
 
 .categorySection {
@@ -199,31 +179,7 @@
     color: #555;
 }
 
-.radioGroupHorizontal input [type='radio'] {
-    appearance: none;
-    width: 16px;
-    height: 16px;
-    border: 1px solid #ccc;
-    border-radius: 50%;
-    outline: none;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.radioGroupHorizontal input:checked {
-    border-color: #00b4b3;
-}
-
-.radioGroupHorizontal input:checked::before {
-    content: '';
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    background-color: #00b4b3;
-    display: block;
-}
+/* 기본 라디오 사용 - 체크 표시 보장 */
 
 .submitButton {
     width: 48px;
