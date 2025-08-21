@@ -86,9 +86,20 @@
     font-size: 15px;
     cursor: pointer;
     color: #555;
+    padding: 4px;
+    border-radius: 4px;
+    transition: background-color 0.15s ease;
 }
 
-/* 기본 라디오 사용 - 체크 표시 보장 */
+.radioLabel:hover {
+    background-color: #f8f9fa;
+}
+
+/* 기본 브라우저 라디오 사용 - 즉시 체크 표시 보장 */
+.radioLabel input[type='radio'] {
+    cursor: pointer;
+    margin: 0;
+}
 
 /* 오른쪽 메인 컨텐츠 */
 .mainContent {
@@ -119,6 +130,16 @@
     margin-bottom: 16px;
     outline: none;
     color: #333;
+    transition: border-color 0.15s ease;
+}
+
+.titleInput:focus {
+    border-bottom-color: #00b4b3;
+}
+
+.titleInput.invalid {
+    border-bottom-color: #e11d48;
+    background-color: #fff5f5;
 }
 
 .titleInput::placeholder {
@@ -136,6 +157,16 @@
     color: #333;
     position: relative;
     z-index: 0; /* 하단 카테고리 영역보다 뒤로 */
+    transition: background-color 0.15s ease;
+}
+
+.textarea:focus {
+    background-color: #f8f9fa;
+}
+
+.textarea.invalid {
+    background-color: #fff5f5;
+    border: 1px solid #e11d48;
 }
 
 .textarea::placeholder {
@@ -177,9 +208,20 @@
     gap: 6px;
     cursor: pointer;
     color: #555;
+    padding: 4px;
+    border-radius: 4px;
+    transition: background-color 0.15s ease;
 }
 
-/* 기본 라디오 사용 - 체크 표시 보장 */
+.radioGroupHorizontal label:hover {
+    background-color: #f8f9fa;
+}
+
+/* 기본 브라우저 라디오 사용 - 즉시 체크 표시 보장 */
+.radioGroupHorizontal input[type='radio'] {
+    cursor: pointer;
+    margin: 0;
+}
 
 .submitButton {
     width: 48px;
@@ -191,16 +233,23 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    transition: background-color 0.2s;
+    transition: all 0.2s ease;
+    position: relative;
 }
 
-.submitButton:hover {
+.submitButton:hover:not(:disabled) {
     background-color: #009a95;
+    transform: scale(1.05);
+}
+
+.submitButton:active:not(:disabled) {
+    transform: scale(0.95);
 }
 
 .submitButton:disabled {
     background-color: #ccc;
     cursor: not-allowed;
+    transform: none;
 }
 
 .submitButton svg {
@@ -212,9 +261,28 @@
     stroke: white;
 }
 
+/* 로딩 스피너 */
+.spinner {
+    width: 20px;
+    height: 20px;
+    border: 2px solid transparent;
+    border-top: 2px solid white;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
 .error {
     color: #e11d48;
     font-size: 14px;
     text-align: center;
     margin-top: 16px;
+    padding: 8px;
+    background-color: #fff5f5;
+    border-radius: 6px;
+    border: 1px solid #fed7d7;
 }

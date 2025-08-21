@@ -2,7 +2,7 @@ import React from 'react';
 import styles from './CommunityListPage.module.css';
 import PostCard from './PostCard';
 
-const PostList = ({ posts, loading, error, onWritePostClick, onDelete, currentUser, query, setQuery }) => {
+const PostList = ({ posts, loading, error, onWritePostClick, onDelete, currentUser, query, setQuery, hasMore, loadingMore, onLoadMore }) => {
     const formatTimeAgo = (dateString) => {
         const now = new Date();
         const postDate = new Date(dateString);
@@ -23,12 +23,21 @@ const PostList = ({ posts, loading, error, onWritePostClick, onDelete, currentUs
                 <button className={styles.writeButton} onClick={onWritePostClick}>
                     + 작성하기
                 </button>
-                <input
-                    className={styles.searchInput}
-                    placeholder="검색"
-                    value={query}
-                    onChange={(e) => setQuery(e.target.value)}
-                />
+                <div className={styles.searchContainer}>
+                    <input
+                        className={styles.searchInput}
+                        placeholder="제목이나 내용으로 검색..."
+                        value={query}
+                        onChange={(e) => setQuery(e.target.value)}
+                        onKeyPress={(e) => e.key === 'Enter' && setQuery(e.target.value)}
+                    />
+                    <button 
+                        className={styles.searchButton}
+                        onClick={() => setQuery(query)}
+                    >
+                        🔍
+                    </button>
+                </div>
             </div>
 
             {loading && <p>게시글을 불러오는 중...</p>}
@@ -53,7 +62,19 @@ const PostList = ({ posts, loading, error, onWritePostClick, onDelete, currentUs
                             <p>표시할 게시글이 없습니다.</p>
                         )}
                     </ul>
-                    {posts.length > 0 && <button className={styles.loadMore}>더보기</button>}
+                    {posts.length > 0 && (
+                        <button 
+                            className={styles.loadMore} 
+                            onClick={onLoadMore}
+                            disabled={loadingMore || !hasMore}
+                        >
+                            {loadingMore ? '로딩 중...' : hasMore ? '더보기' : '모든 게시글을 불러왔습니다'}
+                        </button>
+                    )}
+                    {/* 디버깅용 정보 */}
+                    <div style={{ textAlign: 'center', fontSize: '12px', color: '#999', marginTop: '10px' }}>
+                        게시글: {posts.length}개 | hasMore: {hasMore ? 'true' : 'false'} | loading: {loadingMore ? 'true' : 'false'}
+                    </div>
                 </>
             )}
         </section>
