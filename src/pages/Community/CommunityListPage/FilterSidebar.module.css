@@ -1,35 +1,85 @@
 .sidebar {
-    width: 200px;
-    padding: 16px;
+    width: 280px;
+    background: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    padding: 24px;
+    position: sticky;
+    top: 20px;
 }
 
 .section {
     margin-bottom: 32px;
 }
 
+.section:last-child {
+    margin-bottom: 0;
+}
+
 .sectionTitle {
-    font-size: 14px;
-    font-weight: bold;
-    margin-bottom: 8px;
+    font-size: 16px;
+    font-weight: 700;
+    color: #212529;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.resetButton {
+    background: none;
+    border: none;
+    color: #6c757d;
+    font-size: 13px;
+    cursor: pointer;
+    text-decoration: underline;
+    transition: color 0.2s ease;
+}
+
+.resetButton:hover {
+    color: #00b4b3;
 }
 
 .subTitle {
-    font-size: 13px;
-    color: #555;
-    margin-bottom: 12px;
+    font-size: 14px;
+    color: #6c757d;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.subTitle::before {
+    content: "🔍";
+    font-size: 12px;
 }
 
 .radioLabel {
-    display: block;
+    display: flex;
+    align-items: center;
     font-size: 14px;
-    color: #222;
-    margin-bottom: 8px;
+    color: #495057;
+    margin-bottom: 12px;
     cursor: pointer;
+    transition: color 0.2s ease;
+    padding: 4px 0;
+}
+
+.radioLabel:hover {
+    color: #00b4b3;
 }
 
 .radioLabel input[type='radio'] {
-    margin-right: 8px;
+    margin-right: 10px;
+    width: 16px;
+    height: 16px;
     accent-color: #00b4b3;
+    cursor: pointer;
+}
+
+.radioLabel input[type='radio']:checked + span {
+    color: #00b4b3;
+    font-weight: 600;
 }
 
 .moreButton {
@@ -37,6 +87,12 @@
     border: none;
     color: #00b4b3;
     font-size: 13px;
-    margin-top: 4px;
+    margin-top: 8px;
     cursor: pointer;
+    text-decoration: underline;
+    transition: color 0.2s ease;
+}
+
+.moreButton:hover {
+    color: #009a95;
 }

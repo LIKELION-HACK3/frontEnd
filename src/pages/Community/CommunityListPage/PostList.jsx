@@ -2,7 +2,7 @@ import React from 'react';
 import styles from './CommunityListPage.module.css';
 import PostCard from './PostCard';
 
-const PostList = ({ posts, loading, error, onWritePostClick, onDelete, currentUser }) => {
+const PostList = ({ posts, loading, error, onWritePostClick, onDelete, currentUser, query, setQuery }) => {
     const formatTimeAgo = (dateString) => {
         const now = new Date();
         const postDate = new Date(dateString);
@@ -23,7 +23,12 @@ const PostList = ({ posts, loading, error, onWritePostClick, onDelete, currentUs
                 <button className={styles.writeButton} onClick={onWritePostClick}>
                     + 작성하기
                 </button>
-                <input className={styles.searchInput} placeholder="검색" />
+                <input
+                    className={styles.searchInput}
+                    placeholder="검색"
+                    value={query}
+                    onChange={(e) => setQuery(e.target.value)}
+                />
             </div>
 
             {loading && <p>게시글을 불러오는 중...</p>}
@@ -37,9 +42,9 @@ const PostList = ({ posts, loading, error, onWritePostClick, onDelete, currentUs
                                 <PostCard
                                     key={post.id}
                                     post={post}
-                                    meta={`${post.region_display} · ${post.category || '기타'} · 💬 ${
-                                        post.views || 0
-                                    } · 🗨️ ${post.comments_count || 0}`}
+                                    meta={`조회 ${post.views || 0} · ❤️ ${post.like_count || 0} · 댓글 ${
+                                        post.comment_count || 0
+                                    }`}
                                     currentUser={currentUser}
                                     onDelete={onDelete}
                                 />

@@ -16,6 +16,11 @@ const CommunityListPage = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [currentUser, setCurrentUser] = useState(null);
+    // filters
+    const [selectedRegion, setSelectedRegion] = useState('전체');
+    const [selectedCategory, setSelectedCategory] = useState('전체');
+    const [selectedSort, setSelectedSort] = useState('최근');
+    const [query, setQuery] = useState('');
 
     useEffect(() => {
         const auth = loadAuth();
@@ -33,7 +38,12 @@ const CommunityListPage = () => {
         try {
             setLoading(true);
             setError(null);
-            const response = await fetchCommunityPosts();
+            const params = {};
+            if (query) params.q = query;
+            if (selectedRegion && selectedRegion !== '전체') params.region = selectedRegion;
+            if (selectedCategory && selectedCategory !== '전체') params.category = selectedCategory;
+            if (selectedSort === '인기') params.ordering = '-like_count,-views';
+            const response = await fetchCommunityPosts(params);
             setPosts(response.results || response || []);
         } catch (err) {
             setError('게시글을 불러오지 못했습니다.');
@@ -74,7 +84,14 @@ const CommunityListPage = () => {
                 <TabSelector activeTab={activeTab} setActiveTab={handleTabClick} />
 
                 <div className={styles.contentContainer}>
-                    <FilterSidebar />
+                    <FilterSidebar
+                        selectedRegion={selectedRegion}
+                        setSelectedRegion={setSelectedRegion}
+                        selectedCategory={selectedCategory}
+                        setSelectedCategory={setSelectedCategory}
+                        selectedSort={selectedSort}
+                        setSelectedSort={setSelectedSort}
+                    />
                     <PostList
                         posts={posts}
                         loading={loading}
@@ -82,6 +99,8 @@ const CommunityListPage = () => {
                         onWritePostClick={() => setIsModalOpen(true)}
                         onDelete={handleDelete}
                         currentUser={currentUser}
+                        query={query}
+                        setQuery={setQuery}
                     />
                 </div>
             </div>
