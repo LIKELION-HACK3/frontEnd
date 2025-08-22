@@ -16,17 +16,16 @@
 
 .header__buttons {
     display: flex;
-    gap: 12px;
+    gap: 28px;
 }
 
 .header__button1 {
     font-family: 'Pretendard Variable';
     font-size: 14px;
     font-weight: 400;
-    padding: 8px 14px 8px 14px;
-    border: none;
-    border-radius: 6px;
-    background-color: rgba(0, 0, 0, 0.05);
+    padding: 0;
+    border: none;;
+    background-color: transparent;
     cursor: pointer;
 }
 
@@ -42,14 +41,16 @@
 .header__loginlogo {
     width: 25px;
     height: 24px;
-    background-image: url("../../assets/pic/login-button.svg");
-    background-repeat: no-repeat;
+    -webkit-mask: url("../../assets/pic/login-button.svg") no-repeat center / contain;
+    mask: url("../../assets/pic/login-button.svg") no-repeat center / contain;
+    background-color: #6E6E6E;
 }
 
 .header__button2 {
     font-family: 'Pretendard Variable';
     font-size: 14px;
     font-weight: 400;
+    color: #6E6E6E;
     border: none;
     background-color: transparent;
     padding: 0 0 0 0;
@@ -57,5 +58,14 @@
 }
 
 .header__loginbox:hover .header__button2 {
+    text-decoration: underline;
+}
+
+.isActive {
+    font-weight: 700;
+    color: #1B818C;
+}
+
+.isLoginUnderline {
     text-decoration: underline;
 }

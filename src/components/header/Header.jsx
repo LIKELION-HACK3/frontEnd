@@ -20,6 +20,11 @@ const Header = () => {
         return () => window.removeEventListener('storage', onStorage);
     }, []);
 
+    const isMap = location.pathname.startsWith('/map');
+    const isMyRoom = location.pathname.startsWith('/myroom');
+    const isCommunity = location.pathname.startsWith('/community_news');
+    const isLoginPage = location.pathname.startsWith('/login');
+
     const handleAuthClick = () => {
         if (authed) {
             clearAuth();
@@ -43,17 +48,15 @@ const Header = () => {
                 }}
             />
             <div className={styles.header__buttons}>
-                <button className={styles.header__button1} type="button" onClick={() => navigate('/map')}>
+                <button className={`${styles.header__button1} ${isMap ? styles.isActive : ''}`} type="button" onClick={() => navigate('/map')}>
                     지도
                 </button>
-                <button className={styles.header__button1} type="button" onClick={() => navigate('/community_news')}>
-                    커뮤니티
-                </button>
-                {/* --- 이 부분만 수정되었습니다 --- */}
-                <button className={styles.header__button1} onClick={() => navigate('/myroom')}>
+                <button className={`${styles.header__button1} ${isMyRoom ? styles.isActive : ''}`} type="button" onClick={() => navigate('/myroom')}>
                     MY 룸ㆍAI 리포트
                 </button>
-                {/* --------------------------- */}
+                <button className={`${styles.header__button1} ${isCommunity ? styles.isActive : ''}`} type="button" onClick={() => navigate('/community_news')}>
+                    커뮤니티
+                </button>
                 <div
                     className={styles.header__loginbox}
                     role="button"
@@ -66,7 +69,7 @@ const Header = () => {
                     title={authed ? '로그아웃' : '로그인'}
                 >
                     <div className={styles.header__loginlogo} />
-                    <button className={styles.header__button2}>{authed ? '로그아웃' : '로그인'}</button>
+                    <button className={`${styles.header__button2} ${isLoginPage ? styles.isLoginUnderline : ''}`} type="button">{authed ? '로그아웃' : '로그인'}</button>
                 </div>
             </div>
         </div>
