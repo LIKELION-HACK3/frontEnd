@@ -24,13 +24,13 @@
 
 .tabButton {
     padding: 12px 90px;
-    border: 2px solid #00b4b3;
+    border: 2px solid #0abab5;
     background-color: #fff;
     border-radius: 24px;
     font-weight: 500;
     font-size: 15px;
     cursor: pointer;
-    color: #00b4b3;
+    color: #0abab5;
     transition: all 0.3s ease;
     margin-bottom: 50px;
 }
@@ -40,7 +40,7 @@
 }
 
 .active {
-    background-color: #00b4b3;
+    background-color: #0abab5;
     color: #fff;
 }
 .introBox {
@@ -89,19 +89,10 @@
     font-size: 16px;
     color: #777;
 }
-
-/* =====================[카드 아이콘 규칙(그대로)]===================== */
-/* 카드 상단에서 쓰는 기본 아이콘 크기 (인트로와 구분) */
 .cardIcon {
     width: 18px;
     height: 18px;
 }
-
-/* =====================[정리: 지워야/바꿔야 할 예전 규칙]===================== */
-/* 아래 중 하나라도 있으면 주석 처리하거나 삭제하세요(레이아웃 깨짐 원인)
-          .introBox { display: flex; align-items: flex-start; ... }   ← flex가 남아 있으면 깨짐
-          .introBox .cardIcon { width: 32px; height: 32px; }          ← 이제 introIcon으로 관리
-          */
 
 /* 섹션 */
 .section {

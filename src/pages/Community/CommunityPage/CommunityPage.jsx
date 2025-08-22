@@ -1,9 +1,20 @@
+// src/pages/Community/CommunityListPage/CommunityPage.jsx
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styles from './CommunityPage.module.css';
 import { fetchNews } from '../../../apis/communityApi';
 import { loadAuth } from '../../../apis/auth';
 import communityIcon from '../../../assets/pic/community_icon.svg';
+
+// 배열을 섞고 n개 뽑기 (Fisher–Yates)
+const pickRandom = (arr, n) => {
+    const a = [...(arr || [])];
+    for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a.slice(0, n);
+};
 
 // 재사용 카드 컴포넌트
 const Card = ({ tag, title, date, author, image, url, isGray }) => (
@@ -52,18 +63,27 @@ const CommunityPage = () => {
         setDisplayName(name);
     }, []);
 
-    // 뉴스 데이터 로드
+    // 뉴스 데이터 로드 (랜덤 3 + 3, 중복 제거)
     useEffect(() => {
         const loadNews = async () => {
             try {
                 setLoading(true);
                 setError(null);
 
-                const latestResponse = await fetchNews({ ordering: '-published_at' });
-                const recommendedResponse = await fetchNews({ ordering: 'created_at' });
+                // 한 번 크게 받아오고(가능하면 page_size로 넉넉히)
+                const resp = await fetchNews({ ordering: '-published_at', page_size: 50 });
+                const list = (resp?.results ?? resp ?? []).filter(Boolean);
 
-                setLatestPosts((latestResponse.results || latestResponse).slice(0, 3));
-                setRecommendedPosts((recommendedResponse.results || recommendedResponse).slice(0, 3));
+                // 최신 3개를 랜덤 샘플링
+                const latest3 = pickRandom(list, 3);
+
+                // 추천 3개는 최신과 중복 제거 후 랜덤
+                const taken = new Set(latest3.map((x) => x?.id ?? x?.url ?? `${x?.title}${x?.published_at}`));
+                const rest = list.filter((x) => !taken.has(x?.id ?? x?.url ?? `${x?.title}${x?.published_at}`));
+                const reco3 = pickRandom(rest, 3);
+
+                setLatestPosts(latest3);
+                setRecommendedPosts(reco3);
             } catch (err) {
                 console.error(err);
                 setError('게시글을 불러오지 못했습니다.');
@@ -113,13 +133,14 @@ const CommunityPage = () => {
 
             {!loading && !error && (
                 <>
+                    {/* 최신 게시글 섹션 */}
                     <section className={styles.section}>
                         <div className={styles.sectionInner}>
                             <h2 className={styles.sectionTitle}>최신 게시글</h2>
                             <div className={styles.cardGrid}>
                                 {latestPosts.map((post) => (
                                     <Card
-                                        key={post.id}
+                                        key={post.id ?? post.url}
                                         tag={post.category || '뉴스'}
                                         title={post.title}
                                         date={post.published_at}
@@ -133,13 +154,14 @@ const CommunityPage = () => {
                         </div>
                     </section>
 
+                    {/* 추천 게시글 섹션 (회색 배경 래퍼 유지) */}
                     <section className={styles.recoWrap}>
                         <div className={styles.sectionInner}>
                             <h2 className={styles.sectionTitle}>추천 게시글</h2>
                             <div className={styles.cardGrid}>
                                 {recommendedPosts.map((post) => (
                                     <Card
-                                        key={post.id}
+                                        key={post.id ?? post.url}
                                         tag={post.category || '팁'}
                                         title={post.title}
                                         date={post.published_at}
