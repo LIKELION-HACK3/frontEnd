@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styles from './CommunityPage.module.css';
-import { fetchNews } from '../../../apis/communityApi'; // API 함수 임포트
+import { fetchNews } from '../../../apis/communityApi';
+import { loadAuth } from '../../../apis/auth';
+import communityIcon from '../../../assets/pic/community_icon.svg';
 
-// 카드 컴포넌트 (재사용)
+// 재사용 카드 컴포넌트
 const Card = ({ tag, title, date, author, image, url, isGray }) => (
     <a
         href={url}
@@ -13,53 +15,67 @@ const Card = ({ tag, title, date, author, image, url, isGray }) => (
         style={{ textDecoration: 'none', color: 'inherit' }}
     >
         <div className={styles.cardHeader}>
-            <span className={styles.cardTag}>{tag}</span>
+            <div className={styles.tagWrap}>
+                <img src={communityIcon} alt="카테고리 아이콘" className={styles.cardIcon} />
+                <span className={styles.cardTag}>{tag}</span>
+            </div>
             <span className={styles.cardMenu}>⋮</span>
         </div>
+
         <h3 className={styles.cardTitle}>{title}</h3>
+
         <p className={styles.cardInfo}>
-            {new Date(date).toLocaleDateString()} · {author}
+            {date ? new Date(date).toLocaleDateString() : ''} · {author || '익명'}
         </p>
-        <img className={styles.cardImage} src={image || 'https://via.placeholder.com/300x150?text=News'} alt={title} />
+
+        <img
+            className={styles.cardImage}
+            src={image || 'https://via.placeholder.com/600x300?text=No+Image'}
+            alt={title}
+        />
     </a>
 );
 
-// 실제 페이지 컴포넌트
 const CommunityPage = () => {
     const navigate = useNavigate();
+
+    const [displayName, setDisplayName] = useState('멋쟁이사자');
     const [latestPosts, setLatestPosts] = useState([]);
     const [recommendedPosts, setRecommendedPosts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
+    // 로그인 사용자명 로드
+    useEffect(() => {
+        const auth = loadAuth();
+        const name = auth?.user?.username || auth?.user?.name || auth?.user?.nickname || '멋쟁이사자';
+        setDisplayName(name);
+    }, []);
+
+    // 뉴스 데이터 로드
     useEffect(() => {
         const loadNews = async () => {
             try {
                 setLoading(true);
                 setError(null);
-                // Ordering 파라미터를 사용하여 최신순과 다른 기준(예: 생성순)으로 데이터를 가져옵니다.
+
                 const latestResponse = await fetchNews({ ordering: '-published_at' });
-                const recommendedResponse = await fetchNews({ ordering: 'created_at' }); // 예시: 추천은 생성순
+                const recommendedResponse = await fetchNews({ ordering: 'created_at' });
 
                 setLatestPosts((latestResponse.results || latestResponse).slice(0, 3));
                 setRecommendedPosts((recommendedResponse.results || recommendedResponse).slice(0, 3));
             } catch (err) {
-                setError('게시글을 불러오지 못했습니다.');
                 console.error(err);
+                setError('게시글을 불러오지 못했습니다.');
             } finally {
                 setLoading(false);
             }
         };
-
         loadNews();
     }, []);
 
     const handleTabClick = (tabName) => {
-        if (tabName === '뉴스, 팁') {
-            // 현재 페이지이므로 아무것도 하지 않음
-        } else if (tabName === '함께해요') {
-            navigate('/community_list');
-        }
+        if (tabName === '함께해요') navigate('/community_list');
     };
 
     return (
@@ -75,15 +91,26 @@ const CommunityPage = () => {
                 </button>
             </div>
 
-            <div className={styles.introBox}>
-                <span className={styles.introIcon}>📘</span>
-                <div className={styles.introTextGroup}>
-                    <p className={styles.introTitle}>멋쟁이사자님을 위한 모음.zip</p>
-                    <p className={styles.introSub}>부동산, 지역, 정부 시책 등 구직에 꿀팁되는 한눈에 확인하세요</p>
+            {/* 인트로: 아이콘=제목 왼쪽, 부제목=아이콘 아래 */}
+            <div className={styles.sectionInner}>
+                <div className={styles.introBox}>
+                    <img
+                        src={communityIcon}
+                        alt="커뮤니티 아이콘"
+                        className={`${styles.cardIcon} ${styles.introIcon}`}
+                    />
+                    <p className={styles.introTitle}>
+                        <span className={styles.nameBold}>{displayName}</span>님을 위한 모음.zip
+                    </p>
+                    <p className={styles.introSub}>
+                        부동산, 자취, 정부 지원 정책 등 집 구할 때 꿀팁을 한눈에 확인해보세요
+                    </p>
                 </div>
             </div>
+
             {loading && <p style={{ textAlign: 'center' }}>뉴스를 불러오는 중...</p>}
             {error && <p style={{ textAlign: 'center', color: 'red' }}>{error}</p>}
+
             {!loading && !error && (
                 <>
                     <section className={styles.section}>
@@ -96,7 +123,7 @@ const CommunityPage = () => {
                                         tag={post.category || '뉴스'}
                                         title={post.title}
                                         date={post.published_at}
-                                        author={post.source?.name || '익명'}
+                                        author={post.source?.name || '00뉴스'}
                                         image={post.thumbnail}
                                         url={post.url}
                                         isGray={true}
