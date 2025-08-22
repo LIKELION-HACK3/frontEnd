@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import styles from './AiReportPage.module.css';
 import { fetchAiReport } from '../../apis/aiApi';
+import { fetchRooms } from '../../apis/roomsApi';
 
 const AiReportPage = () => {
     const { id } = useParams();
@@ -14,7 +15,29 @@ const AiReportPage = () => {
         (async () => {
             try {
                 const res = await fetchAiReport(id);
-                if (mounted) setData(res);
+                if (!mounted) return;
+
+                // 리포트 생성 시점과 실제 방 정보가 달라질 수 있으므로, 최신 방 데이터로 보정
+                try {
+                    const [aId, bId] = [res?.room_a?.id, res?.room_b?.id].filter(Boolean);
+                    if (aId || bId) {
+                        const roomsRes = await fetchRooms({ id__in: [aId, bId].filter(Boolean).join(',') });
+                        const list = Array.isArray(roomsRes?.results) ? roomsRes.results : Array.isArray(roomsRes) ? roomsRes : [];
+                        const byId = Object.fromEntries(list.map((r) => [r.id, r]));
+                        const merged = {
+                            ...res,
+                            room_a: byId[res?.room_a?.id] ? { ...res.room_a, ...byId[res.room_a.id] } : res.room_a,
+                            room_b: byId[res?.room_b?.id] ? { ...res.room_b, ...byId[res.room_b.id] } : res.room_b,
+                        };
+                        setData(merged);
+                    } else {
+                        setData(res);
+                    }
+                } catch (mergeErr) {
+                    // 최신 방 조회 실패 시 원본 데이터라도 표시
+                    console.warn('최신 방 데이터 병합 실패:', mergeErr);
+                    setData(res);
+                }
             } catch (e) {
                 if (mounted) setError(e.message || '불러오기에 실패했습니다.');
             } finally {
