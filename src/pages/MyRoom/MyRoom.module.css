@@ -35,6 +35,34 @@
     padding: 120px 0px 120px 0px;
 }
 
+/* 세로 정렬 섹션 (결과 영역) */
+.sectionColumn {
+    flex-direction: column;
+    align-items: center;
+}
+
+/* 결과 헤더 */
+.resultHeaderBox {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 28px;
+}
+
+.resultHeaderTitle {
+    font-size: 28px;
+    font-weight: 800;
+    color: #222;
+    letter-spacing: -0.02em;
+}
+
+.resultHeaderSubtitle {
+    font-size: 12px;
+    color: #6B7280;
+}
+
 .carousel {
     display: grid;
     grid-template-columns: auto max-content auto;
@@ -111,13 +139,14 @@
     border-radius: 12px;
     margin-left: 18px;
     overflow: hidden;
+    background-color: #f0f0f0;
 }
 
 .cardImg {
     width: 100%;
     height: 100%;
     display: block;
-    object-fit: fill;
+    object-fit: cover;
 }
 
 .cardBody {
@@ -154,17 +183,9 @@
     color: #5E5E5E;
 }
 
-.text1 {}
-.deposit {}
-.text2 {}
-.monthlyFee {}
-.text3 {}
-.maintenance {}
 .dot {
     margin: 0;
 }
-
-.titleText {}
 
 .selectButton {
     background-color: #00b4b3;
@@ -229,6 +250,7 @@
     padding: 20px;
     border: 2px solid #D9D9D9;
     border-radius: 16px;
+    background: #ffffff;
 }
 
 .reportSelectionRow {
@@ -239,8 +261,8 @@
 
 .reportSelectionCard {
     width: 480px;
-    height: auto;
-    background-color: #D9D9D9;
+    min-height: 96px;
+    background-color: #F3F4F6;
     border-radius: 12px;
     padding: 16px;
     cursor: pointer;
@@ -248,13 +270,13 @@
 }
 
 .reportSelectionCard:hover {
-    background-color: #CCCCCC;
+    background-color: #E9EAED;
 }
 
 .reportSelectionCardSelected {
     width: calc(480px - 24px - 12px);
     background-color: #FFFFFF;
-    border: solid 1px #D9D9D9;
+    border: solid 1px #E5E7EB;
     border-radius: 12px;
 }
 
@@ -297,10 +319,13 @@
 }
 
 .selectedRoomImage {
-    width: 92px;
-    height: 92px;
-    border-radius: 8px;
+    width: 96px;
+    height: 96px;
+    border-radius: 12px;
     object-fit: cover;
+    background: #f0f0f0;
+    border: 1px solid #E5E7EB;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.06);
 }
 
 .selectedRoomText {
@@ -326,11 +351,6 @@
     font-weight: 400;
     color: #1B818C;
     margin: 0;
-}
-
-.selectedRoomTitle {
-    font-size: 12px;
-    color: #666;
 }
 
 .emptySelection {

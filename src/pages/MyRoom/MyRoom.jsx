@@ -3,13 +3,14 @@ import { useNavigate } from 'react-router-dom';
 import styles from './MyRoom.module.css';
 import BookMark from '../../components/BookMark/BookMark';
 import { fetchAllBookmarks, toggleBookmark } from '../../apis/bookmarks';
-import { createAiReport } from '../../apis/aiApi';
+import { createAiReport, fetchAiReport } from '../../apis/aiApi';
 import leftArrow from '../../assets/pic/left_arrow.svg';
 import rightArrow from '../../assets/pic/right_arrow.svg';
 import moneyIcon from '../../assets/pic/property_money.svg';
 import locationIcon from '../../assets/pic/property_location.svg';
 import roomsIcon from '../../assets/pic/property_rooms.svg';
 import plusIcon from '../../assets/pic/myroom_plus.svg';
+import AiReportResult from '../AiReport/AiReportResult';
 
 const fmtMoney = (v) => {
     if (v == null || v === '') return '-';
@@ -44,6 +45,7 @@ const MyRoom = () => {
     const [userPreference, setUserPreference] = useState('');
     const [isGenerating, setIsGenerating] = useState(false);
     const [pageIndex, setPageIndex] = useState(0);
+    const [reportData, setReportData] = useState(null);
     const bookmarksSectionRef = useRef(null);
     const scrollToBookmarks = () => {
         bookmarksSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -204,8 +206,16 @@ const MyRoom = () => {
         try {
             const reportResult = await createAiReport(apiData);
             const reportId = reportResult.id;
-            if (reportId) navigate(`/report/${reportId}`);
-            else alert('리포트 ID를 받지 못했습니다. 다시 시도해주세요.');
+            if (reportId) {
+                const detail = await fetchAiReport(reportId);
+                setReportData(detail);
+                setTimeout(() => {
+                    const el = document.getElementById('ai-report-result');
+                    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }, 50);
+            } else {
+                alert('리포트 ID를 받지 못했습니다. 다시 시도해주세요.');
+            }
         } catch (error) {
             alert(error.message);
         } finally {
@@ -480,6 +490,17 @@ const MyRoom = () => {
                     {isGenerating ? '리포트 생성 중...' : 'AI 리포트 생성하기'}
                 </button>
             </div>
+
+            {/* 결과 표시 영역 */}
+            {reportData && (
+                <div id="ai-report-result" className={`${styles.section} ${styles.sectionColumn}`}>
+                    <div className={styles.resultHeaderBox}>
+                        <h2 className={styles.resultHeaderTitle}>AI 비교 결과</h2>
+                        <p className={styles.resultHeaderSubtitle}>유니룸의 AI 추천은 다음과 같아요.</p>
+                    </div>
+                    <AiReportResult data={reportData} hideHeader />
+                </div>
+            )}
         </div>
     );
 };
