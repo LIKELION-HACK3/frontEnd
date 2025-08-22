@@ -408,6 +408,10 @@
     background-color: #0000001A;
     border-radius: 50%;
     margin-right: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
 }
 
 .reviewContent {

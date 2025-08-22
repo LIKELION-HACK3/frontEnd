@@ -398,7 +398,7 @@ const DetailPage = () => {
                             reviews.map((review) => (
                                 <div key={review.id} className={styles.reviewCard}>
                                     <div className={styles.reviewAuthor}>
-                                        <div className={styles.authorAvatar}></div>
+                                        <div className={styles.authorAvatar} aria-hidden="true">🥺</div>
                                         <p>{displayReviewAuthor(review)}</p>
                                     </div>
                                     <p className={styles.reviewContent}>{review.content}</p>
