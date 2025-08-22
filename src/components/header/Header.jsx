@@ -1,3 +1,5 @@
+// 배포 환경(리눅스)은 대소문자를 구분합니다. 이 파일 경로는 'components/header/Header.jsx' 입니다.
+// 상단 import 경로도 항상 소문자 'header'를 사용해야 합니다.
 import styles from './Header.module.css';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useEffect, useState } from 'react';
