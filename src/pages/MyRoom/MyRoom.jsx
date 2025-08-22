@@ -10,6 +10,7 @@ import moneyIcon from '../../assets/pic/property_money.svg';
 import locationIcon from '../../assets/pic/property_location.svg';
 import roomsIcon from '../../assets/pic/property_rooms.svg';
 import plusIcon from '../../assets/pic/myroom_plus.svg';
+import { ReactComponent as Star } from '../../assets/pic/star.svg';
 
 const fmtMoney = (v) => {
     if (v == null || v === '') return '-';
@@ -35,7 +36,7 @@ const safeString = (v, fallback = '-') => {
 const MyRoom = () => {
     const navigate = useNavigate();
     const [bookmarks, setBookmarks] = useState([]);
-       const [favoriteRoomIds, setFavoriteRoomIds] = useState(new Set());
+    const [favoriteRoomIds, setFavoriteRoomIds] = useState(new Set());
     const [loading, setLoading] = useState(true);
     const [toggling, setToggling] = useState(new Set());
     const [selectedForReport, setSelectedForReport] = useState([null, null]);
@@ -67,7 +68,7 @@ const MyRoom = () => {
             setBookmarks([]);
             setFavoriteRoomIds(new Set());
         } finally {
-                       setLoading(false);
+            setLoading(false);
         }
     };
 
@@ -162,21 +163,25 @@ const MyRoom = () => {
 
     const renderStars = (ratingKey) => (
         <div className={styles.stars} role="radiogroup" aria-label={`${ratingKey} 가중치`}>
-            {[1, 2, 3, 4, 5].map((n) => (
-                <span
-                    key={n}
-                    className={n <= weights[ratingKey] ? styles.filledStar : styles.emptyStar}
-                    onClick={() => handleWeightChange(ratingKey, n)}
-                    role="radio"
-                    aria-checked={n <= weights[ratingKey]}
-                    tabIndex={0}
-                    onKeyDown={(e) => {
-                        if (e.key === 'Enter' || e.key === ' ') handleWeightChange(ratingKey, n);
-                    }}
-                >
-                    ★
-                </span>
-            ))}
+            {[1, 2, 3, 4, 5].map((n) => {
+                const active = n <= weights[ratingKey];
+                return (
+                    <button
+                        key={n}
+                        type="button"
+                        onClick={() => handleWeightChange(ratingKey, n)}
+                        role="radio"
+                        aria-checked={active}
+                        className={styles.starButton}
+                        tabIndex={0}
+                        onKeyDown={(e) => {
+                            if (e.key === 'Enter' || e.key === ' ') handleWeightChange(ratingKey, n);
+                        }}
+                    >
+                        <Star className={`${styles.starIcon} ${active ? styles.starIconFilled : styles.starIconEmpty}`} />
+                    </button>
+                );
+            })}
         </div>
     );
 
@@ -359,7 +364,7 @@ const MyRoom = () => {
                                             {sel ? (
                                                 <div className={styles.selectedRoomInfo}>
                                                     <img
-                                                        src={sel.thumbnail_url || 'https://via.placeholder.com/80'}
+                                                        src={sel.thumbnail_url || 'https://via.placeholder.com/92'}
                                                         alt={safeString(sel.title, '')}
                                                         className={styles.selectedRoomImage}
                                                     />
