@@ -1,12 +1,9 @@
-/* CommunityWriteModal.module.css */
+/* CommunityWriteModal.module.css — one-dot only, no native radios */
 
 /* 모달 오버레이 */
 .modalOverlay {
     position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
+    inset: 0;
     background-color: rgba(0, 0, 0, 0.5);
     display: flex;
     justify-content: center;
@@ -39,7 +36,6 @@
     padding: 0;
     line-height: 1;
 }
-
 .closeButton:hover {
     color: #333;
 }
@@ -52,22 +48,21 @@
     flex-shrink: 0;
     display: flex;
     flex-direction: column;
+    position: relative; /* 클릭 씹힘 방지 */
+    z-index: 2;
 }
-
 .sidebarTitle {
     font-size: 14px;
     font-weight: 600;
     color: #333;
     margin-bottom: 4px;
 }
-
 .sidebarSubtitle {
     font-size: 14px;
     color: #007bff;
     margin-bottom: 20px;
     cursor: pointer;
 }
-
 .sidebarSubtitle:after {
     content: ' 🔍';
 }
@@ -79,8 +74,9 @@
     flex-grow: 1;
 }
 
+/* 라벨(클릭 타겟) */
 .radioLabel {
-    display: flex;
+    display: inline-flex;
     align-items: center;
     gap: 8px;
     font-size: 15px;
@@ -89,16 +85,10 @@
     padding: 4px;
     border-radius: 4px;
     transition: background-color 0.15s ease;
+    position: relative;
 }
-
 .radioLabel:hover {
     background-color: #f8f9fa;
-}
-
-/* 기본 브라우저 라디오 사용 - 즉시 체크 표시 보장 */
-.radioLabel input[type='radio'] {
-    cursor: pointer;
-    margin: 0;
 }
 
 /* 오른쪽 메인 컨텐츠 */
@@ -108,7 +98,6 @@
     flex-direction: column;
     padding: 24px;
 }
-
 .mainTitle {
     font-size: 20px;
     font-weight: bold;
@@ -116,6 +105,7 @@
     margin-bottom: 16px;
 }
 
+/* 제목/본문 */
 .form {
     display: flex;
     flex-direction: column;
@@ -132,16 +122,13 @@
     color: #333;
     transition: border-color 0.15s ease;
 }
-
 .titleInput:focus {
     border-bottom-color: #00b4b3;
 }
-
 .titleInput.invalid {
     border-bottom-color: #e11d48;
     background-color: #fff5f5;
 }
-
 .titleInput::placeholder {
     color: #aaa;
 }
@@ -156,23 +143,25 @@
     font-family: inherit;
     color: #333;
     position: relative;
-    z-index: 0; /* 하단 카테고리 영역보다 뒤로 */
+    z-index: 0; /* 하단 바보다 뒤 */
     transition: background-color 0.15s ease;
 }
-
 .textarea:focus {
     background-color: #f8f9fa;
 }
-
 .textarea.invalid {
     background-color: #fff5f5;
     border: 1px solid #e11d48;
 }
-
 .textarea::placeholder {
     color: #aaa;
 }
 
+/* invalid 조합 클래스 매핑용 */
+.invalid {
+}
+
+/* 하단 바 */
 .bottomBar {
     display: flex;
     justify-content: space-between;
@@ -189,7 +178,6 @@
     align-items: center;
     gap: 16px;
 }
-
 .categoryLabel {
     font-weight: 600;
     font-size: 15px;
@@ -198,12 +186,11 @@
 
 .radioGroupHorizontal {
     display: flex;
-    gap: 20px; /* 카테고리 간 간격 조정 */
+    gap: 20px;
     font-size: 15px;
 }
-
 .radioGroupHorizontal label {
-    display: flex;
+    display: inline-flex;
     align-items: center;
     gap: 6px;
     cursor: pointer;
@@ -212,17 +199,11 @@
     border-radius: 4px;
     transition: background-color 0.15s ease;
 }
-
 .radioGroupHorizontal label:hover {
     background-color: #f8f9fa;
 }
 
-/* 기본 브라우저 라디오 사용 - 즉시 체크 표시 보장 */
-.radioGroupHorizontal input[type='radio'] {
-    cursor: pointer;
-    margin: 0;
-}
-
+/* 제출 버튼 */
 .submitButton {
     width: 48px;
     height: 48px;
@@ -230,33 +211,28 @@
     background-color: #00b4b3;
     border: none;
     cursor: pointer;
-    display: flex;
+    display: inline-flex;
     justify-content: center;
     align-items: center;
     transition: all 0.2s ease;
     position: relative;
 }
-
 .submitButton:hover:not(:disabled) {
     background-color: #009a95;
     transform: scale(1.05);
 }
-
 .submitButton:active:not(:disabled) {
     transform: scale(0.95);
 }
-
 .submitButton:disabled {
     background-color: #ccc;
     cursor: not-allowed;
     transform: none;
 }
-
 .submitButton svg {
     width: 24px;
     height: 24px;
 }
-
 .submitButton svg path {
     stroke: white;
 }
@@ -270,12 +246,16 @@
     border-radius: 50%;
     animation: spin 1s linear infinite;
 }
-
 @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
 }
 
+/* 에러 박스 */
 .error {
     color: #e11d48;
     font-size: 14px;
@@ -285,4 +265,36 @@
     background-color: #fff5f5;
     border-radius: 6px;
     border: 1px solid #fed7d7;
+}
+
+/* ====== 라디오: 기본 원 숨기고, 커스텀 원만 사용 ====== */
+
+/* (1) 진짜 라디오 입력은 완전히 숨김 */
+.radioLabel > input[type='radio'],
+.radioGroupHorizontal input[type='radio'] {
+    position: absolute !important;
+    opacity: 0 !important;
+    width: 0 !important;
+    height: 0 !important;
+    margin: 0 !important;
+    pointer-events: none !important;
+    appearance: none !important; /* 기본 동그라미 제거 */
+    -webkit-appearance: none !important;
+}
+
+/* (2) 우리가 그리는 동그라미만 노출 */
+.dot {
+    width: 16px;
+    height: 16px;
+    border: 2px solid #cfd4d9;
+    border-radius: 50%;
+    display: inline-block;
+    box-sizing: border-box;
+    vertical-align: middle;
+}
+
+/* (3) 선택 상태 표현 (민트색 채우기) */
+.dot[data-selected='true'] {
+    border-color: #00b4b3;
+    box-shadow: inset 0 0 0 6px #00b4b3;
 }

@@ -37,16 +37,6 @@ const CommunityWriteModal = ({ isOpen, onClose, onPostCreated }) => {
         }
     }, [isOpen]);
 
-    const handleRegionChange = (e) => {
-        console.log('Region changed to:', e.target.value);
-        setRegion(e.target.value);
-    };
-
-    const handleCategoryChange = (e) => {
-        console.log('Category changed to:', e.target.value);
-        setCategory(e.target.value);
-    };
-
     const handleSubmit = async (e) => {
         e.preventDefault();
         setAttemptedSubmit(true);
@@ -64,15 +54,20 @@ const CommunityWriteModal = ({ isOpen, onClose, onPostCreated }) => {
         setError('');
 
         try {
-            // 공백 포함 카테고리 값을 백엔드 호환을 위해 공백 제거하여 전송
             const normalizedCategory = category.replace(/\s+/g, '');
-            const postData = { title: title.trim(), content: content.trim(), region, category: normalizedCategory };
+            const postData = {
+                title: title.trim(),
+                content: content.trim(),
+                region,
+                category: normalizedCategory,
+            };
+
             await createCommunityPost(postData);
             alert('게시글이 성공적으로 등록되었습니다.');
-            onPostCreated();
-            onClose();
+            onPostCreated?.();
+            onClose?.();
         } catch (err) {
-            setError(err.message || '게시글 등록에 실패했습니다.');
+            setError(err?.message || '게시글 등록에 실패했습니다.');
         } finally {
             setLoading(false);
         }
@@ -89,28 +84,44 @@ const CommunityWriteModal = ({ isOpen, onClose, onPostCreated }) => {
                 <button type="button" className={styles.closeButton} onClick={onClose}>
                     &times;
                 </button>
+
+                {/* 왼쪽 사이드바 - 지역 */}
                 <div className={styles.sidebar}>
                     <h3 className={styles.sidebarTitle}>나의 지역</h3>
-                    <p className={styles.sidebarSubtitle}>서울특별시 동대문구 🔍</p>
+                    <p className={styles.sidebarSubtitle}>서울특별시 동대문구</p>
+
                     <div className={styles.regionList}>
-                        {REGION_OPTIONS.map((opt) => (
-                            <label key={opt.value} className={styles.radioLabel}>
-                                <input
-                                    type="radio"
-                                    name="region"
-                                    value={opt.value}
-                                    checked={region === opt.value}
-                                    onChange={handleRegionChange}
-                                    style={{ accentColor: '#00b4b3' }}
-                                />
-                                {opt.label}
-                            </label>
-                        ))}
+                        {REGION_OPTIONS.map((opt) => {
+                            const id = `region-${opt.value}`;
+                            const selected = region === opt.value;
+                            return (
+                                <label
+                                    key={opt.value}
+                                    className={styles.radioLabel}
+                                    htmlFor={id}
+                                    onClick={() => setRegion(opt.value)}
+                                >
+                                    <input
+                                        id={id}
+                                        type="radio"
+                                        name="region"
+                                        value={opt.value}
+                                        checked={selected}
+                                        onChange={() => setRegion(opt.value)}
+                                        className={styles.visuallyHidden}
+                                    />
+                                    <span className={styles.dot} data-selected={selected} />
+                                    {opt.label}
+                                </label>
+                            );
+                        })}
                     </div>
                 </div>
 
+                {/* 오른쪽 메인 영역 */}
                 <div className={styles.mainContent}>
                     <h2 className={styles.mainTitle}>글 제목</h2>
+
                     <input
                         type="text"
                         value={title}
@@ -118,32 +129,49 @@ const CommunityWriteModal = ({ isOpen, onClose, onPostCreated }) => {
                         className={`${styles.titleInput} ${titleInvalid ? styles.invalid : ''}`}
                         placeholder="제목을 입력하세요."
                     />
+
                     <textarea
                         value={content}
                         onChange={(e) => setContent(e.target.value)}
                         className={`${styles.textarea} ${contentInvalid ? styles.invalid : ''}`}
                         placeholder="본문 글을 이곳에 작성해보세요."
                     />
+
                     {error && <p className={styles.error}>{error}</p>}
+
                     <div className={styles.bottomBar}>
+                        {/* 카테고리 선택 */}
                         <div className={styles.categorySection}>
                             <span className={styles.categoryLabel}>카테고리</span>
                             <div className={styles.radioGroupHorizontal}>
-                                {CATEGORY_OPTIONS.map((opt) => (
-                                    <label key={opt.value}>
-                                        <input
-                                            type="radio"
-                                            name="category"
-                                            value={opt.value}
-                                            checked={category === opt.value}
-                                            onChange={handleCategoryChange}
-                                            style={{ accentColor: '#00b4b3' }}
-                                        />
-                                        {opt.label}
-                                    </label>
-                                ))}
+                                {CATEGORY_OPTIONS.map((opt) => {
+                                    const id = `category-${opt.value}`;
+                                    const selected = category === opt.value;
+                                    return (
+                                        <label
+                                            key={opt.value}
+                                            htmlFor={id}
+                                            onClick={() => setCategory(opt.value)}
+                                            className={styles.radioLabel}
+                                        >
+                                            <input
+                                                id={id}
+                                                type="radio"
+                                                name="category"
+                                                value={opt.value}
+                                                checked={selected}
+                                                onChange={() => setCategory(opt.value)}
+                                                className={styles.visuallyHidden}
+                                            />
+                                            <span className={styles.dot} data-selected={selected} />
+                                            {opt.label}
+                                        </label>
+                                    );
+                                })}
                             </div>
                         </div>
+
+                        {/* 제출 버튼 */}
                         <button
                             type="button"
                             onClick={handleSubmit}
