@@ -20,6 +20,21 @@ const MapList = () => {
     const [bookmarked, setBookmarked] = useState(new Set());
     const [searchQuery, setSearchQuery] = useState('');
     const [fromSearch, setFromSearch] = useState(false);
+    const [mapLevel, setMapLevel] = useState(4);
+
+    useEffect(() => {
+        if (location.state?.fromHome) setMapLevel(6);
+    }, []);
+
+    const handleMapSearch = (e) => {
+        e.preventDefault();
+        const params = new URLSearchParams(location.search);
+        const trimmed = searchQuery.trim();
+        if (trimmed) params.set('address', trimmed);
+        else params.delete('address');
+        navigate(`/map?${params.toString()}`, { replace: true });
+        setMapLevel(4);
+    };
 
     const [filters, setFilters] = useState({
         type: '',
@@ -385,7 +400,7 @@ const MapList = () => {
                     </div>
                     <button type="button" className={styles.resetAll} onClick={resetAll}>초기화</button>
                 </div>
-                <div className={styles.home__inputbox}>
+                <form className={styles.home__inputbox} onSubmit={handleMapSearch}>
                     <input
                         type="text"
                         placeholder="원하시는 지역명, 지하철역, 단지명(아파트명)을 입력해주세요"
@@ -394,10 +409,10 @@ const MapList = () => {
                         onChange={(e) => setSearchQuery(e.target.value)}
                     />
                     <button type="submit" className={styles.home__inputbutton} />
-                </div>
+                </form>
             </div>
             <div className={styles.map__canvas}>
-                <KakaoMap rooms={filteredRooms} selectedId={selectedId} onMarkerClick={handleMarkerClick} onVisibleChange={handleVisibleChange} level={fromSearch ? 6 : 4} />
+                <KakaoMap rooms={filteredRooms} selectedId={selectedId} onMarkerClick={handleMarkerClick} onVisibleChange={handleVisibleChange} level={mapLevel} />
                 <div className={styles.map__showestate}>
                     <div className={styles.map__scrollarea} ref={listRef}>
                         {loading && <div>불러오는 중...</div>}

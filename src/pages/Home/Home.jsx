@@ -154,7 +154,7 @@ const Home = () => {
         const params = new URLSearchParams();
         if (searchQuery.trim()) params.set('address', searchQuery.trim());
         if (roomType.trim()) params.set('room_type', roomType.trim());
-        navigate(`/map?${params.toString()}`);
+        navigate(`/map?${params.toString()}`, { state: { fromHome: true } });
     };
 
     const handleRoomTypeFilter = (type) => {
