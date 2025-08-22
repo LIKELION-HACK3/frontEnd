@@ -1,13 +1,14 @@
 import styles from './MapList.module.css';
 import KakaoMap from '../../components/KakaoMap/KakaoMap';
 import { useEffect, useState, useRef, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { fetchRooms } from '../../apis/roomsApi';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { fetchRooms, searchRooms } from '../../apis/roomsApi';
 import { fetchAllBookmarks, toggleBookmark } from '../../apis/bookmarks';
 import downArrow from '../../assets/pic/down_arrow.svg';
 
 const MapList = () => {
     const navigate = useNavigate();
+    const location = useLocation();
     const [rooms, setRooms] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -16,8 +17,9 @@ const MapList = () => {
     const itemRefs = useRef(new Map());
     const listRef = useRef(null);
     const pendingScrollId = useRef(null);
-    const [bookmarked, setBookmarked] = useState(new Set())
+    const [bookmarked, setBookmarked] = useState(new Set());
     const [searchQuery, setSearchQuery] = useState('');
+    const [fromSearch, setFromSearch] = useState(false);
 
     const [filters, setFilters] = useState({
         type: '',
@@ -55,17 +57,30 @@ const MapList = () => {
 
     useEffect(() => {
         (async () => {
+            setLoading(true);
+            setError(null);
             try {
-                const data = await fetchRooms();
-                setRooms(Array.isArray(data) ? data : []);
-            } catch (error) {
-                setError(error);
-                console.error(error);
+                const params = new URLSearchParams(location.search);
+                const address = params.get('address') || '';
+                const room_type = params.get('room_type') || '';
+                setSearchQuery(address);
+                const isSearch = Boolean(address || room_type);
+                setFromSearch(isSearch);
+                if (isSearch) {
+                    const data = await searchRooms({ address, room_type, page: 1, page_size: 100 });
+                    setRooms(Array.isArray(data?.rooms) ? data.rooms : []);
+                } else {
+                    const data = await fetchRooms();
+                    setRooms(Array.isArray(data) ? data : []);
+                }
+            } catch (err) {
+                setError(err);
+                setRooms([]);
             } finally {
                 setLoading(false);
             }
         })();
-    }, []);
+    }, [location.search]);
 
     useEffect(() => {
         (async () => {
@@ -110,13 +125,10 @@ const MapList = () => {
         const container = listRef.current;
         const el = itemRefs.current.get(id);
         if (!container || !el) return false;
-
         const cRect = container.getBoundingClientRect();
         const eRect = el.getBoundingClientRect();
-
         const targetTop = container.scrollTop + (eRect.top - cRect.top) - (container.clientHeight - el.clientHeight) / 2;
         container.scrollTop = Math.max(0, targetTop);
-
         const afterERect = el.getBoundingClientRect();
         const centerDiff = Math.abs((afterERect.top + afterERect.height / 2) - (cRect.top + cRect.height / 2));
         return centerDiff <= 2;
@@ -207,9 +219,7 @@ const MapList = () => {
 
     const filteredRooms = rooms.filter((r) => {
         const { type, lease, price, size, floorLabel, floorNum } = sel;
-
         if (type && (r.room_type || '').trim() !== type) return false;
-
         const monthly = Number(r?.monthly_fee);
         const deposit = Number(r?.deposit);
         if (lease === '월세') {
@@ -218,7 +228,6 @@ const MapList = () => {
             const monthlyIsZero = !Number.isFinite(monthly) || monthly === 0;
             if (!monthlyIsZero) return false;
         }
-
         if (sel.price) {
             const limit = Number(sel.price);
             if (Number.isFinite(limit)) {
@@ -228,16 +237,14 @@ const MapList = () => {
                 if (monthlyMan > limit) return false;
             }
         }
-
         if (sel.size) {
             const base = Number(sel.size);
-             if (Number.isFinite(base)) {
+            if (Number.isFinite(base)) {
                 const py = sqmToPyeongNum(r?.real_area);
                 if (!Number.isFinite(py)) return false;
                 if (py < base || py >= base + 1) return false;
             }
         }
-
         if (floorLabel === '반지하' || floorLabel === '반지층') {
             if (!isSemiBasement(r?.floor, r?.room_type)) return false;
         } else if (floorNum) {
@@ -245,7 +252,6 @@ const MapList = () => {
             const fr = getFrontFloor(r?.floor);
             if (fr == null || fr !== want) return false;
         }
-
         return true;
     });
 
@@ -391,7 +397,7 @@ const MapList = () => {
                 </div>
             </div>
             <div className={styles.map__canvas}>
-                <KakaoMap rooms={filteredRooms} selectedId={selectedId} onMarkerClick={handleMarkerClick} onVisibleChange={handleVisibleChange} />
+                <KakaoMap rooms={filteredRooms} selectedId={selectedId} onMarkerClick={handleMarkerClick} onVisibleChange={handleVisibleChange} level={fromSearch ? 6 : 4} />
                 <div className={styles.map__showestate}>
                     <div className={styles.map__scrollarea} ref={listRef}>
                         {loading && <div>불러오는 중...</div>}
