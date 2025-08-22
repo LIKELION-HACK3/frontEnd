@@ -218,22 +218,30 @@
 }
 
 .reportSelectionGrid {
-    width: 560px;
-    height: 310px;
+    width: auto;
+    height: auto;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     gap: 16px;
     margin-top: 10px;
+    padding: 20px;
     border: 2px solid #D9D9D9;
     border-radius: 16px;
 }
 
+.reportSelectionRow {
+    width: 480px;
+    display: flex;
+    align-items: center;
+}
+
 .reportSelectionCard {
     width: 480px;
+    height: auto;
     background-color: #D9D9D9;
-    border-radius: 8px;
+    border-radius: 12px;
     padding: 16px;
     cursor: pointer;
     transition: background-color 0.2s;
@@ -241,6 +249,39 @@
 
 .reportSelectionCard:hover {
     background-color: #CCCCCC;
+}
+
+.reportSelectionCardSelected {
+    width: calc(480px - 24px - 12px);
+    background-color: #FFFFFF;
+    border: solid 1px #D9D9D9;
+    border-radius: 12px;
+}
+
+.reportSelectionCardSelected:hover {
+    background-color: #FFFFFF;
+}
+
+.cancelButton {
+    width: 24px;
+    height: 24px;
+    margin-left: 12px;
+    border-radius: 50%;
+    border: 1.5px solid #6E6E6E;
+    color: #6E6E6E;
+    background: transparent;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    line-height: 1;
+    cursor: pointer;
+    transition: color 0.15s ease, border-color 0.15s ease;
+}
+
+.cancelButton:hover {
+    color: #000000;
+    border-color: #000000;
 }
 
 .selectionTitle {
@@ -256,8 +297,8 @@
 }
 
 .selectedRoomImage {
-    width: 80px;
-    height: 80px;
+    width: 92px;
+    height: 92px;
     border-radius: 8px;
     object-fit: cover;
 }
@@ -265,12 +306,25 @@
 .selectedRoomText {
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 8px;
 }
 
 .selectedRoomPrice {
-    font-size: 15px;
-    font-weight: 700;
+    font-size: 22px;
+    font-weight: 600;
+    margin: 0;
+}
+
+.selectedRoomMaint {
+    font-size: 16px;
+    font-weight: 600;
+    margin: 0;
+}
+
+.selectedRoomMeta {
+    font-size: 14px;
+    font-weight: 400;
+    color: #1B818C;
     margin: 0;
 }
 
