@@ -88,9 +88,14 @@ const MyRoom = () => {
     }, [rooms]);
 
     useEffect(() => {
+        // Ensure current pageIndex is valid when pages change.
+        // Include pageIndex in deps to satisfy eslint rule, but only update when necessary to avoid loop.
         const maxIdx = Math.max(0, pages.length - 1);
-        if (pageIndex > maxIdx) setPageIndex(0);
-    }, [pages.length]);
+        if (pageIndex > maxIdx) {
+            setPageIndex(0);
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [pages.length, pageIndex]);
 
     const maxPageIndex = Math.max(0, pages.length - 1);
     const isPrevDisabled = pageIndex === 0;
