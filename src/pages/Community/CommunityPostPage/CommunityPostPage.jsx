@@ -115,7 +115,7 @@ const CommunityPostPage = () => {
             <div className={styles.postHeader}>
                 <h1 className={styles.postTitle}>{post.title}</h1>
                 <div className={styles.authorInfo}>
-                    <div className={styles.avatar} />
+                    <div className={styles.avatar} aria-hidden="true">🥺</div>
                     <div className={styles.authorMeta}>
                         <span className={styles.authorName}>{post.author?.username || '익명'}</span>
                         <span className={styles.postTimestamp}>{formatDateTime(post.created_at)}</span>
@@ -161,7 +161,7 @@ const CommunityPostPage = () => {
                 {comments.map((comment) => (
                     <div key={comment.id} className={styles.comment}>
                         <div className={styles.authorInfo}>
-                            <div className={styles.avatar} />
+                            <div className={styles.avatar} aria-hidden="true">🥺</div>
                             <div className={styles.authorMeta}>
                                 <span className={styles.authorName}>{comment.author?.username || '익명'}</span>
                                 <span className={styles.postTimestamp}>{formatDateTime(comment.created_at)}</span>
@@ -179,7 +179,7 @@ const CommunityPostPage = () => {
                                 {comment.replies.map((reply) => (
                                     <div key={reply.id} className={styles.reply}>
                                         <div className={styles.authorInfo}>
-                                            <div className={styles.avatar} />
+                                            <div className={styles.avatar} aria-hidden="true">🥺</div>
                                             <div className={styles.authorMeta}>
                                                 <span className={styles.authorName}>{reply.author?.username || '익명'}</span>
                                                 <span className={styles.postTimestamp}>{formatDateTime(reply.created_at)}</span>
