@@ -74,6 +74,17 @@ const AiReportPage = () => {
         return `${man.toLocaleString()}만원`;
     };
 
+    const makeRecLabel = (room) => {
+        if (!room) return '';
+        const feeText = formatManWon(room?.monthly_fee);
+        const deposit = room?.deposit;
+        const hasDeposit = deposit != null && Number.isFinite(Number(deposit));
+        const priceText = hasDeposit ? `${formatManWon(deposit)}/${feeText}` : `월세 ${feeText}`;
+        const typeText = room?.room_type ? room.room_type : '';
+        const addrText = room?.address ? room.address : '';
+        return [priceText, typeText, addrText].filter(Boolean).join(' · ');
+    };
+
     return (
         <div className={styles.container}>
             <h1 className={styles.mainTitle}>AI 비교 결과</h1>
@@ -86,11 +97,7 @@ const AiReportPage = () => {
                     <div className={styles.recommendationResult}>
                         <div className={styles.recommendationIcon}>🏠</div>
                         <div className={styles.recommendationTag}>
-                            {recommendation === 'room_a' ? (
-                                `월세 ${roomA.monthly_fee ? (roomA.monthly_fee / 10000).toFixed(0) : 0}/70 관리비 8만원 원룸 2층 4.8평`
-                            ) : (
-                                `월세 ${roomB.monthly_fee ? (roomB.monthly_fee / 10000).toFixed(0) : 0}/70 관리비 8만원 원룸 2층 4.8평`
-                            )}
+                            {recommendation === 'room_a' ? makeRecLabel(roomA) : makeRecLabel(roomB)}
                         </div>
                     </div>
                 </section>
