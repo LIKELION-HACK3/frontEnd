@@ -40,56 +40,68 @@ const CommunityListPage = () => {
             setLoading(false);
             return;
         }
-        
+
         try {
             setLoading(true);
             setHasMore(true);
             setError(null);
-            
+
             // 모든 게시글을 한 번만 가져오기 (검색어나 필터 변경 시에는 클라이언트에서 필터링)
             const params = {};
             if (selectedSort === '인기') params.ordering = '-like_count,-views';
-            
+
             console.log('Loading all posts with params:', params);
-            
+
             const response = await fetchCommunityPosts(params);
             const allPostsData = response.results || response || [];
-            
+
             console.log('Loaded all posts:', allPostsData.length);
-            
+
             setAllPosts(allPostsData);
-            
+
             // 클라이언트 사이드에서 검색 및 필터링 적용
-            const filteredPosts = allPostsData.filter(post => {
+            const filteredPosts = allPostsData.filter((post) => {
                 // 검색어 필터링
-                if (query && !post.title.toLowerCase().includes(query.toLowerCase()) && 
-                    !post.content?.toLowerCase().includes(query.toLowerCase())) {
+                if (
+                    query &&
+                    !post.title.toLowerCase().includes(query.toLowerCase()) &&
+                    !post.content?.toLowerCase().includes(query.toLowerCase())
+                ) {
                     return false;
                 }
-                
+
                 // 지역 필터링
                 if (selectedRegion && selectedRegion !== '전체' && post.region !== selectedRegion) {
                     return false;
                 }
-                
+
                 // 카테고리 필터링
                 if (selectedCategory && selectedCategory !== '전체' && post.category !== selectedCategory) {
                     return false;
                 }
-                
+
                 return true;
             });
-            
-            console.log('Filtered posts:', filteredPosts.length, 'query:', query, 'region:', selectedRegion, 'category:', selectedCategory);
-            
+
+            console.log(
+                'Filtered posts:',
+                filteredPosts.length,
+                'query:',
+                query,
+                'region:',
+                selectedRegion,
+                'category:',
+                selectedCategory
+            );
+
             // 첫 로드: 필터링된 게시글 중 첫 10개만 표시
             const firstPagePosts = filteredPosts.slice(0, 10);
             setPosts(firstPagePosts);
             setPage(1);
-            
+
             // 10개보다 많으면 더보기 버튼 표시
             setHasMore(filteredPosts.length > 10);
-            
+
             console.log('First page posts:', firstPagePosts.length, 'hasMore:', filteredPosts.length > 10);
         } catch (err) {
             setError('게시글을 불러오지 못했습니다.');
@@ -105,44 +117,47 @@ const CommunityListPage = () => {
         setPage(1);
         loadPosts();
     }, [activeTab, selectedSort]); // query, selectedRegion, selectedCategory 제거
-    
+
     // 검색어나 필터 변경 시 즉시 필터링 적용
     useEffect(() => {
         if (allPosts.length > 0) {
             // 클라이언트 사이드에서 검색 및 필터링 적용
-            const filteredPosts = allPosts.filter(post => {
+            const filteredPosts = allPosts.filter((post) => {
                 // 검색어 필터링
-                if (query && !post.title.toLowerCase().includes(query.toLowerCase()) && 
-                    !post.content?.toLowerCase().includes(query.toLowerCase())) {
+                if (
+                    query &&
+                    !post.title.toLowerCase().includes(query.toLowerCase()) &&
+                    !post.content?.toLowerCase().includes(query.toLowerCase())
+                ) {
                     return false;
                 }
-                
+
                 // 지역 필터링
                 if (selectedRegion && selectedRegion !== '전체' && post.region !== selectedRegion) {
                     return false;
                 }
-                
+
                 // 카테고리 필터링
                 if (selectedCategory && selectedCategory !== '전체' && post.category !== selectedCategory) {
                     return false;
                 }
-                
+
                 return true;
             });
-            
-            console.log('Filtering posts:', { 
-                allPosts: allPosts.length, 
-                filtered: filteredPosts.length, 
-                query, 
-                region: selectedRegion, 
-                category: selectedCategory 
+
+            console.log('Filtering posts:', {
+                allPosts: allPosts.length,
+                filtered: filteredPosts.length,
+                query,
+                region: selectedRegion,
+                category: selectedCategory,
             });
-            
+
             // 첫 10개만 표시
             const firstPagePosts = filteredPosts.slice(0, 10);
             setPosts(firstPagePosts);
             setPage(1);
-            
+
             // 10개보다 많으면 더보기 버튼 표시
             setHasMore(filteredPosts.length > 10);
         }
@@ -182,47 +197,57 @@ const CommunityListPage = () => {
             console.log('Current page:', page);
             console.log('Current allPosts length:', allPosts.length);
             console.log('Current posts length:', posts.length);
-            
+
             // 클라이언트 사이드에서 검색 및 필터링 적용
-            const currentFilteredPosts = allPosts.filter(post => {
+            const currentFilteredPosts = allPosts.filter((post) => {
                 // 검색어 필터링
-                if (query && !post.title.toLowerCase().includes(query.toLowerCase()) && 
-                    !post.content?.toLowerCase().includes(query.toLowerCase())) {
+                if (
+                    query &&
+                    !post.title.toLowerCase().includes(query.toLowerCase()) &&
+                    !post.content?.toLowerCase().includes(query.toLowerCase())
+                ) {
                     return false;
                 }
-                
+
                 // 지역 필터링
                 if (selectedRegion && selectedRegion !== '전체' && post.region !== selectedRegion) {
                     return false;
                 }
-                
+
                 // 카테고리 필터링
                 if (selectedCategory && selectedCategory !== '전체' && post.category !== selectedCategory) {
                     return false;
                 }
-                
+
                 return true;
             });
-            
+
             console.log('Filtered posts for load more:', currentFilteredPosts.length);
-            
+
             const startIndex = page * 10;
             const endIndex = startIndex + 10;
             const nextPagePosts = currentFilteredPosts.slice(startIndex, endIndex);
-            
+
             console.log('Next page posts:', { startIndex, endIndex, nextPagePosts: nextPagePosts.length });
-            
+
             if (nextPagePosts.length > 0) {
-                setPosts(prev => {
+                setPosts((prev) => {
                     const newPosts = [...prev, ...nextPagePosts];
                     console.log('Updated posts:', newPosts.length);
                     return newPosts;
                 });
-                setPage(prev => prev + 1);
-                
+                setPage((prev) => prev + 1);
+
                 // 더 불러올 게시글이 있는지 확인
                 const newHasMore = currentFilteredPosts.length > endIndex;
-                console.log('New hasMore:', newHasMore, 'currentFilteredPosts.length:', currentFilteredPosts.length, 'endIndex:', endIndex);
+                console.log(
+                    'New hasMore:',
+                    newHasMore,
+                    'currentFilteredPosts.length:',
+                    currentFilteredPosts.length,
+                    'endIndex:',
+                    endIndex
+                );
                 setHasMore(newHasMore);
             } else {
                 console.log('No more posts to load');
@@ -261,11 +286,7 @@ const CommunityListPage = () => {
                     />
                 </div>
             </div>
-            <CommunityWriteModal 
-                isOpen={isModalOpen} 
-                onClose={() => setIsModalOpen(false)} 
-                onPostCreated={loadPosts} 
-            />
+            <CommunityWriteModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} onPostCreated={loadPosts} />
         </>
     );
 };
