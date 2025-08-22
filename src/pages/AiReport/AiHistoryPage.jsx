@@ -12,7 +12,7 @@ const AiHistoryItem = ({ item, onClick }) => {
             <section className={styles.section}>
                 <h2 className={styles.sectionTitle}>추천</h2>
                 <div className={styles.recommendationResult}>
-                    <div className={styles.recommendationIcon}>🤖</div>
+                    <div className={styles.recommendationIcon}>🥺</div>
                     <div className={styles.recommendationTag}>
                         {recRoom?.title || (isA ? '방 A' : '방 B')}
                     </div>
