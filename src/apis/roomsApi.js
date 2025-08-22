@@ -7,6 +7,14 @@ export async function fetchRooms(params = {}) {
     return res.data;
 }
 
+export async function searchRooms({ page = 1, page_size = 20, address = '', room_type = '' } = {}) {
+    const params = { page, page_size };
+    if (address) params.q = address;
+    if (room_type) params.room_type = room_type;
+    const res = await api.get('/api/rooms/search/', { params });
+    return res.data;
+}
+
 export async function fetchReviewsForRoom(roomId) {
     const res = await api.get(`/api/rooms/${roomId}/reviews/`);
     return res.data;

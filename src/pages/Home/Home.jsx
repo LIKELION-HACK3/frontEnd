@@ -13,8 +13,8 @@ const formatPrice = (value) => {
     const num = Number(value);
     if (isNaN(num) || num === 0) return '0원';
 
-    const eok = Math.floor(num / 100000000); // 억
-    const man = Math.floor((num % 100000000) / 10000); // 만원
+    const eok = Math.floor(num / 100000000);
+    const man = Math.floor((num % 100000000) / 10000);
 
     if (eok > 0 && man > 0) return `${eok}억 ${man}`;
     if (eok > 0) return `${eok}억`;
@@ -52,7 +52,6 @@ const RoomCard = ({ room, isFav, onToggle, onClick }) => {
         >
             <img src={imageUrl} alt={room.title} className={styles.room__image} />
 
-            {/* 하트 버튼 */}
             <BookMark
                 roomId={room.id}
                 filled={isFav}
@@ -98,7 +97,7 @@ const Home = () => {
         }
     };
 
-    const fetchRooms = async (query = '', type = '') => {
+    const fetchRooms = async () => {
         setLoading(true);
         try {
             const picked = getRandomUniqueIds(3, RANDOM_MIN_ID, RANDOM_MAX_ID);
@@ -152,13 +151,15 @@ const Home = () => {
 
     const handleSearch = (e) => {
         e.preventDefault();
-        fetchRooms(searchQuery, roomType);
+        const params = new URLSearchParams();
+        if (searchQuery.trim()) params.set('address', searchQuery.trim());
+        if (roomType.trim()) params.set('room_type', roomType.trim());
+        navigate(`/map?${params.toString()}`, { state: { fromHome: true } });
     };
 
     const handleRoomTypeFilter = (type) => {
         const nextType = roomType === type ? '' : type;
         setRoomType(nextType);
-        fetchRooms(searchQuery, nextType);
     };
 
     const handleToggle = (roomId, nextChecked) => {
@@ -172,7 +173,6 @@ const Home = () => {
 
     return (
         <div className={styles.main__wrapper}>
-            {/* 검색창 섹션 */}
             <div className={styles.home__container1}>
                 <p className={styles.home__text1}>
                     <span className={styles.home__text1__shadow}>어떤 집을 찾고 계세요?</span>

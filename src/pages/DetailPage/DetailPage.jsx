@@ -261,8 +261,17 @@ const DetailPage = () => {
 
     return (
         <div className={styles.detailPage}>
-            {/* ... 헤더, 사진, 세부정보 섹션은 동일 ... */}
             <div className={styles.headerSection}>
+                <div className={styles.headerBg} aria-hidden="true">
+                    {propertyData?.images?.[0]?.image_url ? (
+                        <img
+                            src={propertyData.images[0].image_url}
+                            alt=""
+                            className={styles.headerBgImg}
+                        />
+                    ) : null}
+                </div>
+                <div className={styles.headerOverlay} aria-hidden="true" />
                 <div className={styles.headerContent}>
                     <div className={styles.contentGroup}>
                         <div className={styles.external_id}>매물번호 {propertyData.external_id ?? id}</div>
@@ -389,7 +398,7 @@ const DetailPage = () => {
                             reviews.map((review) => (
                                 <div key={review.id} className={styles.reviewCard}>
                                     <div className={styles.reviewAuthor}>
-                                        <div className={styles.authorAvatar}></div>
+                                        <div className={styles.authorAvatar} aria-hidden="true">🥺</div>
                                         <p>{displayReviewAuthor(review)}</p>
                                     </div>
                                     <p className={styles.reviewContent}>{review.content}</p>

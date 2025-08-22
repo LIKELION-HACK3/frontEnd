@@ -13,6 +13,7 @@ import CommunityPostPage from './pages/Community/CommunityPostPage/CommunityPost
 import DetailPage from './pages/DetailPage/DetailPage';
 import MyRoom from './pages/MyRoom/MyRoom';
 import AiReportPage from './pages/AiReport/AiReportPage';
+import AiHistoryPage from './pages/AiReport/AiHistoryPage';
 
 function App() {
     return (
@@ -28,6 +29,7 @@ function App() {
                 <Route path="/community_news" element={<CommunityPage />} />
                 <Route path="/property/:id" element={<DetailPage />} />
                 <Route path="/myroom" element={<MyRoom />} />
+                <Route path="/report/history" element={<AiHistoryPage />} />
                 <Route path="/report/:id" element={<AiReportPage />} />
             </Routes>
             <Footer />

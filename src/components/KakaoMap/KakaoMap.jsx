@@ -2,7 +2,7 @@ import styles from './KakaoMap.module.css';
 import { useEffect, useState, useMemo, useCallback } from 'react';
 import { Map, MapMarker } from 'react-kakao-maps-sdk';
 
-export default function KakaoMap({ rooms = [], selectedId = null, onMarkerClick, onVisibleChange }) {
+export default function KakaoMap({ rooms = [], selectedId = null, onMarkerClick, onVisibleChange, level = 4 }) {
     const FALLBACK_CENTER = { lat: 37.597607, lng: 127.058836 };
     const [center, setCenter] = useState(FALLBACK_CENTER);
 
@@ -79,7 +79,7 @@ export default function KakaoMap({ rooms = [], selectedId = null, onMarkerClick,
     /* 카카오 맵 출력 */
     return (
         <div className={styles.map__wrapper}>
-            <Map center={center} isPanto className={styles.kakaoMap} level={4} onCreate={setMap} onIdle={updateVisible}  >
+            <Map center={center} isPanto className={styles.kakaoMap} level={level} onCreate={setMap} onIdle={updateVisible}  >
                 {markers.map((m) => (
                     <MapMarker
                         key={m.id}
