@@ -32,25 +32,37 @@
     width: 100%;
     height: auto;
     background-color: #FFFFFF;
-    padding: 140px 0px 140px 0px;
+    padding: 120px 0px 120px 0px;
 }
 
 .carousel {
     display: grid;
-    grid-template-columns: auto 1fr auto;
+    grid-template-columns: auto max-content auto;
     align-items: center;
-    column-gap: 20px;
+    justify-items: stretch;
     width: 100%;
+    margin: 0 150px 0 150px;
+    column-gap: 20px;
+}
+
+.carousel > img:first-of-type {
+    justify-self: end;
+}
+
+.carousel > img:last-of-type {
+    justify-self: start;
 }
 
 .viewport {
-    width: 100%;
+    width: 1020px;
+    padding: 0;
     overflow: hidden;
+    justify-self: center;
+    box-sizing: content-box;
 }
 
 .track {
     display: flex;
-    width: 100%;
     transition: transform 0.4s ease;
 }
 
@@ -58,13 +70,16 @@
     flex: 0 0 100%;
     display: flex;
     justify-content: center;
+    align-items: flex-start;
 }
 
 .propertyGrid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 48px 24px;
-    width: 100%;
+    gap: 48px 48px;
+    width: 1000px;
+    align-items: start;
+    align-content: start;
 }
 
 .cardWrapper {
@@ -148,6 +163,7 @@
 .dot {
     margin: 0;
 }
+
 .titleText {}
 
 .selectButton {
@@ -412,15 +428,33 @@
 
 .generateButton {
     width: 980px;
-    background-color: #1B818C;
-    color: white;
+    color: #FFFFFF;
     padding: 14px 24px;
     border: none;
     border-radius: 8px;
-    cursor: pointer;
     font-weight: 600;
     font-size: 14px;
     margin-top: 32px;
+    transition: background-color 0.2s ease, opacity 0.2s ease, cursor 0.2s ease;
+}
+
+.generateButtonActive {
+    background-color: #1B818C;
+    cursor: pointer;
+}
+
+.generateButtonActive:hover {
+    background-color: #176e78;
+}
+
+.generateButtonDisabled {
+    background-color: #D9D9D9;
+    cursor: default;
+}
+
+.generateButton:disabled {
+    cursor: default;
+    opacity: 1;
 }
 
 .ratingLabel {
@@ -463,5 +497,27 @@
 
 .sliderDisabled {
     opacity: 0.3;
+    pointer-events: none;
+}
+
+.propertyCardEmpty {
+    background-color: #D9D9D9;
+}
+
+.emptyCardBody {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 200px;
+    width: 100%;
+    padding: 0 16px;
+    text-align: center;
+    font-size: 14px;
+    color: #666666;
+}
+
+.selectButtonDisabledGray {
+    background-color: #D9D9D9;
+    cursor: default;
     pointer-events: none;
 }

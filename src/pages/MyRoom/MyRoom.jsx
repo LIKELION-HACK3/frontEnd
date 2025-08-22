@@ -1,10 +1,9 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styles from './MyRoom.module.css';
 import BookMark from '../../components/BookMark/BookMark';
 import { fetchAllBookmarks, toggleBookmark } from '../../apis/bookmarks';
 import { createAiReport } from '../../apis/aiApi';
-
 import leftArrow from '../../assets/pic/left_arrow.svg';
 import rightArrow from '../../assets/pic/right_arrow.svg';
 import moneyIcon from '../../assets/pic/property_money.svg';
@@ -39,14 +38,21 @@ const MyRoom = () => {
     const [favoriteRoomIds, setFavoriteRoomIds] = useState(new Set());
     const [loading, setLoading] = useState(true);
     const [toggling, setToggling] = useState(new Set());
-
     const [selectedForReport, setSelectedForReport] = useState([null, null]);
-    const [additionalCriteria, setAdditionalCriteria] = useState('지도');
+    const [additionalCriteria, setAdditionalCriteria] = useState(null);
     const [weights, setWeights] = useState({ price: 0, location: 0, area: 0 });
     const [userPreference, setUserPreference] = useState('');
     const [isGenerating, setIsGenerating] = useState(false);
-
     const [pageIndex, setPageIndex] = useState(0);
+    const bookmarksSectionRef = useRef(null);
+    const scrollToBookmarks = () => {
+        bookmarksSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    };
+    const hasTwoRooms = selectedForReport.filter(Boolean).length === 2;
+    const hasWeights = (weights.price + weights.location + weights.area) > 0;
+    const hasCriteria = !!additionalCriteria;
+    const hasPreference = userPreference.trim().length > 0;
+    const isReadyToGenerate = hasTwoRooms && hasWeights && hasCriteria && hasPreference;
 
     const loadBookmarks = async () => {
         setLoading(true);
@@ -76,6 +82,7 @@ const MyRoom = () => {
         for (let i = 0; i < rooms.length; i += 6) {
             chunked.push(rooms.slice(i, i + 6));
         }
+        if (chunked.length === 0) chunked.push([]);
         return chunked;
     }, [rooms]);
 
@@ -173,9 +180,9 @@ const MyRoom = () => {
             comparison_criteria: {
                 price_weight: weights.price / totalWeight,
                 location_weight: weights.location / totalWeight,
-                area_weight: weights.area / totalWeight,
+                area_weight: weights.area / totalWeight
             },
-            user_preferences: userPreference,
+            user_preferences: userPreference
         };
         try {
             const reportResult = await createAiReport(apiData);
@@ -195,11 +202,9 @@ const MyRoom = () => {
                 <h1 className={styles.title}>MY 룸 목록</h1>
                 <p className={styles.subtitle}>관심 있는 집들을 한번에 확인해보세요.</p>
             </div>
-            <div className={styles.section}>
+            <div className={styles.section} ref={bookmarksSectionRef}>
                 {loading ? (
                     <p className={styles.subtitle}>불러오는 중…</p>
-                ) : rooms.length === 0 ? (
-                    <p className={styles.subtitle}>아직 북마크한 집이 없어요.</p>
                 ) : (
                     <div className={styles.carousel}>
                         <img
@@ -213,87 +218,98 @@ const MyRoom = () => {
                                 className={styles.track}
                                 style={{ transform: `translateX(-${pageIndex * 100}%)` }}
                             >
-                                {pages.map((pageRooms, idx) => (
-                                    <div className={styles.page} key={idx}>
-                                        <div className={styles.propertyGrid}>
-                                            {pageRooms.map((room) => {
-                                                const isSelected = selectedForReport.some((r) => r?.id === room.id);
-                                                const isJeonse =
-                                                    room.contract_type === '전세' ||
-                                                    Number(room?.monthly_fee) === 0 ||
-                                                    room?.monthly_fee == null;
-                                                return (
-                                                    <div key={room.id} className={styles.cardWrapper}>
-                                                        <div className={styles.propertyCard}>
-                                                            <BookMark
-                                                                filled={favoriteRoomIds.has(room.id)}
-                                                                onToggle={() => onToggle(room.id)}
-                                                            />
-                                                            <div className={styles.cardPic}>
-                                                                <img
-                                                                    src={room.thumbnail_url || 'https://via.placeholder.com/160'}
-                                                                    alt={room.title}
-                                                                    className={styles.cardImg}
+                                {pages.map((pageRooms, idx) => {
+                                    const items = [...pageRooms];
+                                    while (items.length < 6) {
+                                        items.push({ __empty: true, _key: `empty-${idx}-${items.length}` });
+                                    }
+                                    return (
+                                        <div className={styles.page} key={idx}>
+                                            <div className={styles.propertyGrid}>
+                                                {items.map((item) => {
+                                                    if (item.__empty) {
+                                                        return (
+                                                            <div key={item._key} className={styles.cardWrapper}>
+                                                                <div className={`${styles.propertyCard} ${styles.propertyCardEmpty}`}>
+                                                                    <div className={styles.emptyCardBody}>
+                                                                        북마크로 원하는 매물을 추가하세요
+                                                                    </div>
+                                                                </div>
+                                                                <button
+                                                                    className={`${styles.selectButton} ${styles.selectButtonDisabledGray}`}
+                                                                    disabled
+                                                                    aria-disabled="true"
+                                                                >
+                                                                    AI 리포트 선택
+                                                                </button>
+                                                            </div>
+                                                        );
+                                                    }
+                                                    const room = item;
+                                                    const isSelected = selectedForReport.some((r) => r?.id === room.id);
+                                                    const isJeonse =
+                                                        room.contract_type === '전세' ||
+                                                        Number(room?.monthly_fee) === 0 ||
+                                                        room?.monthly_fee == null;
+                                                    return (
+                                                        <div key={room.id} className={styles.cardWrapper}>
+                                                            <div className={styles.propertyCard}>
+                                                                <BookMark
+                                                                    filled={favoriteRoomIds.has(room.id)}
+                                                                    onToggle={() => onToggle(room.id)}
                                                                 />
+                                                                <div className={styles.cardPic}>
+                                                                    <img
+                                                                        src={room.thumbnail_url || 'https://via.placeholder.com/160'}
+                                                                        alt={room.title}
+                                                                        className={styles.cardImg}
+                                                                    />
+                                                                </div>
+                                                                <div className={styles.cardBody}>
+                                                                    <div className={styles.info1}>
+                                                                        {isJeonse ? (
+                                                                            <>
+                                                                                <span className={styles.text1}>전세 </span>
+                                                                                <span className={styles.deposit}>{fmtMoney(room.deposit)}</span>
+                                                                            </>
+                                                                        ) : (
+                                                                            <>
+                                                                                <span className={styles.text1}>월세 </span>
+                                                                                <span className={styles.deposit}>{fmtMoney(room.deposit)}</span>
+                                                                                <span className={styles.text2}>/</span>
+                                                                                <span className={styles.monthlyFee}>{fmtMoney(room.monthly_fee)}</span>
+                                                                            </>
+                                                                        )}
+                                                                    </div>
+                                                                    <div className={styles.info2}>
+                                                                        <span className={styles.text3}>관리비 </span>
+                                                                        <span className={styles.maintenance}>{fmtMoney(room.maintenance_cost)}</span>
+                                                                    </div>
+                                                                    <div className={styles.info3}>
+                                                                        <span>{safeString(room?.room_type)}</span>
+                                                                        <span className={styles.dot}>ㆍ</span>
+                                                                        <span>{room?.floor ?? '-'}</span>
+                                                                        <span className={styles.dot}>ㆍ</span>
+                                                                        <span>{toPyeong(room?.real_area)}</span>
+                                                                    </div>
+                                                                    <div className={styles.info4}>
+                                                                        <div className={styles.titleText}>{room.title || ''}</div>
+                                                                    </div>
+                                                                </div>
                                                             </div>
-                                                            <div className={styles.cardBody}>
-                                                                <div className={styles.info1}>
-                                                                    {isJeonse ? (
-                                                                        <>
-                                                                            <span className={styles.text1}>전세 </span>
-                                                                            <span className={styles.deposit}>{fmtMoney(room.deposit)}</span>
-                                                                        </>
-                                                                    ) : (
-                                                                        <>
-                                                                            <span className={styles.text1}>월세 </span>
-                                                                            <span className={styles.deposit}>{fmtMoney(room.deposit)}</span>
-                                                                            <span className={styles.text2}>/</span>
-                                                                            <span className={styles.monthlyFee}>{fmtMoney(room.monthly_fee)}</span>
-                                                                        </>
-                                                                    )}
-                                                                </div>
-                                                                <div className={styles.info2}>
-                                                                    <span className={styles.text3}>관리비 </span>
-                                                                    <span className={styles.maintenance}>{fmtMoney(room.maintenance_cost)}</span>
-                                                                </div>
-                                                                <div className={styles.info3}>
-                                                                    <span>{safeString(room?.room_type)}</span>
-                                                                    <span className={styles.dot}>ㆍ</span>
-                                                                    <span>{room?.floor ?? '-'}</span>
-                                                                    <span className={styles.dot}>ㆍ</span>
-                                                                    <span>{toPyeong(room?.real_area)}</span>
-                                                                </div>
-                                                                <div className={styles.info4}>
-                                                                    <div className={styles.titleText}>{room.title || ''}</div>
-                                                                </div>
-                                                            </div>
+                                                            <button
+                                                                className={`${styles.selectButton} ${isSelected ? styles.selected : ''}`}
+                                                                onClick={() => handleSelectForReport(room)}
+                                                            >
+                                                                {isSelected ? '✓ 선택됨' : 'AI 리포트 선택'}
+                                                            </button>
                                                         </div>
-                                                        <button
-                                                            className={`${styles.selectButton} ${isSelected ? styles.selected : ''}`}
-                                                            onClick={() =>
-                                                                setSelectedForReport((prev) => {
-                                                                    if (prev.some((r) => r?.id === room.id)) {
-                                                                        return prev.map((r) => (r?.id === room.id ? null : r));
-                                                                    }
-                                                                    const i = prev.indexOf(null);
-                                                                    if (i !== -1) {
-                                                                        const next = [...prev];
-                                                                        next[i] = room;
-                                                                        return next;
-                                                                    }
-                                                                    alert('최대 2개의 집만 선택할 수 있습니다.');
-                                                                    return prev;
-                                                                })
-                                                            }
-                                                        >
-                                                            {isSelected ? '✓ 선택됨' : 'AI 리포트 선택'}
-                                                        </button>
-                                                    </div>
-                                                );
-                                            })}
+                                                    );
+                                                })}
+                                            </div>
                                         </div>
-                                    </div>
-                                ))}
+                                    );
+                                })}
                             </div>
                         </div>
                         <img
@@ -312,7 +328,7 @@ const MyRoom = () => {
                         <p className={styles.subtitle}>2개의 집을 골라 AI에게 분석을 맡겨보세요.</p>
                         <div className={styles.reportSelectionGrid}>
                             {[0, 1].map((index) => (
-                                <div key={index} className={styles.reportSelectionCard}>
+                                <div key={index} className={styles.reportSelectionCard} role="button" tabIndex={0} onClick={scrollToBookmarks} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') scrollToBookmarks(); }}>
                                     <p className={styles.selectionTitle}>선택 {index + 1}</p>
                                     {selectedForReport[index] ? (
                                         <div className={styles.selectedRoomInfo}>
@@ -375,10 +391,10 @@ const MyRoom = () => {
                                 </div>
                                 <div className={styles.weightItem}>
                                     <div className={styles.ratingLabel}>
-                                        <div className={styles.iconCircle}>
-                                            <img src={roomsIcon} alt="면적" className={styles.icon} />
-                                        </div>
-                                        <span className={styles.labelText}>면적</span>
+                                            <div className={styles.iconCircle}>
+                                                <img src={roomsIcon} alt="면적" className={styles.icon} />
+                                            </div>
+                                            <span className={styles.labelText}>면적</span>
                                     </div>
                                     {renderStars('area')}
                                 </div>
@@ -412,7 +428,12 @@ const MyRoom = () => {
                         placeholder="중요하게 생각하는 점이나 특별한 요청사항을 자유롭게 작성해주세요."
                     />
                 </div>
-                <button className={styles.generateButton} onClick={handleGenerateReport} disabled={isGenerating}>
+                <button
+                    className={`${styles.generateButton} ${isReadyToGenerate ? styles.generateButtonActive : styles.generateButtonDisabled}`}
+                    onClick={isReadyToGenerate ? handleGenerateReport : undefined}
+                    disabled={!isReadyToGenerate || isGenerating}
+                    aria-disabled={!isReadyToGenerate || isGenerating}
+                >
                     {isGenerating ? '리포트 생성 중...' : 'AI 리포트 생성하기'}
                 </button>
             </div>
