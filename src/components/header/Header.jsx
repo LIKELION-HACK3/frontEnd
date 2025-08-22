@@ -1,9 +1,3 @@
-// 호환용 브릿지: 대소문자 경로 혼용으로 인한 빌드 오류 방지
-// 실제 컴포넌트는 components/header/Header.jsx 에 있습니다.
-import Header from '../header/Header.jsx';
-
-export default Header;
-
 // 배포 환경(리눅스)은 대소문자를 구분합니다. 이 파일 경로는 'components/header/Header.jsx' 입니다.
 // 상단 import 경로도 항상 소문자 'header'를 사용해야 합니다.
 import styles from './Header.module.css';
