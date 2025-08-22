@@ -66,6 +66,14 @@ const AiReportPage = () => {
 
     const { room_a: roomA, room_b: roomB, analysis_summary, detailed_comparison, recommendation, reasoning } = data;
 
+    const formatManWon = (value) => {
+        if (value == null) return '-';
+        const n = Number(value);
+        if (!Number.isFinite(n)) return String(value);
+        const man = Math.round(n / 10000);
+        return `${man.toLocaleString()}만원`;
+    };
+
     return (
         <div className={styles.container}>
             <h1 className={styles.mainTitle}>AI 비교 결과</h1>
@@ -95,31 +103,59 @@ const AiReportPage = () => {
                     </div>
                 </section>
 
-                {/* 상세 비교 */}
+                {/* 상세 비교 (백엔드 데이터 사용) */}
                 <section className={styles.section}>
                     <h2 className={styles.sectionTitle}>상세 비교</h2>
-                    <div className={styles.comparisonNote}>
-                        제시해주신 데이터 예시에서 표가 생성된것도 보이던데 이 부분은 지피티에서 자체 생성을 해주는거겠죠..? 아래는 표 대신 임의로 넣어둔 것입니다.
-                    </div>
                     <div className={styles.comparisonTable}>
                         <div className={styles.tableRow}>
-                            <div className={styles.tableCell}>방A</div>
-                            <div className={styles.tableCell}>10평</div>
-                            <div className={styles.tableCell}>500만원</div>
-                            <div className={styles.tableCell}>10평</div>
-                            <div className={styles.tableCell}>500만원</div>
+                            <div className={styles.tableCell}><strong>항목</strong></div>
+                            <div className={styles.tableCell}><strong>방 A</strong></div>
+                            <div className={styles.tableCell}><strong>방 B</strong></div>
                         </div>
                         <div className={styles.tableRow}>
-                            <div className={styles.tableCell}>방B</div>
-                            <div className={styles.tableCell}>8평</div>
-                            <div className={styles.tableCell}>480만원</div>
-                            <div className={styles.tableCell}>8평</div>
-                            <div className={styles.tableCell}>480만원</div>
+                            <div className={styles.tableCell}>제목</div>
+                            <div className={styles.tableCell}>{roomA?.title ?? '-'}</div>
+                            <div className={styles.tableCell}>{roomB?.title ?? '-'}</div>
+                        </div>
+                        <div className={styles.tableRow}>
+                            <div className={styles.tableCell}>유형</div>
+                            <div className={styles.tableCell}>{roomA?.room_type ?? '-'}</div>
+                            <div className={styles.tableCell}>{roomB?.room_type ?? '-'}</div>
+                        </div>
+                        <div className={styles.tableRow}>
+                            <div className={styles.tableCell}>월세</div>
+                            <div className={styles.tableCell}>{formatManWon(roomA?.monthly_fee)}</div>
+                            <div className={styles.tableCell}>{formatManWon(roomB?.monthly_fee)}</div>
+                        </div>
+                        <div className={styles.tableRow}>
+                            <div className={styles.tableCell}>주소</div>
+                            <div className={styles.tableCell}>{roomA?.address ?? '-'}</div>
+                            <div className={styles.tableCell}>{roomB?.address ?? '-'}</div>
+                        </div>
+                        <div className={styles.tableRow}>
+                            <div className={styles.tableCell}>추천</div>
+                            <div className={styles.tableCell}>{recommendation === 'room_a' ? '✅ 추천' : '-'}</div>
+                            <div className={styles.tableCell}>{recommendation === 'room_b' ? '✅ 추천' : '-'}</div>
                         </div>
                     </div>
-                    <div className={styles.comparisonSummary}>
-                        방 A가 방 B보다 더 많은 자연광을 제공합니다. 방 A가 방 B보다 더 많은 자연광을 제공합니다.
-                    </div>
+                    {(!detailed_comparison ||
+                        (!detailed_comparison.price_analysis &&
+                         !detailed_comparison.location_analysis &&
+                         !detailed_comparison.area_analysis)) ? (
+                        <div className={styles.comparisonSummary}>상세 비교 데이터가 없습니다.</div>
+                    ) : (
+                        <div className={styles.comparisonSummary}>
+                            {detailed_comparison.price_analysis && (
+                                <p><strong>가격 분석:</strong> {detailed_comparison.price_analysis}</p>
+                            )}
+                            {detailed_comparison.location_analysis && (
+                                <p><strong>위치 분석:</strong> {detailed_comparison.location_analysis}</p>
+                            )}
+                            {detailed_comparison.area_analysis && (
+                                <p><strong>면적 분석:</strong> {detailed_comparison.area_analysis}</p>
+                            )}
+                        </div>
+                    )}
                 </section>
 
                 {/* 추천 이유 */}
