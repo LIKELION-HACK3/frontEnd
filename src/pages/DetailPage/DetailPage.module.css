@@ -43,10 +43,8 @@
 }
 
 .contentGroup {
-    /*제목 주소 버튼 세로로 묶어주는 컨테이너 */
     display: flex;
     flex-direction: column;
-
     align-items: flex-start;
     gap: 12px;
 }
@@ -61,7 +59,6 @@
 }
 
 .title {
-    /*1000/64 부분 */
     font-size: 36px;
     font-weight: 700;
     margin: 0;
@@ -69,7 +66,6 @@
 }
 
 .address {
-    /*이문동어쩌구 */
     font-size: 16px;
     font-weight: 400;
     color: #FFFFFF;
@@ -77,22 +73,20 @@
 }
 
 .headerButtons {
-    /*찜 담기랑 문의하기 감쌈*/
     display: flex;
     gap: 10px;
 }
 
 .actionButton {
-    /*액션 버튼 공통 스타일*/
     cursor: pointer;
     border-radius: 12px;
     font-family: 'Pretendard Variable';
     font-size: 16px;
     font-weight: 500;
+    transition: background-color 0.15s ease, border-color 0.15s ease;
 }
 
 .lightButton {
-    /*MY 찜 담기*/
     background-color: #0abab5;
     color: #fff;
     border: none;
@@ -100,19 +94,56 @@
 }
 
 .darkButton {
-    /*문의하기*/
     background-color: transparent;
     border: 1px solid #fff;
     color: #fff;
     padding: 14px 70px;
 }
 
+.darkButton:hover {
+    background-color: rgba(255,255,255,0.12);
+}
+
+.darkButtonActive {
+    background-color: #F35588;
+    color: #FFFFFF;
+    border: 1px solid transparent;
+}
+
+.darkButtonActive:hover {
+    background-color: #e23e76;
+}
+
+.bookmarkButton {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    line-height: 1;
+}
+
+.bookmarkButton svg {
+    overflow: visible;
+    display: block;
+}
+
+.bookmarkButton svg * {
+    fill: transparent;
+    stroke: #FFFFFF;
+    stroke-width: 1.2px;
+    vector-effect: non-scaling-stroke;
+}
+
+.bookmarkButton.darkButtonActive svg * {
+    fill: #FFFFFF;
+    stroke: none;
+}
+
 .headerImage {
-    /*매물 상세페이지 대표이미지*/
     width: 500px;
     height: 300px;
     border-radius: 12px;
-    overflow: hidden; 
+    overflow: hidden;
 }
 
 .headerImageMap {
@@ -131,7 +162,6 @@
 }
 
 .sectionTitle {
-    /*페이지 각 섹션 공통 스타일 (내부 사진,세부 정보, 전체 평점 등)*/
     font-size: 32px;
     font-weight: 700;
 }
@@ -206,17 +236,14 @@
 }
 
 .detailsSubtitle {
-    /*세부 정보 부제목*/
     font-size: 14px;
     color: #888;
     margin-bottom: 15px;
 }
 
 .detailsGrid {
-    /*상세 정보 2열 격자*/
     display: grid;
-    /*grid-template-columns: 1fr 1fr;*/
-    grid-template-columns: repeat(2, 1fr); /* 2열 */
+    grid-template-columns: repeat(2, 1fr);
     gap: 26px;
 }
 
@@ -263,7 +290,6 @@
 }
 
 .detailItem {
-    /*디테일GRID 내 상세 정보 아이템 속성*/
     border: 1px solid #ccc;
     padding: 15px;
     border-radius: 4px;
@@ -271,14 +297,12 @@
 }
 
 .detailLabel {
-    /*카드 안의 정보 항목 값*/
     font-weight: bold;
     color: #555;
     margin-bottom: 5px;
 }
 
 .detailValue {
-    /*상세 정보 카드 안의 실제값*/
     white-space: pre-line;
 }
 
@@ -303,7 +327,6 @@
 }
 
 .ratingLoginText {
-    /*평점과 리뷰 콘텐츠 컨테이너*/
     font-size: 14px;
     color: #888;
     margin-bottom: 15px;
@@ -320,12 +343,12 @@
 
 .filledStar {
     color: #56DFCF;
-    display: inline-block; 
+    display: inline-block;
 }
 
 .emptyStar {
     color: #dddddd;
-    display: inline-block; 
+    display: inline-block;
 }
 
 .labelText {
@@ -334,7 +357,6 @@
 }
 
 .writeReviewButton {
-    /*리뷰 작성하기 버튼 스타일*/
     display: block;
     padding: 14px 70px;
     background-color: #1B818C;
@@ -356,18 +378,15 @@
 }
 
 .reviewHeader {
-    /*리뷰 헤더-전체보기 버튼 포함*/
     display: flex;
     align-items: center;
     margin-bottom: 30px;
 }
 
 .reviewList {
-    /*개별 리뷰 카드 컨테이너*/
     display: flex;
     flex-direction: column;
     gap: 20px;
-
     height: 465px;
     overflow-y: auto;
     overscroll-behavior: contain;
@@ -379,7 +398,7 @@
     background: #efefef;
     border-radius: 8px;
 }
-.reviewList::-webkit-scrollbar-thumb {
+reviewList::-webkit-scrollbar-thumb {
     background: #d3d3d3;
     border-radius: 8px;
     background-clip: content-box;
@@ -394,7 +413,6 @@
 }
 
 .reviewAuthor {
-    /*리뷰 작성자 프로필 이름름*/
     display: flex;
     align-items: center;
     font-size: 16px;
@@ -402,7 +420,6 @@
 }
 
 .authorAvatar {
-    /*뷰 작성자 프로필 동그라미*/
     width: 36px;
     height: 36px;
     background-color: #0000001A;
@@ -415,7 +432,6 @@
 }
 
 .reviewContent {
-    /*리뷰 내용 나타내는 텍스트*/
     padding-top: 10px;
     font-size: 14px;
     font-weight: 400;
@@ -452,29 +468,19 @@
     gap: 30px;
 }
 
-.ratingLoginText {
-    /*평점과 리뷰 콘텐츠 컨테이너*/
-    font-size: 14px;
-    color: #888;
-    margin-bottom: 15px;
-}
-
 .ratingItem {
-    /*개별 평점 항목*/
     display: flex;
     align-items: center;
     gap: 24px;
 }
 
 .stars {
-    /*별 표시 컨테이너*/
     display: flex;
     gap: 2px;
     font-size: 18px;
 }
 
 .reviewContent {
-    /*리뷰 내용 나타내는 텍스트*/
     margin: 0;
 }
 
@@ -503,7 +509,6 @@
     text-align: center;
 }
 
-/* 추가된 스타일 */
 .reviewForm {
     display: flex;
     flex-direction: column;
@@ -532,7 +537,6 @@
     box-sizing: border-box;
 }
 
-/* ===== 리뷰 작성 모달 관련 ===== */
 @keyframes popIn {
     0% {
         transform: scale(0.8);
@@ -577,8 +581,6 @@
     overflow-y: auto;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
     position: relative;
-
-    /* 뽀잉 효과 */
     animation: popIn 0.25s ease-out forwards;
 }
 
@@ -607,5 +609,5 @@
 }
 
 .reviewForm .labelText {
-    font-size: 16px;    
+    font-size: 16px;
 }

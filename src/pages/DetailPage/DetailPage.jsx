@@ -4,6 +4,8 @@ import { useParams } from 'react-router-dom';
 import { Map, MapMarker } from 'react-kakao-maps-sdk';
 import { createReview, fetchReviewsForRoom, fetchReviewStats } from '../../apis/roomsApi';
 import { getMyInfo, loadAuth, getUserPublic } from '../../apis/auth';
+import { toggleBookmark } from '../../apis/bookmarks';
+import BookMark from '../../components/BookMark/BookMark';
 
 import leftArrow from '../../assets/pic/left_arrow.svg';
 import rightArrow from '../../assets/pic/right_arrow.svg';
@@ -23,12 +25,10 @@ const toMan = (value) => {
     return Math.round(n / 10000).toLocaleString();
 };
 
-// 금액을 '억'과 '만원' 단위로 변환하는 함수
 const formatPrice = (value) => {
     const num = Number(value);
     if (isNaN(num) || value === null || value === '') return '-';
     if (num === 0) return '0';
-
     if (num >= 100000000) {
         const eok = Math.floor(num / 100000000);
         const man = Math.floor((num % 100000000) / 10000);
@@ -37,9 +37,7 @@ const formatPrice = (value) => {
         }
         return `${eok}억`;
     }
-
     if (num >= 10000) return `${(num / 10000).toLocaleString()}`;
-
     return `${num.toLocaleString()}원`;
 };
 
@@ -49,6 +47,7 @@ const DetailPage = () => {
     const [startIndex, setStartIndex] = useState(0);
     const [me, setMe] = useState(null);
     const [authorMap, setAuthorMap] = useState({});
+    const [isBookmarked, setIsBookmarked] = useState(false);
 
     const hydrateAuthors = async (items) => {
         const ids = Array.from(
@@ -58,7 +57,6 @@ const DetailPage = () => {
                     .filter(Boolean)
             )
         );
-
         if (ids.length === 0) return;
         const nextMap = { ...authorMap };
         await Promise.all(
@@ -72,7 +70,6 @@ const DetailPage = () => {
         setAuthorMap(nextMap);
     };
 
-    // 평점과 리뷰를 위한 state
     const [ratingStats, setRatingStats] = useState(null);
     const [reviews, setReviews] = useState([]);
 
@@ -105,30 +102,21 @@ const DetailPage = () => {
 
     useEffect(() => {
         if (!id) return;
-
         const loadAllData = async () => {
             try {
                 loadAuth();
                 try {
                     const meData = await getMyInfo();
                     if (meData) setMe(meData);
-                } catch (e) {
-                    console.warn('정보 조회 실패:', e?.message || e);
-                }
+                } catch (e) {}
                 const propData = await fetch(`https://app.uniroom.shop/api/rooms/${id}/`).then((res) => res.json());
                 setPropertyData(propData);
-            } catch (e) {
-                console.error('방 정보를 불러오는데 실패했습니다:', e);
-            }
-
+            } catch (e) {}
             try {
                 const reviewData = await fetchReviewsForRoom(id);
                 setReviews(reviewData || []);
                 await hydrateAuthors(reviewData || []);
-            } catch (e) {
-                console.error('리뷰 목록을 불러오는데 실패했습니다:', e);
-            }
-
+            } catch (e) {}
             try {
                 const statsData = await fetchReviewStats(id);
                 setRatingStats(statsData);
@@ -139,17 +127,30 @@ const DetailPage = () => {
                         const data = await res.json();
                         setReviews(data || []);
                         await hydrateAuthors(data || []);
-                    } else {
-                        console.error('리뷰(공개) 요청 실패:', res.status);
                     }
-                } catch (e2) {
-                    console.error('리뷰 목록을 불러오는데 실패했습니다:', e2);
-                }
+                } catch (e2) {}
             }
         };
-
         loadAllData();
     }, [id]);
+
+    const handleActionBookmark = async () => {
+        const auth = loadAuth();
+        if (!auth || !auth.access) {
+            alert('로그인 후 북마크를 이용하실 수 있습니다');
+            return;
+        }
+        const next = !isBookmarked;
+        setIsBookmarked(next);
+        try {
+            const res = await toggleBookmark(Number(id));
+            if (res?.action === 'added') setIsBookmarked(true);
+            else if (res?.action === 'removed') setIsBookmarked(false);
+        } catch (e) {
+            setIsBookmarked(!next);
+            alert(e?.message || '북마크 토글에 실패했습니다.');
+        }
+    };
 
     const handleRatingChange = (key, value) => {
         setRatings((prev) => ({ ...prev, [key]: value }));
@@ -167,15 +168,13 @@ const DetailPage = () => {
             alert('리뷰가 성공적으로 등록되었습니다.');
             setNewReviewContent('');
             setRatings({ rating_safety: 0, rating_noise: 0, rating_light: 0, rating_traffic: 0, rating_bug: 0 });
-            // 리뷰와 평점만 새로고침
             fetchReviewsForRoom(id)
                 .then((data) => setReviews(data || []))
-                .catch(console.error);
-            fetchReviewStats(id).then(setRatingStats).catch(console.error);
+                .catch(() => {});
+            fetchReviewStats(id).then(setRatingStats).catch(() => {});
             handleClose();
         } catch (error) {
             alert(error.message || '리뷰 등록에 실패했습니다.');
-            console.error(error);
         }
     };
 
@@ -250,12 +249,9 @@ const DetailPage = () => {
     const displayReviewAuthor = (review) => {
         if (review?.username) return review.username;
         if (typeof review?.user === 'object' && review.user?.username) return review.user.username;
-
         const uid = typeof review?.user === 'object' ? review.user?.id : review?.user;
-
         if (uid && authorMap[uid]) return authorMap[uid];
         if (me && uid === me.id) return me.username;
-
         return uid ? `사용자 ${uid}` : '익명';
     };
 
@@ -279,7 +275,13 @@ const DetailPage = () => {
                         <p className={styles.address}>{propertyData.title}</p>
                         <div className={styles.headerButtons}>
                             <button className={`${styles.actionButton} ${styles.lightButton}`}>문의하기</button>
-                            <button className={`${styles.actionButton} ${styles.darkButton}`}>MY 홈 담기</button>
+                            <button
+                                className={`${styles.actionButton} ${styles.darkButton} ${styles.bookmarkButton} ${isBookmarked ? styles.darkButtonActive : ''}`}
+                                onClick={handleActionBookmark}
+                            >
+                                <span>MY 홈 담기</span>
+                                <BookMark roomId={Number(id)} filled={isBookmarked} variant="inline" interactive={false} size={16} />
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -357,7 +359,6 @@ const DetailPage = () => {
                             <p className={styles.cardLabel}>상세 면적</p>
                             <p className={styles.cardValue}>
                                 공급면적 · {propertyData.supply_area} m²
-                                <br />
                                 전용면적 · {propertyData.real_area} m²
                             </p>
                         </div>
@@ -365,7 +366,6 @@ const DetailPage = () => {
                 </div>
             </div>
 
-            {/* 평점 & 리뷰 섹션 */}
             <div className={styles.footerSection}>
                 <div className={styles.ratingSection}>
                     <span className={styles.sectionTitle}>전체 평점</span>
@@ -413,7 +413,6 @@ const DetailPage = () => {
                 </div>
             </div>
 
-            {/* 모달 */}
             {isReviewModalOpen && (
                 <div className={styles.modalOverlay}>
                     <div className={`${styles.modalContent} ${isClosing ? styles.close : ''}`}>

@@ -1,9 +1,19 @@
 import heart from '../../assets/pic/heart.svg';
+import { ReactComponent as HeartSvg } from '../../assets/pic/heart.svg';
 import { useEffect, useState } from 'react';
 import { toggleBookmark } from '../../apis/bookmarks';
 import { loadAuth } from '../../apis/auth';
 
-const BookMark = ({ roomId, filled = false, onToggle, stopPropagation = true, placement = 'top-right' }) => {
+const BookMark = ({
+    roomId,
+    filled = false,
+    onToggle,
+    stopPropagation = true,
+    placement = 'top-right',
+    variant = 'badge',
+    size = 24,
+    interactive
+}) => {
     const [isOn, setIsOn] = useState(!!filled);
     const [busy, setBusy] = useState(false);
 
@@ -11,7 +21,10 @@ const BookMark = ({ roomId, filled = false, onToggle, stopPropagation = true, pl
         setIsOn(!!filled);
     }, [filled]);
 
+    const isInteractive = interactive === undefined ? variant === 'badge' : interactive;
+
     const handleClick = async (e) => {
+        if (!isInteractive) return;
         if (stopPropagation) {
             e.stopPropagation();
             e.preventDefault();
@@ -44,15 +57,34 @@ const BookMark = ({ roomId, filled = false, onToggle, stopPropagation = true, pl
         }
     };
 
+    if (variant === 'inline') {
+        return (
+            <span
+                onClick={isInteractive ? handleClick : undefined}
+                aria-pressed={isInteractive ? isOn : undefined}
+                style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: size + 2, height: size + 2 }}
+            >
+                <HeartSvg
+                    width={size}
+                    height={size}
+                    fill={isOn ? '#FFFFFF' : 'none'}
+                    stroke={isOn ? 'none' : '#FFFFFF'}
+                    strokeWidth={1}
+                    style={{ overflow: 'visible', display: 'block' }}
+                />
+            </span>
+        );
+    }
+
     const iconStyle = {
-        width: 24,
-        height: 24,
+        width: size,
+        height: size,
         backgroundColor: isOn ? '#F35588' : '#DDDDDD',
         WebkitMask: `url(${heart}) no-repeat center / contain`,
         mask: `url(${heart}) no-repeat center / contain`,
         display: 'block',
-        transition: 'background-color 120ms ease-in-out',
-    }
+        transition: 'background-color 120ms ease-in-out'
+    };
 
     const placementStyle =
         placement === 'bottom-right' ? { right: 12, bottom: 12 } :
@@ -70,18 +102,15 @@ const BookMark = ({ roomId, filled = false, onToggle, stopPropagation = true, pl
             style={{
                 position: 'absolute',
                 ...placementStyle,
-                width: 36,
-                height: 36,
+                width: size + 12,
+                height: size + 12,
                 borderRadius: '50%',
                 border: 'none',
                 background: 'transparent',
                 display: 'grid',
                 placeItems: 'center',
-                cursor: busy ? 'default' : 'pointer',
-                transition: 'transform 120ms',
+                cursor: busy ? 'default' : 'pointer'
             }}
-            onMouseDown={(e) => (e.currentTarget.style.transform = 'scale(0.95)')}
-            onMouseUp={(e) => (e.currentTarget.style.transform = 'scale(1)')}
         >
             <span style={iconStyle} />
         </button>
