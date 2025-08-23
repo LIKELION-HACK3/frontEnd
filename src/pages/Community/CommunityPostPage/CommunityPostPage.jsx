@@ -62,6 +62,7 @@ const CommunityPostPage = () => {
         try {
             const res = await togglePostLike(id);
             setPost((prev) => (prev ? { ...prev, like_count: res.like_count } : prev));
+            try { window.dispatchEvent(new CustomEvent('community:likesChanged')); } catch {}
         } catch (e) {
             alert(e.message);
         }
@@ -140,6 +141,7 @@ const CommunityPostPage = () => {
                     replies: c.replies?.map((r) => (r.id === commentId ? { ...r, like_count: res.count } : r)) || c.replies,
                 }))
             );
+            try { window.dispatchEvent(new CustomEvent('community:likesChanged')); } catch {}
         } catch (e) {
             alert(e.message);
         }

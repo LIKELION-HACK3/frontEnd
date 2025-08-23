@@ -2,7 +2,7 @@ import React from 'react';
 import styles from './CommunityListPage.module.css';
 import PostCard from './PostCard';
 
-const PostList = ({ posts, loading, error, onWritePostClick, onDelete, currentUser, query, setQuery, hasMore, loadingMore, onLoadMore }) => {
+const PostList = ({ posts, loading, error, onWritePostClick, onDelete, currentUser, query, setQuery, hasMore, loadingMore, onLoadMore, topLiked, onTopLikedClick }) => {
     const formatTimeAgo = (dateString) => {
         const now = new Date();
         const postDate = new Date(dateString);
@@ -39,6 +39,14 @@ const PostList = ({ posts, loading, error, onWritePostClick, onDelete, currentUs
                     </button>
                 </div>
             </div>
+
+            {topLiked && (
+                <button className={styles.topLikedBar} onClick={() => onTopLikedClick?.(topLiked.id)}>
+                    <div className={styles.topLikedLabel}>지금 뜨는 글</div>
+                    <div className={styles.topLikedTitle}>{topLiked.title}</div>
+                    <div className={styles.topLikedMeta}>❤️ {topLiked.like_count || 0} · 조회 {topLiked.views || 0}</div>
+                </button>
+            )}
 
             {loading && <p>게시글을 불러오는 중...</p>}
             {error && <p style={{ color: 'red' }}>{error}</p>}
