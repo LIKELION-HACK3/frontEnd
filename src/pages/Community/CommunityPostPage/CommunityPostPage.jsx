@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { fetchCommunityPostDetail, fetchComments, createComment, togglePostLike, toggleCommentLike, reportCommunityPost, updateCommunityPost } from '../../../apis/communityApi';
+import { fetchCommunityPostDetail, fetchComments, createComment, togglePostLike, toggleCommentLike, reportCommunityPost, updateCommunityPost, deleteComment } from '../../../apis/communityApi';
 import { loadAuth } from '../../../apis/auth';
 import styles from './CommunityPostPage.module.css';
 
@@ -145,6 +145,19 @@ const CommunityPostPage = () => {
         }
     };
 
+    const handleDeleteComment = async (commentId) => {
+        if (!window.confirm('이 댓글을 삭제하시겠어요?')) return;
+        try {
+            await deleteComment(commentId);
+            const list = await fetchComments(id);
+            setComments(list || []);
+            // 댓글 수 감소 (대댓글 삭제는 총합 반영 어려워 생략)
+            setPost((prev) => (prev ? { ...prev, comment_count: Math.max(0, (prev.comment_count || 1) - 1) } : prev));
+        } catch (e) {
+            alert(e.message);
+        }
+    };
+
     if (loading) return <div className={styles.loading}>불러오는 중...</div>;
     if (error) return <div className={styles.error}>{error}</div>;
     if (!post) return null;
@@ -218,6 +231,9 @@ const CommunityPostPage = () => {
                                 ❤️ {comment.like_count || 0}
                             </button>
                             <button type="button" onClick={() => setReplyTargetId(comment.id)}>답글</button>
+                            {comment.author?.id === currentUserId && (
+                                <button type="button" onClick={() => handleDeleteComment(comment.id)} className={styles.deleteButton}>삭제</button>
+                            )}
                         </div>
                         {comment.replies && comment.replies.length > 0 && (
                             <div className={styles.replyList}>
@@ -235,6 +251,9 @@ const CommunityPostPage = () => {
                                             <button type="button" onClick={() => handleLikeComment(reply.id)}>
                                                 ❤️ {reply.like_count || 0}
                                             </button>
+                                            {reply.author?.id === currentUserId && (
+                                                <button type="button" onClick={() => handleDeleteComment(reply.id)} className={styles.deleteButton}>삭제</button>
+                                            )}
                                         </div>
                                     </div>
                                 ))}
