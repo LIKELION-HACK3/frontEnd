@@ -74,22 +74,37 @@
 .postActions {
     display: flex;
     align-items: center;
-    gap: 16px;
+    flex-wrap: wrap;
+    gap: 12px;
     color: #6c757d;
     font-size: 14px;
-    padding: 12px 0 16px;
+    padding: 14px 0 18px;
     border-bottom: 1px solid #e9ecef;
     margin-bottom: 24px;
+}
+
+.postActions span {
+    display: inline-flex;
+    align-items: center;
+    height: 36px;
 }
 
 .likeButton {
     background: #fff;
     border: 1px solid #ffc7d1;
     color: #e85d75;
-    padding: 6px 12px;
-    border-radius: 20px;
+    padding: 8px 14px;
+    height: 36px;
+    line-height: 20px;
+    border-radius: 999px;
     cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
 }
+
+.likeButton:hover { background: #fff4f7; border-color: #f3a3b1; box-shadow: 0 1px 2px rgba(0,0,0,0.04); }
 
 .likeButtonActive {
     background: #ffe9ee;
@@ -107,6 +122,21 @@
     transition: background-color 0.15s ease, border-color 0.15s ease;
 }
 .reportButton:hover { background: #fff4ef; border-color: #ffb89e; }
+
+/* 링크 스타일 신고 버튼 */
+.reportLink {
+    margin-left: auto;
+    background: none;
+    border: none;
+    color: #1971c2;
+    cursor: pointer;
+    padding: 0 6px;
+    height: 36px;
+    display: inline-flex;
+    align-items: center;
+    text-decoration: underline;
+}
+.reportLink:hover { color: #1864ab; }
 
 .commentSection {
     background: #ffffff;
@@ -283,20 +313,26 @@
 }
 .modalSubmit:hover { background: #ff5a5a; }
 
-.editButton {
-    background-color: #4CAF50;
-    color: white;
-    border: none;
-    padding: 8px 16px;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 14px;
-    margin-right: 8px;
+.ownerActions {
+    display: inline-flex;
+    gap: 6px;
+    margin-left: 6px;
 }
 
-.editButton:hover {
-    background-color: #45a049;
+.editButton {
+    background-color: #37b24d;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    height: 30px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+    transition: transform 0.12s ease, background-color 0.15s ease, box-shadow 0.15s ease;
 }
+.editButton:hover { background-color: #2f9e44; box-shadow: 0 2px 6px rgba(55,178,77,0.18); }
+.editButton:active { transform: translateY(1px); }
 
 .editForm {
     display: flex;
@@ -330,14 +366,16 @@
 }
 
 .deleteButton {
-    background: #e74c3c;
+    background: #e03131;
     color: #fff;
     border: none;
     padding: 6px 10px;
-    border-radius: 4px;
+    height: 30px;
+    border-radius: 8px;
     cursor: pointer;
-    margin-left: 8px;
+    font-weight: 600;
+    font-size: 13px;
+    transition: transform 0.12s ease, background-color 0.15s ease, box-shadow 0.15s ease;
 }
-.deleteButton:hover {
-    background: #c0392b;
-}
+.deleteButton:hover { background: #c92a2a; box-shadow: 0 2px 6px rgba(224,49,49,0.18); }
+.deleteButton:active { transform: translateY(1px); }
