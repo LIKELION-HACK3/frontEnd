@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { fetchCommunityPostDetail, fetchComments, createComment, togglePostLike, toggleCommentLike, reportCommunityPost } from '../../../apis/communityApi';
+import { fetchCommunityPostDetail, fetchComments, createComment, togglePostLike, toggleCommentLike, reportCommunityPost, updateCommunityPost } from '../../../apis/communityApi';
+import { loadAuth } from '../../../apis/auth';
 import styles from './CommunityPostPage.module.css';
 
 const CommunityPostPage = () => {
@@ -14,6 +15,14 @@ const CommunityPostPage = () => {
     const [replyTargetId, setReplyTargetId] = useState(null);
     const [isReportOpen, setIsReportOpen] = useState(false);
     const [reportReason, setReportReason] = useState('');
+    const [isEditOpen, setIsEditOpen] = useState(false);
+    const [editForm, setEditForm] = useState({
+        title: '',
+        content: '',
+        region: '',
+        category: ''
+    });
+    const [currentUserId, setCurrentUserId] = useState(null);
 
     useEffect(() => {
         const loadPost = async () => {
@@ -23,6 +32,13 @@ const CommunityPostPage = () => {
                 setPost(postData);
                 const list = await fetchComments(id);
                 setComments(list || []);
+                
+                // 현재 사용자 정보 로드
+                const auth = loadAuth();
+                const uid = auth?.user?.id ?? null;
+                if (uid !== null) {
+                    setCurrentUserId(uid);
+                }
             } catch (err) {
                 setError('게시글을 불러오는 데 실패했습니다.');
                 console.error(err);
@@ -56,6 +72,16 @@ const CommunityPostPage = () => {
         setIsReportOpen(true);
     };
 
+    const handleOpenEdit = () => {
+        setEditForm({
+            title: post.title,
+            content: post.content,
+            region: post.region,
+            category: post.category
+        });
+        setIsEditOpen(true);
+    };
+
     const handleSubmitReport = async () => {
         const reason = reportReason.trim();
         if (!reason) {
@@ -67,6 +93,22 @@ const CommunityPostPage = () => {
             alert('신고가 접수되었습니다. 감사합니다.');
             setIsReportOpen(false);
             setReportReason('');
+        } catch (e) {
+            alert(e.message);
+        }
+    };
+
+    const handleSubmitEdit = async () => {
+        const { title, content, region, category } = editForm;
+        if (!title.trim() || !content.trim() || !region.trim() || !category.trim()) {
+            alert('모든 필드를 입력해 주세요.');
+            return;
+        }
+        try {
+            const updatedPost = await updateCommunityPost(id, editForm);
+            setPost(updatedPost);
+            setIsEditOpen(false);
+            alert('게시글이 수정되었습니다.');
         } catch (e) {
             alert(e.message);
         }
@@ -138,6 +180,9 @@ const CommunityPostPage = () => {
                     ❤️ 공감 {post.like_count}
                 </button>
                 <span>댓글 {post.comment_count}</span>
+                {post.author?.id === currentUserId && (
+                    <button type="button" className={styles.editButton} onClick={handleOpenEdit}>수정</button>
+                )}
                 <button type="button" className={styles.reportButton} onClick={handleOpenReport}>신고</button>
             </div>
 
@@ -212,6 +257,63 @@ const CommunityPostPage = () => {
                         <div className={styles.modalActions}>
                             <button type="button" className={styles.modalCancel} onClick={() => setIsReportOpen(false)}>취소</button>
                             <button type="button" className={styles.modalSubmit} onClick={handleSubmitReport}>신고하기</button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {isEditOpen && (
+                <div className={styles.modalBackdrop} onClick={() => setIsEditOpen(false)}>
+                    <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
+                        <h3 className={styles.modalTitle}>게시글 수정</h3>
+                        <div className={styles.editForm}>
+                            <input
+                                type="text"
+                                value={editForm.title}
+                                onChange={(e) => setEditForm({...editForm, title: e.target.value})}
+                                placeholder="제목"
+                                className={styles.editInput}
+                            />
+                            <textarea
+                                value={editForm.content}
+                                onChange={(e) => setEditForm({...editForm, content: e.target.value})}
+                                placeholder="내용"
+                                className={styles.editTextarea}
+                            />
+                            <select
+                                value={editForm.region}
+                                onChange={(e) => setEditForm({...editForm, region: e.target.value})}
+                                className={styles.editSelect}
+                            >
+                                <option value="">지역 선택</option>
+                                <option value="이문동">이문동</option>
+                                <option value="휘경동">휘경동</option>
+                                <option value="전농동">전농동</option>
+                                <option value="답십리동">답십리동</option>
+                                <option value="장안동">장안동</option>
+                                <option value="청량리동">청량리동</option>
+                                <option value="동대문동">동대문동</option>
+                                <option value="신설동">신설동</option>
+                                <option value="용두동">용두동</option>
+                                <option value="제기동">제기동</option>
+                                <option value="전동">전동</option>
+                            </select>
+                            <select
+                                value={editForm.category}
+                                onChange={(e) => setEditForm({...editForm, category: e.target.value})}
+                                className={styles.editSelect}
+                            >
+                                <option value="">카테고리 선택</option>
+                                <option value="구해요">구해요</option>
+                                <option value="팝니다">팝니다</option>
+                                <option value="정보공유">정보공유</option>
+                                <option value="질문">질문</option>
+                                <option value="기타">기타</option>
+                            </select>
+                        </div>
+                        <div className={styles.modalActions}>
+                            <button type="button" className={styles.modalCancel} onClick={() => setIsEditOpen(false)}>취소</button>
+                            <button type="button" className={styles.modalSubmit} onClick={handleSubmitEdit}>수정하기</button>
                         </div>
                     </div>
                 </div>

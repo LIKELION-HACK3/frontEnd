@@ -63,6 +63,19 @@ export const createCommunityPost = async (postData) => {
     }
 };
 
+export const updateCommunityPost = async (postId, updateData) => {
+    const auth = loadAuth();
+    if (!auth?.access) {
+        throw new Error('게시글을 수정하려면 로그인이 필요합니다.');
+    }
+    try {
+        const response = await api.patch(`/api/community/posts/${postId}/`, updateData);
+        return response.data;
+    } catch (error) {
+        normalizeError(error);
+    }
+};
+
 export const deleteCommunityPost = async (postId) => {
     const auth = loadAuth();
     if (!auth?.access) {
