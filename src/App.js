@@ -1,8 +1,6 @@
 import './assets/css/styles.module.css';
 import { Route, Routes } from 'react-router-dom';
 
-// 대문자/소문자 경로 모두 허용: 소문자 우선, 브릿지 파일이 있을 경우에도 안전
-// 절대 고정: 항상 소문자 경로로 임포트
 import Header from './components/header/Header.jsx';
 import Footer from './components/Footer/Footer';
 import Home from './pages/Home/Home';
