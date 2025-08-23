@@ -209,3 +209,14 @@
     /* 필요 시 2열로
     .cardGrid { grid-template-columns: repeat(2, minmax(0, 1fr)); } */
 }
+
+:global(:root) {
+    scrollbar-gutter: stable both-edges;
+} /* Chromium 계열 */
+:global(html) {
+    overflow-y: scroll;
+}
+
+.cardGrid[data-loading='true'] {
+    min-height: 420px;
+}
