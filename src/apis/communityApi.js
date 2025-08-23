@@ -144,6 +144,28 @@ export const createComment = async (postId, content, parent = null) => {
     }
 };
 
+export const deleteComment = async (commentId) => {
+    const auth = loadAuth();
+    if (!auth?.access) {
+        throw new Error('댓글 삭제는 로그인이 필요합니다.');
+    }
+    try {
+        const response = await api.delete(`/api/community/comments/${commentId}/`);
+        return response.status === 204 ? { success: true } : response.data;
+    } catch (error) {
+        // Fallback for potential legacy/typo route
+        if (error?.response?.status === 404) {
+            try {
+                const res2 = await api.delete(`/api/comminty/comminty/comments/${commentId}`);
+                return res2.status === 204 ? { success: true } : res2.data;
+            } catch (e2) {
+                normalizeError(e2);
+            }
+        }
+        normalizeError(error);
+    }
+};
+
 // --- 신고 (Report) API ---
 export const reportCommunityPost = async (postId, reason) => {
     const auth = loadAuth();
