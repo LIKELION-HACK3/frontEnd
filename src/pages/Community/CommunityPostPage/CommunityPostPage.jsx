@@ -162,6 +162,25 @@ const CommunityPostPage = () => {
     if (error) return <div className={styles.error}>{error}</div>;
     if (!post) return null;
 
+    const isAnonymous = post?.is_anonymous === true || post?.anonymous === true || post?.author_hidden === true;
+    let isFrontendAnonymous = false;
+    try {
+        const raw = localStorage.getItem('anonymous_posts');
+        const list = Array.isArray(JSON.parse(raw)) ? JSON.parse(raw) : [];
+        if (list.includes(post.id)) isFrontendAnonymous = true;
+    } catch {}
+    if (!isFrontendAnonymous) {
+        try {
+            const raw2 = localStorage.getItem('anonymous_titles');
+            const list2 = Array.isArray(JSON.parse(raw2)) ? JSON.parse(raw2) : [];
+            const prefix = String(post.title || '').slice(0, 100);
+            if (list2.some((e) => e && e.title === prefix)) {
+                isFrontendAnonymous = true;
+            }
+        } catch {}
+    }
+    const authorName = (isAnonymous || isFrontendAnonymous) ? '익명' : (post.author?.username || '익명');
+
     return (
         <div className={styles.container}>
             <button onClick={() => navigate(-1)} className={styles.backButton}>
@@ -172,7 +191,7 @@ const CommunityPostPage = () => {
                 <div className={styles.authorInfo}>
                     <div className={styles.avatar} aria-hidden="true">🥺</div>
                     <div className={styles.authorMeta}>
-                        <span className={styles.authorName}>{post.author?.username || '익명'}</span>
+                        <span className={styles.authorName}>{authorName}</span>
                         <span className={styles.postTimestamp}>{formatDateTime(post.created_at)}</span>
                     </div>
                 </div>
