@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { fetchCommunityPostDetail, fetchComments, createComment, togglePostLike, toggleCommentLike, reportCommunityPost, updateCommunityPost, deleteComment } from '../../../apis/communityApi';
+import { fetchCommunityPostDetail, fetchComments, createComment, togglePostLike, toggleCommentLike, reportCommunityPost, updateCommunityPost, deleteCommunityPost, deleteComment } from '../../../apis/communityApi';
 import { loadAuth } from '../../../apis/auth';
 import styles from './CommunityPostPage.module.css';
 
@@ -158,6 +158,17 @@ const CommunityPostPage = () => {
         }
     };
 
+    const handleDeletePost = async () => {
+        if (!window.confirm('이 게시글을 삭제하시겠어요?')) return;
+        try {
+            await deleteCommunityPost(id);
+            alert('게시글이 삭제되었습니다.');
+            navigate('/community_list');
+        } catch (e) {
+            alert(e.message || '게시글 삭제에 실패했습니다.');
+        }
+    };
+
     if (loading) return <div className={styles.loading}>불러오는 중...</div>;
     if (error) return <div className={styles.error}>{error}</div>;
     if (!post) return null;
@@ -213,9 +224,12 @@ const CommunityPostPage = () => {
                 </button>
                 <span>댓글 {post.comment_count}</span>
                 {post.author?.id === currentUserId && (
-                    <button type="button" className={styles.editButton} onClick={handleOpenEdit}>수정</button>
+                    <div className={styles.ownerActions}>
+                        <button type="button" className={styles.editButton} onClick={handleOpenEdit}>수정</button>
+                        <button type="button" className={styles.deleteButton} onClick={handleDeletePost}>삭제</button>
+                    </div>
                 )}
-                <button type="button" className={styles.reportButton} onClick={handleOpenReport}>신고</button>
+                <button type="button" className={styles.reportLink} onClick={handleOpenReport}>신고</button>
             </div>
 
             <div className={styles.commentSection}>
