@@ -1,10 +1,14 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styles from './FilterSidebar.module.css';
 
 const FilterSidebar = ({ selectedRegion, setSelectedRegion, selectedCategory, setSelectedCategory, selectedSort, setSelectedSort }) => {
-    const regionOptions = ['전체', '이문동', '회기동', '휘경동', '청량리동', '제기동'];
+    const allRegionOptions = ['전체', '이문동', '회기동', '휘경동', '청량리동', '제기동'];
     const categoryOptions = ['전체', '구해요', '동네 소식', '자취 꿀팁', '기타'];
     const sortOptions = ['최근', '인기'];
+
+    const [showAllRegions, setShowAllRegions] = useState(false);
+    const collapsedCount = Math.max(1, allRegionOptions.indexOf('휘경동') + 1);
+    const visibleRegions = showAllRegions ? allRegionOptions : allRegionOptions.slice(0, collapsedCount);
 
     const handleReset = () => {
         setSelectedRegion('전체');
@@ -22,7 +26,7 @@ const FilterSidebar = ({ selectedRegion, setSelectedRegion, selectedCategory, se
                     </button>
                 </h4>
                 <div className={styles.subTitle}>서울특별시 동대문구</div>
-                {regionOptions.map((region) => (
+                {visibleRegions.map((region) => (
                     <label key={region} className={styles.radioLabel}>
                         <input
                             type="radio"
@@ -34,7 +38,7 @@ const FilterSidebar = ({ selectedRegion, setSelectedRegion, selectedCategory, se
                         <span>{region}</span>
                     </label>
                 ))}
-                <button className={styles.moreButton}>더보기</button>
+                <button className={styles.moreButton} onClick={() => setShowAllRegions((v) => !v)}>{showAllRegions ? '접기' : '더보기'}</button>
             </div>
 
             <div className={styles.section}>
