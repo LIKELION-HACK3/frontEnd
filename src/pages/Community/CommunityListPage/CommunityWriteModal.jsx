@@ -22,6 +22,7 @@ const CommunityWriteModal = ({ isOpen, onClose, onPostCreated }) => {
     const [content, setContent] = useState('');
     const [category, setCategory] = useState('구해요');
     const [region, setRegion] = useState('이문동');
+    const [anonymous, setAnonymous] = useState(false);
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
     const [attemptedSubmit, setAttemptedSubmit] = useState(false);
@@ -32,6 +33,7 @@ const CommunityWriteModal = ({ isOpen, onClose, onPostCreated }) => {
             setContent('');
             setCategory('구해요');
             setRegion('이문동');
+            setAnonymous(false);
             setError('');
             setAttemptedSubmit(false);
         }
@@ -61,8 +63,35 @@ const CommunityWriteModal = ({ isOpen, onClose, onPostCreated }) => {
                 region,
                 category: normalizedCategory,
             };
+            if (anonymous) {
+                postData.anonymous = true;
+            }
 
-            await createCommunityPost(postData);
+            const created = await createCommunityPost(postData);
+            // 프론트 전용 익명 처리: 로컬에 익명 게시글 id 저장
+            if (anonymous && created?.id != null) {
+                try {
+                    const raw = localStorage.getItem('anonymous_posts');
+                    const list = Array.isArray(JSON.parse(raw)) ? JSON.parse(raw) : [];
+                    if (!list.includes(created.id)) {
+                        const next = [...list, created.id];
+                        localStorage.setItem('anonymous_posts', JSON.stringify(next));
+                    }
+                } catch {
+                    localStorage.setItem('anonymous_posts', JSON.stringify([created.id]));
+                }
+            } else if (anonymous) {
+                // 백엔드가 id를 반환하지 않는 경우 대비: 제목/시간 기반 식별 저장
+                const entry = { title: String(title).slice(0, 100), createdAt: new Date().toISOString() };
+                try {
+                    const raw = localStorage.getItem('anonymous_titles');
+                    const list = Array.isArray(JSON.parse(raw)) ? JSON.parse(raw) : [];
+                    const next = [entry, ...list].slice(0, 20);
+                    localStorage.setItem('anonymous_titles', JSON.stringify(next));
+                } catch {
+                    localStorage.setItem('anonymous_titles', JSON.stringify([entry]));
+                }
+            }
             alert('게시글이 성공적으로 등록되었습니다.');
             onPostCreated?.();
             onClose?.();
@@ -129,6 +158,16 @@ const CommunityWriteModal = ({ isOpen, onClose, onPostCreated }) => {
                         className={`${styles.titleInput} ${titleInvalid ? styles.invalid : ''}`}
                         placeholder="제목을 입력하세요."
                     />
+
+                    {/* 익명 옵션 - 제목 아래로 이동 */}
+                    <label className={styles.radioLabel} style={{ alignSelf: 'flex-start', marginBottom: 12 }}>
+                        <input
+                            type="checkbox"
+                            checked={anonymous}
+                            onChange={(e) => setAnonymous(e.target.checked)}
+                        />
+                        <span style={{ marginLeft: 6 }}>익명으로 작성</span>
+                    </label>
 
                     <textarea
                         value={content}
