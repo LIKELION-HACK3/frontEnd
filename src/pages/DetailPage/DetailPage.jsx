@@ -4,7 +4,7 @@ import { useParams } from 'react-router-dom';
 import { Map, MapMarker } from 'react-kakao-maps-sdk';
 import { createReview, fetchReviewsForRoom, fetchReviewStats } from '../../apis/roomsApi';
 import { getMyInfo, loadAuth, getUserPublic } from '../../apis/auth';
-import { toggleBookmark } from '../../apis/bookmarks';
+import { fetchAllBookmarks, toggleBookmark } from '../../apis/bookmarks';
 import BookMark from '../../components/BookMark/BookMark';
 
 import leftArrow from '../../assets/pic/left_arrow.svg';
@@ -111,6 +111,18 @@ const DetailPage = () => {
                 } catch (e) {}
                 const propData = await fetch(`https://app.uniroom.shop/api/rooms/${id}/`).then((res) => res.json());
                 setPropertyData(propData);
+                try {
+                    const auth = loadAuth();
+                    if (auth?.access) {
+                        const list = await fetchAllBookmarks();
+                        const ids = new Set(
+                            list.map((bm) => Number(bm?.room?.id)).filter((v) => Number.isFinite(v))
+                        );
+                        setIsBookmarked(ids.has(Number(id)));
+                    } else {
+                        setIsBookmarked(false);
+                    }
+                } catch (e) {}
             } catch (e) {}
             try {
                 const reviewData = await fetchReviewsForRoom(id);

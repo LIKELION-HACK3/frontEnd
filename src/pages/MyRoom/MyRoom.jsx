@@ -282,11 +282,13 @@ const MyRoom = () => {
                                                         room?.monthly_fee == null;
                                                     return (
                                                         <div key={room.id} className={styles.cardWrapper}>
-                                                            <div className={styles.propertyCard}>
-                                                                <BookMark
-                                                                    filled={favoriteRoomIds.has(room.id)}
-                                                                    onToggle={() => onToggle(room.id)}
-                                                                />
+                                                            <div className={styles.propertyCard} role="button" tabIndex={0} aria-label={`매물 상세 보기: ${safeString(room.title, '')}`} onClick={() => navigate(`/property/${room.id}`)} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') navigate(`/property/${room.id}`); }}>
+                                                                <div onClick={(e) => e.stopPropagation()}>
+                                                                    <BookMark
+                                                                        filled={favoriteRoomIds.has(room.id)}
+                                                                        onToggle={() => onToggle(room.id)}
+                                                                    />
+                                                                </div>
                                                                 <div className={styles.cardPic}>
                                                                     <img
                                                                         src={room.thumbnail_url || 'https://via.placeholder.com/160'}

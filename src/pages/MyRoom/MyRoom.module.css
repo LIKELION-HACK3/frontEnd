@@ -100,6 +100,7 @@
     background-color: #fff;
     position: relative;
     overflow: hidden;
+    cursor: pointer;
 }
 
 .cardPic {
@@ -585,6 +586,7 @@
 .propertyCardEmpty {
     background-color: #D9D9D9;
     border: none;
+    cursor: default;
 }
 
 .emptyCardBody {
