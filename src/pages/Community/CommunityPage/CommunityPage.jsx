@@ -1,4 +1,3 @@
-// src/pages/Community/CommunityListPage/CommunityPage.jsx
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styles from './CommunityPage.module.css';
@@ -6,7 +5,6 @@ import { fetchNews } from '../../../apis/communityApi';
 import { loadAuth } from '../../../apis/auth';
 import communityIcon from '../../../assets/pic/community_icon.svg';
 
-// 배열을 섞고 n개 뽑기 (Fisher–Yates)
 const pickRandom = (arr, n) => {
     const a = [...(arr || [])];
     for (let i = a.length - 1; i > 0; i--) {
@@ -16,7 +14,6 @@ const pickRandom = (arr, n) => {
     return a.slice(0, n);
 };
 
-// 재사용 카드 컴포넌트
 const Card = ({ tag, title, date, author, image, url, isGray }) => (
     <a
         href={url}
@@ -32,18 +29,21 @@ const Card = ({ tag, title, date, author, image, url, isGray }) => (
             </div>
             <span className={styles.cardMenu}>⋮</span>
         </div>
+        <div className={styles.cardMainWrapper}>
+            <div className={styles.cardInfoWrapper}>
+                <h3 className={styles.cardTitle}>{title}</h3>
 
-        <h3 className={styles.cardTitle}>{title}</h3>
+                <p className={styles.cardInfo}>
+                    {date ? new Date(date).toLocaleDateString() : ''} · {author || '익명'}
+                </p>
+            </div>
 
-        <p className={styles.cardInfo}>
-            {date ? new Date(date).toLocaleDateString() : ''} · {author || '익명'}
-        </p>
-
-        <img
-            className={styles.cardImage}
-            src={image || 'https://via.placeholder.com/600x300?text=No+Image'}
-            alt={title}
-        />
+            <img
+                className={styles.cardImage}
+                src={image || 'https://via.placeholder.com/600x300?text=No+Image'}
+                alt={title}
+            />
+        </div>
     </a>
 );
 
@@ -100,7 +100,9 @@ const CommunityPage = () => {
 
     return (
         <div className={styles.communityPage}>
-            <h1 className={styles.pageTitle}>커뮤니티</h1>
+            <div className={styles.pageTitleWrapper}>
+                <h1 className={styles.pageTitle}>커뮤니티</h1>
+            </div>
 
             <div className={styles.tabButtons}>
                 <button className={`${styles.tabButton} ${styles.active}`} onClick={() => handleTabClick('뉴스, 팁')}>
@@ -113,15 +115,17 @@ const CommunityPage = () => {
 
             {/* 인트로: 아이콘=제목 왼쪽, 부제목=아이콘 아래 */}
             <div className={styles.sectionInner}>
-                <div className={styles.introBox}>
-                    <img
-                        src={communityIcon}
-                        alt="커뮤니티 아이콘"
-                        className={`${styles.cardIcon} ${styles.introIcon}`}
-                    />
-                    <p className={styles.introTitle}>
-                        <span className={styles.nameBold}>{displayName}</span>님을 위한 모음.zip
-                    </p>
+                <div className={styles.titleWrapper}>
+                    <div className={styles.introWrapper}>
+                        <img
+                            src={communityIcon}
+                            alt="커뮤니티 아이콘"
+                            className={`${styles.cardIcon} ${styles.introIcon}`}
+                        />
+                        <p className={styles.introTitle}>
+                            <span className={styles.nameBold}>{displayName}</span>님을 위한 모음.zip
+                        </p>
+                    </div>
                     <p className={styles.introSub}>
                         부동산, 자취, 정부 지원 정책 등 집 구할 때 꿀팁을 한눈에 확인해보세요
                     </p>
@@ -134,9 +138,9 @@ const CommunityPage = () => {
             {!loading && !error && (
                 <>
                     {/* 최신 게시글 섹션 */}
-                    <section className={styles.section}>
-                        <div className={styles.sectionInner}>
-                            <h2 className={styles.sectionTitle}>최신 게시글</h2>
+                    <section className={styles.cardSection}>
+                        <div className={styles.cardSectionInner}>
+                            <h2 className={styles.cardSectionTitle}>최신 게시글</h2>
                             <div className={styles.cardGrid}>
                                 {latestPosts.map((post) => (
                                     <Card
@@ -156,8 +160,8 @@ const CommunityPage = () => {
 
                     {/* 추천 게시글 섹션 (회색 배경 래퍼 유지) */}
                     <section className={styles.recoWrap}>
-                        <div className={styles.sectionInner}>
-                            <h2 className={styles.sectionTitle}>추천 게시글</h2>
+                        <div className={styles.recoSectionInner}>
+                            <h2 className={styles.recoSectionTitle}>추천 게시글</h2>
                             <div className={styles.cardGrid}>
                                 {recommendedPosts.map((post) => (
                                     <Card

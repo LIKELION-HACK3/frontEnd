@@ -399,7 +399,8 @@
     background: #efefef;
     border-radius: 8px;
 }
-reviewList::-webkit-scrollbar-thumb {
+
+.reviewList::-webkit-scrollbar-thumb {
     background: #d3d3d3;
     border-radius: 8px;
     background-clip: content-box;
