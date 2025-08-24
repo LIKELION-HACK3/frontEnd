@@ -76,8 +76,6 @@ const MyRoom = () => {
         loadBookmarks();
     }, []);
 
-    // 히스토리는 별도 페이지로 이동하여 표시
-
     const rooms = useMemo(() => bookmarks.map((bm) => bm.room).filter(Boolean), [bookmarks]);
 
     const pages = useMemo(() => {
@@ -90,13 +88,10 @@ const MyRoom = () => {
     }, [rooms]);
 
     useEffect(() => {
-        // Ensure current pageIndex is valid when pages change.
-        // Include pageIndex in deps to satisfy eslint rule, but only update when necessary to avoid loop.
         const maxIdx = Math.max(0, pages.length - 1);
         if (pageIndex > maxIdx) {
             setPageIndex(0);
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [pages.length, pageIndex]);
 
     const maxPageIndex = Math.max(0, pages.length - 1);
@@ -357,7 +352,7 @@ const MyRoom = () => {
                     <div className={styles.aiLeft}>
                         <h1 className={styles.title}>AI 리포트 받아보기</h1>
                         <p className={styles.subtitle}>2개의 매물을 골라 AI에게 분석을 맡겨보세요.</p>
-                        <div className={styles.reportSelectionGrid}>
+                        <div className={styles.reportSelectionGrid} data-filled={hasTwoRooms}>
                             {[0, 1].map((index) => {
                                 const sel = selectedForReport[index];
                                 return (
@@ -460,7 +455,7 @@ const MyRoom = () => {
                         <div className={styles.criteriaGroup}>
                             <h4 className={styles.groupTitle}>추가 기준</h4>
                             <div className={styles.radioGroup}>
-                                {['지도', '편의시설', '보안', '층수'].map((item) => (
+                                {['교통편', '편의시설', '보안', '층수'].map((item) => (
                                     <label key={item} className={styles.radioLabel}>
                                         <input
                                             type="radio"
@@ -482,7 +477,7 @@ const MyRoom = () => {
                         className={styles.preferenceTextarea}
                         value={userPreference}
                         onChange={(e) => setUserPreference(e.target.value)}
-                        placeholder="중요하게 생각하는 점이나 특별한 요청사항을 자유롭게 작성해주세요."
+                        placeholder={`중요하게 생각하는 점이나 특별한 요청사항을 자유롭게 작성해주세요.\nex) 두 집의 장단점을 확실하게 비교해줘,`}
                     />
                 </div>
                 <button
