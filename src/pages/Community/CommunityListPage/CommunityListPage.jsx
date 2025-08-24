@@ -1,3 +1,4 @@
+// src/pages/Community/CommunityListPage/CommunityListPage.jsx
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styles from './CommunityListPage.module.css';
@@ -6,142 +7,114 @@ import PostList from './PostList';
 import CommunityWriteModal from './CommunityWriteModal';
 import { fetchCommunityPosts, deleteCommunityPost } from '../../../apis/communityApi';
 import { loadAuth } from '../../../apis/auth';
+import searchIcon from '../../../assets/pic/search-glass.svg';
 
 const CommunityListPage = () => {
     const navigate = useNavigate();
     const [isModalOpen, setIsModalOpen] = useState(false);
+
     const [posts, setPosts] = useState([]);
+    const [allPosts, setAllPosts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [currentUser, setCurrentUser] = useState(null);
 
-    // pagination
-    const [hasMore, setHasMore] = useState(true);
-    const [loadingMore, setLoadingMore] = useState(false);
-    const [page, setPage] = useState(1);
-    const [allPosts, setAllPosts] = useState([]); // 클라이언트 사이드 페이지네이션용
-
-    // filters
     const [selectedRegion, setSelectedRegion] = useState('전체');
     const [selectedCategory, setSelectedCategory] = useState('전체');
     const [selectedSort, setSelectedSort] = useState('최근');
     const [query, setQuery] = useState('');
 
-    // highlight bar state
+    const [hasMore, setHasMore] = useState(true);
+    const [loadingMore, setLoadingMore] = useState(false);
+    const [page, setPage] = useState(1);
+
     const [topLiked, setTopLiked] = useState(null);
 
     useEffect(() => {
         const auth = loadAuth();
-        if (auth && auth.user) {
-            setCurrentUser(auth.user);
-        }
+        if (auth?.user) setCurrentUser(auth.user);
     }, []);
 
-    const sortPosts = useCallback((list) => {
-        if (selectedSort === '인기') {
-            // 조회수 우선(desc), 그 다음 공감수(desc), 최신순(desc)
+    const sortPosts = useCallback(
+        (list) => {
+            if (selectedSort !== '인기') return list;
             const toNum = (v) => (typeof v === 'number' && !Number.isNaN(v) ? v : 0);
             return [...list].sort((a, b) => {
-                const av = toNum(a?.views);
-                const bv = toNum(b?.views);
-                if (bv !== av) return bv - av;
-                const al = toNum(a?.like_count);
-                const bl = toNum(b?.like_count);
-                if (bl !== al) return bl - al;
-                const at = new Date(a?.created_at || a?.updated_at || 0).getTime();
-                const bt = new Date(b?.created_at || b?.updated_at || 0).getTime();
-                return bt - at;
+                const v = toNum(b?.views) - toNum(a?.views);
+                if (v !== 0) return v;
+                const l = toNum(b?.like_count) - toNum(a?.like_count);
+                if (l !== 0) return l;
+                return new Date(b?.created_at || b?.updated_at || 0) - new Date(a?.created_at || a?.updated_at || 0);
             });
-        }
-        return list;
-    }, [selectedSort]);
+        },
+        [selectedSort]
+    );
 
     const computeTopLiked = useCallback((list) => {
         if (!Array.isArray(list) || list.length === 0) return null;
         const sorted = [...list].sort((a, b) => (b?.like_count || 0) - (a?.like_count || 0));
         const top = sorted[0];
-        // 최소 표기 임계값: 3 하트 이상일 때만 노출
-        if ((top?.like_count || 0) >= 3) return top;
-        return null;
+        return (top?.like_count || 0) >= 3 ? top : null;
     }, []);
 
     const loadPosts = useCallback(async () => {
         try {
             setLoading(true);
-            setHasMore(true);
             setError(null);
+            setHasMore(true);
 
             const params = {};
             if (selectedSort === '인기') params.ordering = '-views,-like_count';
 
-            const response = await fetchCommunityPosts(params);
-            const allPostsData = response.results || response || [];
-            setAllPosts(allPostsData);
-            setTopLiked(computeTopLiked(allPostsData));
+            const res = await fetchCommunityPosts(params);
+            const list = res.results || res || [];
+            setAllPosts(list);
+            setTopLiked(computeTopLiked(list));
 
-            const filteredPosts = allPostsData.filter((post) => {
-                // 검색어
-                if (
-                    query &&
-                    !post.title.toLowerCase().includes(query.toLowerCase()) &&
-                    !post.content?.toLowerCase().includes(query.toLowerCase())
-                )
-                    return false;
-                // 지역
-                if (selectedRegion && selectedRegion !== '전체' && post.region !== selectedRegion) return false;
-                // 카테고리
-                if (selectedCategory && selectedCategory !== '전체' && post.category !== selectedCategory) return false;
-                return true;
+            const q = query.trim().toLowerCase();
+            const filtered = list.filter((post) => {
+                const qOk = !q || post.title?.toLowerCase?.().includes(q) || post.content?.toLowerCase?.().includes(q);
+                const rOk = selectedRegion === '전체' || post.region === selectedRegion;
+                const cOk = selectedCategory === '전체' || post.category === selectedCategory;
+                return qOk && rOk && cOk;
             });
 
-            const sorted = sortPosts(filteredPosts);
-            const firstPagePosts = sorted.slice(0, 10);
-            setPosts(firstPagePosts);
+            const sorted = sortPosts(filtered);
+            setPosts(sorted.slice(0, 10));
             setPage(1);
             setHasMore(sorted.length > 10);
-        } catch (err) {
+        } catch (e) {
+            console.error(e);
             setError('게시글을 불러오지 못했습니다.');
-            console.error(err);
             setPosts([]);
         } finally {
             setLoading(false);
         }
     }, [selectedSort, selectedRegion, selectedCategory, query, sortPosts, computeTopLiked]);
 
-    // 정렬/필터 변경 시 첫 페이지부터 로드
     useEffect(() => {
-        setPage(1);
         loadPosts();
-    }, [selectedSort, selectedRegion, selectedCategory, query, loadPosts]);
+    }, [loadPosts]);
 
-    // 검색/필터 변경 시 즉시 반영 (allPosts가 있을 때)
     useEffect(() => {
-        if (allPosts.length > 0) {
-            const filteredPosts = allPosts.filter((post) => {
-                if (
-                    query &&
-                    !post.title.toLowerCase().includes(query.toLowerCase()) &&
-                    !post.content?.toLowerCase().includes(query.toLowerCase())
-                )
-                    return false;
-                if (selectedRegion && selectedRegion !== '전체' && post.region !== selectedRegion) return false;
-                if (selectedCategory && selectedCategory !== '전체' && post.category !== selectedCategory) return false;
-                return true;
-            });
-            const sorted = sortPosts(filteredPosts);
-            const firstPagePosts = sorted.slice(0, 10);
-            setPosts(firstPagePosts);
-            setPage(1);
-            setHasMore(sorted.length > 10);
-            setTopLiked(computeTopLiked(allPosts));
-        }
+        if (allPosts.length === 0) return;
+        const q = query.trim().toLowerCase();
+        const filtered = allPosts.filter((post) => {
+            const qOk = !q || post.title?.toLowerCase?.().includes(q) || post.content?.toLowerCase?.().includes(q);
+            const rOk = selectedRegion === '전체' || post.region === selectedRegion;
+            const cOk = selectedCategory === '전체' || post.category === selectedCategory;
+            return qOk && rOk && cOk;
+        });
+        const sorted = sortPosts(filtered);
+        setPosts(sorted.slice(0, 10));
+        setPage(1);
+        setHasMore(sorted.length > 10);
+        setTopLiked(computeTopLiked(allPosts));
     }, [allPosts, query, selectedRegion, selectedCategory, sortPosts, computeTopLiked]);
 
-    // 이벤트 기반 상단 하이라이트 갱신 (서버 부하 최소화)
     useEffect(() => {
         let rafId = null;
         const refreshTop = async () => {
-            // 탭이 보이지 않을 때는 네트워크 요청을 하지 않음
             if (typeof document !== 'undefined' && document.visibilityState !== 'visible') return;
             try {
                 const res = await fetchCommunityPosts({ ordering: '-like_count,-views' });
@@ -154,21 +127,15 @@ const CommunityListPage = () => {
                 ) {
                     setTopLiked(nextTop);
                 }
-            } catch (e) {
-                // 무시
-            }
+            } catch {}
         };
-
         const onLikesChanged = () => {
             if (rafId) cancelAnimationFrame(rafId);
             rafId = requestAnimationFrame(refreshTop);
         };
-
         window.addEventListener('community:likesChanged', onLikesChanged);
         document.addEventListener('visibilitychange', onLikesChanged);
-        // 초기 한 번
         onLikesChanged();
-
         return () => {
             window.removeEventListener('community:likesChanged', onLikesChanged);
             document.removeEventListener('visibilitychange', onLikesChanged);
@@ -177,64 +144,49 @@ const CommunityListPage = () => {
     }, [topLiked, computeTopLiked]);
 
     const handleDelete = async (postId) => {
-        if (window.confirm('정말로 이 게시글을 삭제하시겠습니까?')) {
-            try {
-                await deleteCommunityPost(postId);
-                loadPosts();
-            } catch (err) {
-                alert(err.message || '게시글 삭제에 실패했습니다.');
-                console.error(err);
-            }
+        if (!window.confirm('정말로 이 게시글을 삭제하시겠습니까?')) return;
+        try {
+            await deleteCommunityPost(postId);
+            loadPosts();
+        } catch (err) {
+            alert(err.message || '게시글 삭제에 실패했습니다.');
+            console.error(err);
         }
     };
 
-    const handleOpenModal = () => {
-        setIsModalOpen(true);
+    const handleOpenModal = () => setIsModalOpen(true);
+    const handleTabClick = (tabName) => {
+        if (tabName === '뉴스, 팁') navigate('/community_news');
+    };
+    const openTopLiked = (postId) => postId && navigate(`/community/posts/${postId}`);
+    const handleSearch = () => {
+        setPage(1);
+        loadPosts();
     };
 
     const handleLoadMore = () => {
-        if (!loadingMore && hasMore && allPosts.length > 0) {
-            const currentFilteredPosts = allPosts.filter((post) => {
-                if (
-                    query &&
-                    !post.title.toLowerCase().includes(query.toLowerCase()) &&
-                    !post.content?.toLowerCase().includes(query.toLowerCase())
-                )
-                    return false;
-                if (selectedRegion && selectedRegion !== '전체' && post.region !== selectedRegion) return false;
-                if (selectedCategory && selectedCategory !== '전체' && post.category !== selectedCategory) return false;
-                return true;
-            });
-
-            const sorted = sortPosts(currentFilteredPosts);
-            const startIndex = page * 10;
-            const endIndex = startIndex + 10;
-            const nextPagePosts = sorted.slice(startIndex, endIndex);
-
-            if (nextPagePosts.length > 0) {
-                setPosts((prev) => [...prev, ...nextPagePosts]);
-                setPage((prev) => prev + 1);
-                setHasMore(sorted.length > endIndex);
-            } else {
-                setHasMore(false);
-            }
-        }
-    };
-
-    const openTopLiked = (postId) => {
-        if (!postId) return;
-        navigate(`/community/posts/${postId}`);
-    };
-
-    const handleTabClick = (tabName) => {
-        if (tabName === '뉴스, 팁') {
-            navigate('/community_news');
+        if (loadingMore || !hasMore || allPosts.length === 0) return;
+        const q = query.trim().toLowerCase();
+        const filtered = allPosts.filter((post) => {
+            const qOk = !q || post.title?.toLowerCase?.().includes(q) || post.content?.toLowerCase?.().includes(q);
+            const rOk = selectedRegion === '전체' || post.region === selectedRegion;
+            const cOk = selectedCategory === '전체' || post.category === selectedCategory;
+            return qOk && rOk && cOk;
+        });
+        const sorted = sortPosts(filtered);
+        const start = page * 10;
+        const next = sorted.slice(start, start + 10);
+        if (next.length > 0) {
+            setPosts((prev) => [...prev, ...next]);
+            setPage((p) => p + 1);
+            setHasMore(sorted.length > start + 10);
+        } else {
+            setHasMore(false);
         }
     };
 
     return (
         <>
-            {/* 상단(제목+탭) — CommunityPage와 동일한 구조/클래스 */}
             <div className={styles.communityPage}>
                 <h1 className={styles.pageTitle}>커뮤니티</h1>
 
@@ -247,7 +199,48 @@ const CommunityListPage = () => {
                     </button>
                 </div>
 
-                {/* 본문은 기존 레이아웃 유지 */}
+                {/* 검색/작성 */}
+                <div className={styles.actionBar}>
+                    <button className={styles.writeButton} onClick={handleOpenModal}>
+                        + 작성하기
+                    </button>
+                    <div className={styles.searchContainer}>
+                        <input
+                            className={styles.searchInput}
+                            placeholder="검색"
+                            value={query}
+                            onChange={(e) => setQuery(e.target.value)}
+                            onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                        />
+                        <button className={styles.searchButton} onClick={handleSearch}>
+                            {/* 흰색 SVG를 마스크로 사용 → 정확히 #1b818C 색상으로 렌더 */}
+                            <span
+                                className={styles.searchIcon}
+                                aria-hidden="true"
+                                style={{ WebkitMaskImage: `url(${searchIcon})`, maskImage: `url(${searchIcon})` }}
+                            />
+                        </button>
+                    </div>
+                </div>
+
+                {/* 상단 핫게시물 바 */}
+                {topLiked && (
+                    <div
+                        className={styles.topLikedBar}
+                        onClick={() => openTopLiked(topLiked.id)}
+                        role="button"
+                        tabIndex={0}
+                        onKeyDown={(e) => e.key === 'Enter' && openTopLiked(topLiked.id)}
+                        title="핫게시물로 이동"
+                    >
+                        <span className={styles.topLikedLabel}>핫게시물</span>
+                        <span className={styles.topLikedTitle}>{topLiked.title}</span>
+                        <span className={styles.topLikedMeta}>
+                            ♥ {topLiked.like_count || 0} · 조회 {topLiked.views || 0}
+                        </span>
+                    </div>
+                )}
+
                 <div className={styles.contentContainer}>
                     <FilterSidebar
                         selectedRegion={selectedRegion}
@@ -269,8 +262,6 @@ const CommunityListPage = () => {
                         hasMore={hasMore}
                         loadingMore={loadingMore}
                         onLoadMore={handleLoadMore}
-                        topLiked={topLiked}
-                        onTopLikedClick={openTopLiked}
                     />
                 </div>
             </div>

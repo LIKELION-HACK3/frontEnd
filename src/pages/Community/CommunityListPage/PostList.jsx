@@ -2,7 +2,20 @@ import React from 'react';
 import styles from './CommunityListPage.module.css';
 import PostCard from './PostCard';
 
-const PostList = ({ posts, loading, error, onWritePostClick, onDelete, currentUser, query, setQuery, hasMore, loadingMore, onLoadMore, topLiked, onTopLikedClick }) => {
+const PostList = ({
+    posts,
+    loading,
+    error,
+    onDelete,
+    currentUser,
+    query,
+    setQuery,
+    hasMore,
+    loadingMore,
+    onLoadMore,
+    topLiked,
+    onTopLikedClick,
+}) => {
     const formatTimeAgo = (dateString) => {
         const now = new Date();
         const postDate = new Date(dateString);
@@ -19,32 +32,15 @@ const PostList = ({ posts, loading, error, onWritePostClick, onDelete, currentUs
 
     return (
         <section className={styles.postListSection}>
-            <div className={styles.actionBar}>
-                <button className={styles.writeButton} onClick={onWritePostClick}>
-                    + 작성하기
-                </button>
-                <div className={styles.searchContainer}>
-                    <input
-                        className={styles.searchInput}
-                        placeholder="제목이나 내용으로 검색..."
-                        value={query}
-                        onChange={(e) => setQuery(e.target.value)}
-                        onKeyPress={(e) => e.key === 'Enter' && setQuery(e.target.value)}
-                    />
-                    <button 
-                        className={styles.searchButton}
-                        onClick={() => setQuery(query)}
-                    >
-                        🔍
-                    </button>
-                </div>
-            </div>
+            {/* CommunityListPage.jsx로 이동된 액션 바는 여기에서 제거 */}
 
             {topLiked && (
                 <button className={styles.topLikedBar} onClick={() => onTopLikedClick?.(topLiked.id)}>
                     <div className={styles.topLikedLabel}>지금 뜨는 글</div>
                     <div className={styles.topLikedTitle}>{topLiked.title}</div>
-                    <div className={styles.topLikedMeta}>❤️ {topLiked.like_count || 0} · 조회 {topLiked.views || 0}</div>
+                    <div className={styles.topLikedMeta}>
+                        ❤️ {topLiked.like_count || 0} · 조회 {topLiked.views || 0}
+                    </div>
                 </button>
             )}
 
@@ -71,17 +67,14 @@ const PostList = ({ posts, loading, error, onWritePostClick, onDelete, currentUs
                         )}
                     </ul>
                     {posts.length > 0 && (
-                        <button 
-                            className={styles.loadMore} 
-                            onClick={onLoadMore}
-                            disabled={loadingMore || !hasMore}
-                        >
+                        <button className={styles.loadMore} onClick={onLoadMore} disabled={loadingMore || !hasMore}>
                             {loadingMore ? '로딩 중...' : hasMore ? '더보기' : '모든 게시글을 불러왔습니다'}
                         </button>
                     )}
                     {/* 디버깅용 정보 */}
                     <div style={{ textAlign: 'center', fontSize: '12px', color: '#999', marginTop: '10px' }}>
-                        게시글: {posts.length}개 | hasMore: {hasMore ? 'true' : 'false'} | loading: {loadingMore ? 'true' : 'false'}
+                        게시글: {posts.length}개 | hasMore: {hasMore ? 'true' : 'false'} | loading:{' '}
+                        {loadingMore ? 'true' : 'false'}
                     </div>
                 </>
             )}

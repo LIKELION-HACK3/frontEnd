@@ -3,10 +3,8 @@
     margin: 0 auto;
     padding: 40px 20px;
     font-family: 'Pretendard Variable', sans-serif;
-    color: #222;
 }
 
-/* 제목 */
 .pageTitle {
     text-align: center;
     font-size: 28px;
@@ -14,7 +12,6 @@
     margin-bottom: 36px;
 }
 
-/* 탭 */
 .tabButtons {
     display: flex;
     justify-content: center;
@@ -44,20 +41,6 @@
     color: #fff;
 }
 
-.contentContainer {
-    display: flex;
-    gap: 24px;
-    align-items: flex-start;
-}
-
-.postListSection {
-    flex: 1;
-    background: #ffffff;
-    border-radius: 16px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-    padding: 24px;
-}
-
 .actionBar {
     display: flex;
     align-items: center;
@@ -69,65 +52,152 @@
 }
 
 .writeButton {
-    background-color: #ffffff;
-    color: #00b4b3;
-    border: 2px solid #00b4b3;
-    padding: 12px 24px;
+    background-color: #f1f3f5;
+    color: #1b818c; /* ← 텍스트 색상만 변경 */
+    border: 1px solid #dee2e6;
+    width: 300px;
+    padding-top: 10px;
+    padding-bottom: 10px;
     border-radius: 28px;
     cursor: pointer;
-    font-weight: 600;
+    font-weight: 400; /* ← Roboto Regular 굵기 */
     font-size: 15px;
-    transition: all 0.2s ease;
+    transition: background-color 0.2s ease;
+    flex-shrink: 0;
+    font-family: 'Roboto', sans-serif; /* ← Roboto 폰트 지정 */
 }
 
 .writeButton:hover {
-    background-color: #e6f8f8;
+    background-color: #e9ecef;
 }
 
 .searchContainer {
     display: flex;
     align-items: center;
-    flex: 1;
-    max-width: 400px;
+    flex-grow: 1;
+    max-width: 850px;
 }
 
 .searchInput {
-    flex: 1;
-    height: 44px;
+    width: 100%;
+    height: 48px;
     padding: 0 20px;
-    border: 1px solid #dee2e6;
-    border-radius: 24px 0 0 24px;
-    background: #ffffff;
     font-size: 15px;
-    transition: border-color 0.2s ease;
+    color: #1b818c; /* ← 입력 글씨 색상만 변경 */
+    background-color: #ffffff;
+    border: 1px solid #1b818c; /* ← 테두리 색상만 변경 */
     border-right: none;
-}
-
-.searchButton {
-    height: 44px;
-    padding: 0 16px;
-    background: #00b4b3;
-    color: white;
-    border: 1px solid #00b4b3;
-    border-radius: 0 24px 24px 0;
-    cursor: pointer;
-    font-size: 16px;
-    transition: background-color 0.2s ease;
-}
-
-.searchButton:hover {
-    background: #009a99;
-}
-
-.searchButton:active {
-    background: #008a89;
+    border-radius: 24px 0 0 24px;
+    transition: border-color 0.2s ease;
 }
 
 .searchInput:focus {
     outline: none;
-    border-color: #00b4b3;
+    border-color: #adb5bd; /* ← 원래 값 유지(요청 외 변경 없음) */
 }
 
+.searchButton {
+    height: 48px;
+    padding: 0 20px;
+    background: #ffffff;
+    color: #6c757d;
+    border: 1px solid #dee2e6;
+    border-left: none;
+    border-radius: 0 24px 24px 0;
+    cursor: pointer;
+    font-size: 18px;
+    transition: background-color 0.2s ease;
+}
+
+.searchButton:hover {
+    background-color: #f8f9fa;
+}
+
+.contentContainer {
+    display: flex;
+    gap: 24px;
+    align-items: flex-start;
+}
+
+.searchButton {
+    border-color: #1b818c;
+}
+
+/* 입력 커서/텍스트 컬러 보강 (입력값은 이미 color 지정됨이지만 커서까지 통일) */
+.searchInput {
+    caret-color: #1b818c;
+}
+
+/* 플레이스홀더 컬러 통일 */
+.searchInput::placeholder {
+    color: #1b818c;
+    opacity: 1;
+}
+.searchInput::-webkit-input-placeholder {
+    color: #1b818c;
+}
+.searchInput::-ms-input-placeholder {
+    color: #1b818c;
+}
+
+.searchContainer {
+    border: 1px solid #1b818c;
+    border-radius: 24px;
+    overflow: hidden;
+}
+
+/* 자식의 테두리는 제거 (겉모습은 동일, 이음새 완전 제거) */
+.searchInput {
+    border: 0;
+    border-right: 0;
+}
+.searchButton {
+    border: 0;
+    border-left: 0;
+}
+
+.topLikedBar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: #f8fffe;
+    border: 1px solid #d7f2ef;
+    padding: 12px 16px;
+    border-radius: 12px;
+    margin-bottom: 16px;
+    cursor: pointer;
+}
+.topLikedBar:hover {
+    background: #f3fdfa;
+}
+.topLikedLabel {
+    background: #00b4b3;
+    color: #fff;
+    padding: 4px 8px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 700;
+}
+.topLikedTitle {
+    flex: 1;
+    font-weight: 600;
+    color: #164e63;
+}
+.topLikedMeta {
+    color: #0e7490;
+    font-size: 13px;
+}
+
+/* 글 목록 섹션 박스 */
+.postListSection {
+    flex: 1;
+    background: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    padding: 24px;
+}
+
+/* 목록/카드 서식 (PostList가 이 클래스명을 사용함) */
 .postList {
     list-style: none;
     padding: 0;
@@ -139,18 +209,16 @@
     justify-content: space-between;
     align-items: flex-start;
     border-bottom: 1px solid #f1f3f4;
-    padding: 20px 0;
+    padding: 10px 0;
     gap: 20px;
     transition: background-color 0.2s ease;
 }
-
 .postCard:hover {
     background-color: #f8f9fa;
     margin: 0 -24px;
     padding: 20px 24px;
     border-radius: 8px;
 }
-
 .postCard:last-child {
     border-bottom: none;
 }
@@ -162,7 +230,6 @@
     gap: 8px;
     min-width: 0;
 }
-
 .postTitle {
     font-size: 18px;
     font-weight: 600;
@@ -170,7 +237,6 @@
     line-height: 1.4;
     margin-bottom: 4px;
 }
-
 .postContent {
     font-size: 15px;
     color: #495057;
@@ -183,7 +249,6 @@
     -webkit-box-orient: vertical;
     margin-bottom: 8px;
 }
-
 .postMeta {
     font-size: 13px;
     color: #6c757d;
@@ -191,13 +256,13 @@
     align-items: center;
     gap: 12px;
 }
-
 .postMeta span {
     display: flex;
     align-items: center;
     gap: 4px;
 }
 
+/* (선택) 삭제/더보기 버튼 서식 복구 — 구성에 따라 PostList 내부에서 사용 */
 .deleteButton {
     background-color: transparent;
     border: 1px solid #dc3545;
@@ -209,7 +274,6 @@
     transition: all 0.2s ease;
     flex-shrink: 0;
 }
-
 .deleteButton:hover {
     background-color: #dc3545;
     color: white;
@@ -229,17 +293,14 @@
     transition: all 0.2s ease;
     min-width: 120px;
 }
-
 .loadMore:hover:not(:disabled) {
     background-color: #e6f8f8;
     transform: translateY(-1px);
     box-shadow: 0 4px 12px rgba(0, 180, 179, 0.2);
 }
-
 .loadMore:active:not(:disabled) {
     transform: translateY(0);
 }
-
 .loadMore:disabled {
     background-color: #f8f9fa;
     border-color: #dee2e6;
@@ -249,30 +310,54 @@
     box-shadow: none;
 }
 
-.topLikedBar {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    background: #f8fffe;
-    border: 1px solid #d7f2ef;
-    padding: 12px 16px;
-    border-radius: 12px;
-    margin-bottom: 16px;
+.postListSection {
+    padding: 16px;
+} /* 컨테이너 안쪽 여백 살짝 축소 (기존 24px) */
+
+.postCard {
+    padding: 12px 0;
+} /* 각 행 위/아래 여백 ↓ (기존 20px) */
+.postCard:hover {
+    padding: 12px 24px;
+} /* 호버 시 세로 높이 유지 */
+
+.postInfo {
+    gap: 4px;
+} /* 제목/본문/메타 간 간격 ↓ (기존 8px) */
+
+.postTitle {
+    /* h4 기본 위쪽 마진 제거 + 글자 살짝 ↓ */
+    margin: 0 0 2px;
+    font-size: 16px; /* 기존 18px */
 }
-.topLikedLabel {
-    background: #00b4b3;
-    color: #fff;
-    padding: 4px 8px;
-    border-radius: 8px;
-    font-size: 12px;
-    font-weight: 700;
+
+.postContent {
+    font-size: 14px; /* 기존 15px */
+    margin: 0 0 2px; /* 기본 p 마진 제거 */
+    -webkit-line-clamp: 1; /* 1줄만 보이게 → 더 얇게 */
+    line-clamp: 1;
 }
-.topLikedTitle {
-    flex: 1;
-    font-weight: 600;
-    color: #164e63;
+
+.postMeta {
+    font-size: 12px; /* 기존 13px */
+    margin: 0; /* 기본 p 마진 제거 */
 }
-.topLikedMeta {
-    color: #0e7490;
-    font-size: 13px;
+
+/* 안전하게: postInfo 안의 모든 p 기본 마진 제거 */
+.postInfo p {
+    margin: 0;
+}
+
+/* 검색 아이콘(마스크로 채색) */
+.searchIcon {
+    display: inline-block;
+    width: 25px;
+    height: 25px;
+    background-color: #1b818c; /* 원하는 색상 */
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+    mask-position: center;
+    -webkit-mask-size: contain;
+    mask-size: contain;
 }
