@@ -493,10 +493,11 @@ const MyRoom = () => {
                 >
                     {isGenerating ? '리포트 생성 중...' : 'AI 리포트 생성하기'}
                 </button>
-                <div className={styles.preferenceSection} style={{ width: '100%' }}>
+                <div className={styles.ctaRow}>
                     <button
-                        className={`${styles.generateButton} ${styles.generateButtonActive}`}
+                        className={`${styles.historySecondary}`}
                         onClick={() => navigate('/report/history')}
+                        type="button"
                     >
                         AI 히스토리 보기
                     </button>

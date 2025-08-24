@@ -155,18 +155,6 @@
     color: #5E5E5E;
 }
 
-.text1 {}
-.deposit {}
-.text2 {}
-.monthlyFee {}
-.text3 {}
-.maintenance {}
-.dot {
-    margin: 0;
-}
-
-.titleText {}
-
 .selectButton {
     background-color: #00b4b3;
     color: white;
@@ -606,4 +594,26 @@
     background-color: #D9D9D9;
     cursor: default;
     pointer-events: none;
+}
+
+.ctaRow {
+    width: 980px;
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 10px;
+}
+
+.historySecondary {
+    background: #ffffff;
+    color: #176e78;
+    border: 1px solid #cfe5e7;
+    height: 40px;
+    padding: 0 16px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+}
+.historySecondary:hover {
+    background: #f3fbfb;
 }
