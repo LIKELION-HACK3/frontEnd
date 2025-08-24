@@ -55,6 +55,22 @@ const AiHistoryPage = () => {
 
     const openDetail = (id) => navigate(`/report/${id}`);
 
+    const handleNextClick = async () => {
+        if (loading) return;
+        try {
+            const nextPage = page + 1;
+            const data = await listAiReports(nextPage, 10);
+            const arr = data.results || [];
+            if (!arr.length) {
+                if (typeof window !== 'undefined') window.alert('다음 페이지가 없습니다.');
+                return;
+            }
+            setPage(nextPage); // 실제 반영은 useEffect에서 로드
+        } catch (e) {
+            setError(e.message || '다음 페이지를 불러오지 못했습니다.');
+        }
+    };
+
     return (
         <div className={styles.container}>
             <h1 className={styles.mainTitle}>AI 히스토리</h1>
@@ -70,8 +86,8 @@ const AiHistoryPage = () => {
                 </div>
             ))}
             <div style={{ display: 'flex', gap: 8, justifyContent: 'center', marginTop: 16 }}>
-                <button className={styles.shareButton} onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page === 1}>이전</button>
-                <button className={styles.copyButton} onClick={() => setPage((p) => p + 1)} disabled={!hasMore}>다음</button>
+                <button className={styles.shareButton} onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page === 1 || loading}>이전</button>
+                <button className={styles.copyButton} onClick={handleNextClick} disabled={loading}>다음</button>
             </div>
         </div>
     );
