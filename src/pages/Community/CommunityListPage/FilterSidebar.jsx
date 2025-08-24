@@ -19,12 +19,13 @@ const FilterSidebar = ({ selectedRegion, setSelectedRegion, selectedCategory, se
     return (
         <div className={styles.sidebar}>
             <div className={styles.section}>
-                <h4 className={styles.sectionTitle}>
+                <h4 className={styles.mainSectionTitle}>
                     필터
                     <button className={styles.resetButton} onClick={handleReset}>
                         초기화
                     </button>
                 </h4>
+                <h4 className={styles.locationSectionTitle} >지역</h4>
                 <div className={styles.subTitle}>서울특별시 동대문구</div>
                 {visibleRegions.map((region) => (
                     <label key={region} className={styles.radioLabel}>

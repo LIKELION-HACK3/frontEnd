@@ -477,7 +477,7 @@ const MyRoom = () => {
                         className={styles.preferenceTextarea}
                         value={userPreference}
                         onChange={(e) => setUserPreference(e.target.value)}
-                        placeholder={`중요하게 생각하는 점이나 특별한 요청사항을 자유롭게 작성해주세요.\nex) 두 집의 장단점을 확실하게 비교해줘,`}
+                        placeholder={`중요하게 생각하는 점이나 특별한 요청사항을 자유롭게 작성해주세요.\nex) 두 집의 장단점을 확실하게 비교해줘.`}
                     />
                 </div>
                 <button

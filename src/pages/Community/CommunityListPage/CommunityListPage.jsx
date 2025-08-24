@@ -188,10 +188,12 @@ const CommunityListPage = () => {
     return (
         <>
             <div className={styles.communityPage}>
-                <h1 className={styles.pageTitle}>커뮤니티</h1>
+                <div className={styles.titleWrapper}>
+                    <h1 className={styles.pageTitle}>커뮤니티</h1>
+                </div>
 
                 <div className={styles.tabButtons}>
-                    <button className={styles.tabButton} onClick={() => handleTabClick('뉴스, 팁')}>
+                    <button className={styles.tabButton2} onClick={() => handleTabClick('뉴스, 팁')}>
                         뉴스, 팁
                     </button>
                     <button className={`${styles.tabButton} ${styles.active}`} onClick={() => {}}>
@@ -199,74 +201,76 @@ const CommunityListPage = () => {
                     </button>
                 </div>
 
-                {/* 검색/작성 */}
-                <div className={styles.actionBar}>
-                    <button className={styles.writeButton} onClick={handleOpenModal}>
-                        + 작성하기
-                    </button>
-                    <div className={styles.searchContainer}>
-                        <input
-                            className={styles.searchInput}
-                            placeholder="검색"
-                            value={query}
-                            onChange={(e) => setQuery(e.target.value)}
-                            onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-                        />
-                        <button className={styles.searchButton} onClick={handleSearch}>
-                            {/* 흰색 SVG를 마스크로 사용 → 정확히 #1b818C 색상으로 렌더 */}
-                            <span
-                                className={styles.searchIcon}
-                                aria-hidden="true"
-                                style={{ WebkitMaskImage: `url(${searchIcon})`, maskImage: `url(${searchIcon})` }}
-                            />
+                <div className={styles.body_wrapper}>
+                    {/* 검색/작성 */}
+                    <div className={styles.actionBar}>
+                        <button className={styles.writeButton} onClick={handleOpenModal}>
+                            + 작성하기
                         </button>
+                        <div className={styles.searchContainer}>
+                            <input
+                                className={styles.searchInput}
+                                placeholder="검색"
+                                value={query}
+                                onChange={(e) => setQuery(e.target.value)}
+                                onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                            />
+                            <button className={styles.searchButton} onClick={handleSearch}>
+                                {/* 흰색 SVG를 마스크로 사용 → 정확히 #1b818C 색상으로 렌더 */}
+                                <span
+                                    className={styles.searchIcon}
+                                    aria-hidden="true"
+                                    style={{ WebkitMaskImage: `url(${searchIcon})`, maskImage: `url(${searchIcon})` }}
+                                />
+                            </button>
+                        </div>
+                    </div>
+
+                    {/* 상단 핫게시물 바 */}
+                    {topLiked && (
+                        <div
+                            className={styles.topLikedBar}
+                            onClick={() => openTopLiked(topLiked.id)}
+                            role="button"
+                            tabIndex={0}
+                            onKeyDown={(e) => e.key === 'Enter' && openTopLiked(topLiked.id)}
+                            title="핫게시물로 이동"
+                        >
+                            <span className={styles.topLikedLabel}>핫게시물</span>
+                            <span className={styles.topLikedTitle}>{topLiked.title}</span>
+                            <span className={styles.topLikedMeta}>
+                                ♥ {topLiked.like_count || 0} · 조회 {topLiked.views || 0}
+                            </span>
+                        </div>
+                    )}
+
+                    <div className={styles.contentContainer}>
+                        <FilterSidebar
+                            selectedRegion={selectedRegion}
+                            setSelectedRegion={setSelectedRegion}
+                            selectedCategory={selectedCategory}
+                            setSelectedCategory={setSelectedCategory}
+                            selectedSort={selectedSort}
+                            setSelectedSort={setSelectedSort}
+                        />
+                        <PostList
+                            posts={posts}
+                            loading={loading}
+                            error={error}
+                            onWritePostClick={handleOpenModal}
+                            onDelete={handleDelete}
+                            currentUser={currentUser}
+                            query={query}
+                            setQuery={setQuery}
+                            hasMore={hasMore}
+                            loadingMore={loadingMore}
+                            onLoadMore={handleLoadMore}
+                        />
                     </div>
                 </div>
 
-                {/* 상단 핫게시물 바 */}
-                {topLiked && (
-                    <div
-                        className={styles.topLikedBar}
-                        onClick={() => openTopLiked(topLiked.id)}
-                        role="button"
-                        tabIndex={0}
-                        onKeyDown={(e) => e.key === 'Enter' && openTopLiked(topLiked.id)}
-                        title="핫게시물로 이동"
-                    >
-                        <span className={styles.topLikedLabel}>핫게시물</span>
-                        <span className={styles.topLikedTitle}>{topLiked.title}</span>
-                        <span className={styles.topLikedMeta}>
-                            ♥ {topLiked.like_count || 0} · 조회 {topLiked.views || 0}
-                        </span>
-                    </div>
-                )}
-
-                <div className={styles.contentContainer}>
-                    <FilterSidebar
-                        selectedRegion={selectedRegion}
-                        setSelectedRegion={setSelectedRegion}
-                        selectedCategory={selectedCategory}
-                        setSelectedCategory={setSelectedCategory}
-                        selectedSort={selectedSort}
-                        setSelectedSort={setSelectedSort}
-                    />
-                    <PostList
-                        posts={posts}
-                        loading={loading}
-                        error={error}
-                        onWritePostClick={handleOpenModal}
-                        onDelete={handleDelete}
-                        currentUser={currentUser}
-                        query={query}
-                        setQuery={setQuery}
-                        hasMore={hasMore}
-                        loadingMore={loadingMore}
-                        onLoadMore={handleLoadMore}
-                    />
-                </div>
+                <CommunityWriteModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} onPostCreated={loadPosts} />
             </div>
-
-            <CommunityWriteModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} onPostCreated={loadPosts} />
         </>
     );
 };

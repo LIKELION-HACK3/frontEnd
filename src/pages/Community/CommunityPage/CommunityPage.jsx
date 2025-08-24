@@ -108,7 +108,7 @@ const CommunityPage = () => {
                 <button className={`${styles.tabButton} ${styles.active}`} onClick={() => handleTabClick('뉴스, 팁')}>
                     뉴스, 팁
                 </button>
-                <button className={styles.tabButton} onClick={() => handleTabClick('함께해요')}>
+                <button className={styles.tabButton2} onClick={() => handleTabClick('함께해요')}>
                     함께해요
                 </button>
             </div>

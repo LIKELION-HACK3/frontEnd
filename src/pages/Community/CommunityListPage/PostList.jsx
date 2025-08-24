@@ -73,8 +73,7 @@ const PostList = ({
                     )}
                     {/* 디버깅용 정보 */}
                     <div style={{ textAlign: 'center', fontSize: '12px', color: '#999', marginTop: '10px' }}>
-                        게시글: {posts.length}개 | hasMore: {hasMore ? 'true' : 'false'} | loading:{' '}
-                        {loadingMore ? 'true' : 'false'}
+                        게시글: {posts.length}개
                     </div>
                 </>
             )}
