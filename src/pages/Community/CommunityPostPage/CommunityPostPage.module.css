@@ -13,20 +13,21 @@
     border-radius: 24px;
     cursor: pointer;
     margin-bottom: 20px;
+    font-family: 'Pretendard Variable', sans-serif;
 }
 
 .postHeader {
     background: #ffffff;
     border: 1px solid #e9ecef;
     border-radius: 16px;
-    padding: 24px;
+    padding: 30px;
     margin-bottom: 16px;
 }
 
 .postTitle {
     font-size: 28px;
     font-weight: 800;
-    margin-bottom: 12px;
+    margin-bottom: 16px;
 }
 
 .authorInfo {
@@ -49,9 +50,11 @@
 .authorMeta {
     display: flex;
     flex-direction: column;
+    gap: 6px;
 }
 
 .authorName {
+    font-size: 14px;
     font-weight: 600;
 }
 
@@ -90,6 +93,7 @@
 }
 
 .likeButton {
+    font-family: 'Pretendard Variable', sans-serif;
     background: #fff;
     border: 1px solid #ffc7d1;
     color: #e85d75;
@@ -125,6 +129,7 @@
 
 /* 링크 스타일 신고 버튼 */
 .reportLink {
+    font-family: 'Pretendard Variable', sans-serif;
     margin-left: auto;
     background: none;
     border: none;
@@ -162,9 +167,11 @@
     padding: 12px 14px;
     font-size: 14px;
     resize: vertical;
+    font-family: 'Pretendard Variable', sans-serif;
 }
 
 .commentSubmit {
+    font-family: 'Pretendard Variable', sans-serif;
     background: #5fb3b3;
     color: #fff;
     border: none;
