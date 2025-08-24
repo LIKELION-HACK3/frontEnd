@@ -18,6 +18,7 @@ import muteIcon from '../../assets/pic/detail_mute.svg';
 import bugIcon from '../../assets/pic/detail_bug.svg';
 import shieldIcon from '../../assets/pic/detail_shield.svg';
 import trainIcon from '../../assets/pic/detail_train.svg';
+import { ReactComponent as Star } from '../../assets/pic/star.svg';
 
 const toMan = (value) => {
     const n = Number(value);
@@ -201,34 +202,43 @@ const DetailPage = () => {
     if (!propertyData) return <div>Loading...</div>;
 
     const renderStars = (score) => {
-        const stars = [];
-        const roundedScore = Math.round(Number(score) * 2) / 2;
-        for (let i = 1; i <= 5; i++) {
-            let starClass = styles.emptyStar;
-            if (i <= roundedScore) starClass = styles.filledStar;
-            stars.push(<span key={i} className={starClass}>★</span>);
-        }
-        return stars;
+        const n = Math.round(Number(score) || 0);
+        return (
+            <div className={styles.stars} aria-hidden="true">
+                {[1, 2, 3, 4, 5].map((i) => (
+                    <Star
+                        key={i}
+                        className={`${styles.starIcon} ${i <= n ? styles.starIconFilled : styles.starIconEmpty}`}
+                    />
+                ))}
+            </div>
+        );
     };
 
     const renderNewReviewStars = (ratingKey) => {
         return (
-            <div className={styles.stars}>
-                {[1, 2, 3, 4, 5].map((star) => (
-                    <span
-                        key={star}
-                        className={star <= ratings[ratingKey] ? styles.filledStar : styles.emptyStar}
-                        onClick={() => handleRatingChange(ratingKey, star)}
-                        style={{ cursor: 'pointer' }}
-                        role="button"
-                        tabIndex={0}
-                        onKeyDown={(e) => {
-                            if (e.key === 'Enter' || e.key === ' ') handleRatingChange(ratingKey, star);
-                        }}
-                    >
-                        ★
-                    </span>
-                ))}
+            <div className={styles.stars} role="radiogroup" aria-label={`${ratingKey} 별점 선택`}>
+                {[1, 2, 3, 4, 5].map((n) => {
+                    const active = n <= (ratings[ratingKey] || 0);
+                    return (
+                        <button
+                            key={n}
+                            type="button"
+                            onClick={() => handleRatingChange(ratingKey, n)}
+                            role="radio"
+                            aria-checked={active}
+                            className={styles.starButton}
+                            tabIndex={0}
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter' || e.key === ' ') handleRatingChange(ratingKey, n);
+                            }}
+                        >
+                            <Star
+                                className={`${styles.starIcon} ${active ? styles.starIconFilled : styles.starIconEmpty}`}
+                            />
+                        </button>
+                    );
+                })}
             </div>
         );
     };
@@ -383,15 +393,21 @@ const DetailPage = () => {
                     <span className={styles.sectionTitle}>전체 평점</span>
                     <div className={styles.ratingList}>
                         {ratingStats && ratingStats.averages ? (
-                            Object.entries(ratingCategories).map(([key, { label, icon }]) => (
-                                <div key={key} className={styles.ratingItem}>
-                                    <div className={styles.ratingLabel}>
-                                        <div className={styles.iconCircle}>{icon}</div>
-                                        <span className={styles.labelText}>{label}</span>
+                            Object.entries(ratingCategories).map(([key, { label, icon }]) => {
+                                const avg =
+                                    (ratingStats.averages?.[key] ??
+                                     ratingStats.averages?.[`rating_${key}`] ??
+                                     0);
+                                return (
+                                    <div key={key} className={styles.ratingItem}>
+                                        <div className={styles.ratingLabel}>
+                                            <div className={styles.iconCircle}>{icon}</div>
+                                            <span className={styles.labelText}>{label}</span>
+                                        </div>
+                                        <div className={styles.stars}>{renderStars(avg)}</div>
                                     </div>
-                                    <div className={styles.stars}>{renderStars(ratingStats.averages[key])}</div>
-                                </div>
-                            ))
+                                );
+                            })
                         ) : (
                             <p>평점 데이터를 불러오는 중...</p>
                         )}

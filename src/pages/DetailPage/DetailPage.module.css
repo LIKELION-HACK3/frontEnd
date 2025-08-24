@@ -46,7 +46,7 @@
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    gap: 12px;
+    gap: 20px;
 }
 
 .external_id {
@@ -69,7 +69,7 @@
     font-size: 16px;
     font-weight: 400;
     color: #FFFFFF;
-    margin-bottom: 30px;
+    margin-bottom: 20px;
 }
 
 .headerButtons {
@@ -310,7 +310,7 @@
     display: flex;
     justify-content: center;
     align-items: flex-start;
-    gap: 100px;
+    gap: 80px;
     margin-bottom: 120px;
     padding-top: 60px;
     position: relative;
@@ -335,10 +335,10 @@
 .ratingList {
     display: flex;
     flex-direction: column;
-    gap: 24px;
+    gap: 16px;
     background-color: #F0F0F0;
     border-radius: 12px;
-    padding: 36px 42px;
+    padding: 30px 34px;
 }
 
 .filledStar {
@@ -379,6 +379,7 @@
 
 .reviewHeader {
     display: flex;
+    justify-content: center;
     align-items: center;
     margin-bottom: 30px;
 }
@@ -387,7 +388,7 @@
     display: flex;
     flex-direction: column;
     gap: 20px;
-    height: 465px;
+    height: 420px;
     overflow-y: auto;
     overscroll-behavior: contain;
     width: calc(100% + 16px);
@@ -441,7 +442,7 @@ reviewList::-webkit-scrollbar-thumb {
 .ratingLabel {
     display: flex;
     align-items: center;
-    gap: 14px;
+    gap: 24px;
 }
 
 .iconCircle {
@@ -476,8 +477,58 @@ reviewList::-webkit-scrollbar-thumb {
 
 .stars {
     display: flex;
-    gap: 2px;
-    font-size: 18px;
+    gap: 6px;
+    cursor: pointer;
+}
+
+.starButton {
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    margin: 0;
+    border: none;
+    background: transparent;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.starIcon {
+    width: 20px;
+    height: 20px;
+    display: block;
+    overflow: visible;
+}
+
+.starIcon path {
+    fill: transparent !important;
+    stroke: #666666;
+    stroke-width: 1.5;
+    stroke-linejoin: round;
+    stroke-linecap: round;
+}
+
+.starIconFilled path {
+    fill: #1B818C !important;
+    stroke: #666666;
+}
+
+.starIconEmpty path {
+    fill: #DDDDDD !important;
+    stroke: #666666;
+}
+
+.reviewForm .starIconFilled path {
+    fill: #F35588 !important;
+}
+
+.ratingSection .starIconFilled path {
+    fill: #56DFCF !important;
+}
+
+.reviewForm .stars {
+    gap: 0px;
 }
 
 .reviewContent {
@@ -600,7 +651,7 @@ reviewList::-webkit-scrollbar-thumb {
 }
 
 .reviewForm .ratingList {
-    padding: 30px 40px;
+    padding: 30px 34px;
 }
 
 .reviewForm .iconCircle {
