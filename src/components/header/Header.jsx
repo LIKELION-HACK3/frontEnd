@@ -4,6 +4,7 @@ import styles from './Header.module.css';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { loadAuth, clearAuth } from '../../apis/auth';
+import Logo from '../../assets/pic/uniroom_logo.svg';
 
 const Header = () => {
     const navigate = useNavigate();
@@ -48,6 +49,8 @@ const Header = () => {
                 onKeyDown={(e) => {
                     if (e.key === 'Enter' || e.key === ' ') navigate('/');
                 }}
+                style={{ backgroundImage: `url(${Logo})` }}
+                aria-label="Uniroom 로고"
             />
             <div className={styles.header__buttons}>
                 <button className={`${styles.header__button1} ${isMap ? styles.isActive : ''}`} type="button" onClick={() => navigate('/map')}>

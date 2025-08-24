@@ -11,8 +11,10 @@
 .header__logo {
     width: 140px;
     height: 40px;
-    background-color: #0ABAB5;
     cursor: pointer;
+    background-repeat: no-repeat;
+    background-position: left center;
+    background-size: contain;
 }
 
 .header__buttons {

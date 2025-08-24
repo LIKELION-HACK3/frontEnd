@@ -319,7 +319,7 @@ const MapList = () => {
                             <img src={downArrow} alt="" className={styles.caretIcon} />
                         </button>
                         {openDrop.type && (
-                            <div className={`${styles.menu} ${styles.menuNarrow}`}>
+                            <div className={`${styles.menu} ${styles.menuNarrow}`} style={{ '--menu-hpad': '23px', '--option-hpad': '0px' }}>
                                 <div className={`${styles.option} ${sel.type === '원룸' ? styles.active : ''}`} onClick={() => pick('type', '원룸')}>
                                     원룸
                                 </div>
@@ -337,7 +337,7 @@ const MapList = () => {
                             <img src={downArrow} alt="" className={styles.caretIcon} />
                         </button>
                         {openDrop.lease && (
-                            <div className={`${styles.menu} ${styles.menuNarrow}`}>
+                            <div className={`${styles.menu} ${styles.menuNarrow}`} style={{ '--menu-hpad': '24px', '--option-hpad': '9px' }}>
                                 <div className={`${styles.option} ${sel.lease === '월세' ? styles.active : ''}`} onClick={() => pick('lease', '월세')}>
                                     월세
                                 </div>

@@ -193,10 +193,10 @@
 
 .menu {
     position: absolute;
-    top: calc(100% + 6px);
+    top: calc(100% + 6px);  
     left: 0;
     min-width: 160px;
-    padding: 8px 12px;
+    padding: 8px var(--menu-hpad, 12px);
     background: #F2F2F2;
     border: 1px solid #0000001A;
     border-radius: 6px;
@@ -213,9 +213,9 @@
 }
 
 .menuNarrow .option {
-    padding: 6px 6px;
+    padding: 6px var(--option-hpad, 6px);
     color: #555555;
-    text-size: 13px;
+    font-size: 14px;
     text-align: center;
 }
 
