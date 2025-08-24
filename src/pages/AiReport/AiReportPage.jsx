@@ -168,12 +168,11 @@ const AiReportPage = () => {
                             <div className={styles.tableCell}>{recommendation === 'room_b' ? '✅ 추천' : '-'}</div>
                         </div>
                     </div>
-                    {(!detailed_comparison ||
-                        (!detailed_comparison.price_analysis &&
-                         !detailed_comparison.location_analysis &&
-                         !detailed_comparison.area_analysis)) ? (
-                        <div className={styles.comparisonSummary}>상세 비교 데이터가 없습니다.</div>
-                    ) : (
+                    {(detailed_comparison && (
+                        detailed_comparison.price_analysis ||
+                        detailed_comparison.location_analysis ||
+                        detailed_comparison.area_analysis
+                    )) && (
                         <div className={styles.comparisonSummary}>
                             {detailed_comparison.price_analysis && (
                                 <p><strong>가격 분석:</strong> {detailed_comparison.price_analysis}</p>
