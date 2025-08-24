@@ -189,10 +189,6 @@ const CommunityListPage = () => {
     };
 
     const handleOpenModal = () => {
-        setSelectedRegion('전체');
-        setSelectedCategory('전체');
-        setSelectedSort('최근');
-        setQuery('');
         setIsModalOpen(true);
     };
 

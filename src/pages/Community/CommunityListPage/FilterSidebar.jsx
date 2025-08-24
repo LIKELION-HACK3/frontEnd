@@ -30,12 +30,12 @@ const FilterSidebar = ({ selectedRegion, setSelectedRegion, selectedCategory, se
                     <label key={region} className={styles.radioLabel}>
                         <input
                             type="radio"
-                            name="region"
+                            name="filter_region"
                             value={region}
                             checked={selectedRegion === region}
                             onChange={() => setSelectedRegion(region)}
                         />
-                        <span>{region}</span>
+                        <span className={styles.radioText}>{region}</span>
                     </label>
                 ))}
                 <button className={styles.moreButton} onClick={() => setShowAllRegions((v) => !v)}>{showAllRegions ? '접기' : '더보기'}</button>
@@ -47,12 +47,12 @@ const FilterSidebar = ({ selectedRegion, setSelectedRegion, selectedCategory, se
                     <label key={cat} className={styles.radioLabel}>
                         <input
                             type="radio"
-                            name="category"
+                            name="filter_category"
                             value={cat}
                             checked={selectedCategory === cat}
                             onChange={() => setSelectedCategory(cat)}
                         />
-                        <span>{cat}</span>
+                        <span className={styles.radioText}>{cat}</span>
                     </label>
                 ))}
             </div>
@@ -63,12 +63,12 @@ const FilterSidebar = ({ selectedRegion, setSelectedRegion, selectedCategory, se
                     <label key={sort} className={styles.radioLabel}>
                         <input
                             type="radio"
-                            name="sort"
+                            name="filter_sort"
                             value={sort}
                             checked={selectedSort === sort}
                             onChange={() => setSelectedSort(sort)}
                         />
-                        <span>{sort}</span>
+                        <span className={styles.radioText}>{sort}</span>
                     </label>
                 ))}
             </div>

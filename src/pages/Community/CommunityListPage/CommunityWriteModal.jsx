@@ -124,23 +124,9 @@ const CommunityWriteModal = ({ isOpen, onClose, onPostCreated }) => {
                             const id = `region-${opt.value}`;
                             const selected = region === opt.value;
                             return (
-                                <label
-                                    key={opt.value}
-                                    className={styles.radioLabel}
-                                    htmlFor={id}
-                                    onClick={() => setRegion(opt.value)}
-                                >
-                                    <input
-                                        id={id}
-                                        type="radio"
-                                        name="region"
-                                        value={opt.value}
-                                        checked={selected}
-                                        onChange={() => setRegion(opt.value)}
-                                        className={styles.visuallyHidden}
-                                    />
-                                    <span className={styles.dot} data-selected={selected} />
-                                    {opt.label}
+                                <label key={opt.value} className={styles.radioLabel}>
+                                    <input id={id} type="radio" name="write_region" value={opt.value} checked={selected} onChange={() => setRegion(opt.value)} />
+                                    <span className={styles.radioText}>{opt.label}</span>
                                 </label>
                             );
                         })}
@@ -187,23 +173,9 @@ const CommunityWriteModal = ({ isOpen, onClose, onPostCreated }) => {
                                     const id = `category-${opt.value}`;
                                     const selected = category === opt.value;
                                     return (
-                                        <label
-                                            key={opt.value}
-                                            htmlFor={id}
-                                            onClick={() => setCategory(opt.value)}
-                                            className={styles.radioLabel}
-                                        >
-                                            <input
-                                                id={id}
-                                                type="radio"
-                                                name="category"
-                                                value={opt.value}
-                                                checked={selected}
-                                                onChange={() => setCategory(opt.value)}
-                                                className={styles.visuallyHidden}
-                                            />
-                                            <span className={styles.dot} data-selected={selected} />
-                                            {opt.label}
+                                        <label key={opt.value} className={styles.radioLabel}>
+                                            <input id={id} type="radio" name="write_category" value={opt.value} checked={selected} onChange={() => setCategory(opt.value)} />
+                                            <span className={styles.radioText}>{opt.label}</span>
                                         </label>
                                     );
                                 })}
