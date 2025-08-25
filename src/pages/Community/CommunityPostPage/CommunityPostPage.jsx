@@ -281,7 +281,7 @@ const CommunityPostPage = () => {
                             <div className={styles.replyList}>
                                 {comment.replies.map((reply) => (
                                     <div key={reply.id} className={styles.reply}>
-                                        <div className={styles.authorInfo}>
+                                        <div className={styles.replyAuthorInfo}>
                                             <div className={styles.avatar} aria-hidden="true">🥺</div>
                                             <div className={styles.authorMeta}>
                                                 <span className={styles.authorName}>{reply.author?.username || '익명'}</span>
@@ -291,7 +291,7 @@ const CommunityPostPage = () => {
                                         <p className={styles.commentContent}>{reply.content}</p>
                                         <div className={styles.commentActions}>
                                             <button type="button" onClick={() => handleLikeComment(reply.id)}>
-                                                ❤️ {reply.like_count || 0}
+                                                <Heart className={styles.likeHeart} /> {reply.like_count || 0}
                                             </button>
                                             {reply.author?.id === currentUserId && (
                                                 <button type="button" onClick={() => handleDeleteComment(reply.id)} className={styles.deleteButton}>삭제</button>
