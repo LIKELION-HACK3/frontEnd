@@ -354,3 +354,15 @@
     -webkit-mask-size: contain;
     mask-size: contain;
 }
+
+.likeHeart {
+    width: 12px;
+    display: block;
+    color: #F35588;
+    overflow: visible; 
+}
+
+.likeHeart * {
+    fill: currentColor;
+    stroke: currentColor;
+}

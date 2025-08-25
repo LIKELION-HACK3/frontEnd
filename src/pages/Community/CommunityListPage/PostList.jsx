@@ -52,13 +52,20 @@ const PostList = ({
                 <>
                     <ul className={styles.postList}>
                         {posts.length > 0 ? (
-                            posts.map((post) => (
+                            posts.map((post) => (             
                                 <PostCard
                                     key={post.id}
                                     post={post}
-                                    meta={`조회 ${post.views || 0} · ❤️ ${post.like_count || 0} · 댓글 ${
-                                        post.comment_count || 0
-                                    }`}
+                                    meta={
+                                        <span className={styles.metaRow}>
+                                            조회 {post.views || 0} ·
+                                            <span className={styles.likeWrap}>
+                                                <Heart className={styles.likeHeart} />
+                                                <span className={styles.likeCount}>{post.like_count || 0}</span>
+                                            </span>
+                                            · 댓글 {post.comment_count || 0}
+                                        </span>
+                                    }
                                     currentUser={currentUser}
                                     onDelete={onDelete}
                                 />
