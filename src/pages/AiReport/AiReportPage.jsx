@@ -112,97 +112,100 @@ const AiReportPage = () => {
         <div className={styles.container}>
             <h1 className={styles.mainTitle}>AI 비교 결과</h1>
             <p className={styles.subtitle}>유니룸의 AI 추천은 다음과 같아요.</p>
-
-            <div className={styles.resultCard}>
-                {/* 추천 결과 */}
-                <section className={styles.section}>
-                    <h2 className={styles.sectionTitle}>추천 결과</h2>
-                    <div className={styles.recommendationResult}>
-                        <div className={styles.recommendationIcon}>🏠</div>
-                        <div className={styles.recommendationTag}>
-                            {recommendation === 'room_a' ? makeRecLabel(roomA) : makeRecLabel(roomB)}
+            <div className={styles.cardWrapper}>
+                <div className={styles.resultCard}>
+                    {/* 추천 결과 */}
+                    <section className={styles.section}>
+                        <h2 className={styles.sectionTitle}>추천 결과</h2>
+                        <div className={styles.recommendationResult}>
+                            <div className={styles.iconWrapper}>
+                                <div className={styles.recommendationIcon}>🏠</div>
+                            </div>
+                            <div className={styles.recommendationTag}>
+                                {recommendation === 'room_a' ? makeRecLabel(roomA) : makeRecLabel(roomB)}
+                            </div>
                         </div>
+                    </section>
+
+                    {/* AI 요약 */}
+                    <section className={styles.section}>
+                        <h2 className={styles.sectionTitle}>AI 요약</h2>
+                        <div className={styles.summaryText}>
+                            {analysis_summary}
+                        </div>
+                    </section>
+
+                    {/* 상세 비교 (백엔드 데이터 사용) */}
+                    <section className={styles.section}>
+                        <h2 className={styles.sectionTitle}>상세 비교</h2>
+                        <div className={styles.comparisonTable}>
+                            <div className={styles.tableRow}>
+                                <div className={styles.tableCell}><strong>항목</strong></div>
+                                <div className={styles.tableCell}><strong>방 A</strong></div>
+                                <div className={styles.tableCell}><strong>방 B</strong></div>
+                            </div>
+                            <div className={styles.tableRow}>
+                                <div className={styles.tableCell}>제목</div>
+                                <div className={styles.tableCell}>{roomA?.title ?? '-'}</div>
+                                <div className={styles.tableCell}>{roomB?.title ?? '-'}</div>
+                            </div>
+                            <div className={styles.tableRow}>
+                                <div className={styles.tableCell}>유형</div>
+                                <div className={styles.tableCell}>{roomA?.room_type ?? '-'}</div>
+                                <div className={styles.tableCell}>{roomB?.room_type ?? '-'}</div>
+                            </div>
+                            <div className={styles.tableRow}>
+                                <div className={styles.tableCell}>월세</div>
+                                <div className={styles.tableCell}>{formatManWon(roomA?.monthly_fee)}</div>
+                                <div className={styles.tableCell}>{formatManWon(roomB?.monthly_fee)}</div>
+                            </div>
+                            <div className={styles.tableRow}>
+                                <div className={styles.tableCell}>주소</div>
+                                <div className={styles.tableCell}>{roomA?.address ?? '-'}</div>
+                                <div className={styles.tableCell}>{roomB?.address ?? '-'}</div>
+                            </div>
+                            <div className={styles.tableRow}>
+                                <div className={styles.tableCell}>추천</div>
+                                <div className={styles.tableCell}>{recommendation === 'room_a' ? '✅ 추천' : '-'}</div>
+                                <div className={styles.tableCell}>{recommendation === 'room_b' ? '✅ 추천' : '-'}</div>
+                            </div>
+                        </div>
+                        {(detailed_comparison && (
+                            detailed_comparison.price_analysis ||
+                            detailed_comparison.location_analysis ||
+                            detailed_comparison.area_analysis
+                        )) && (
+                            <div className={styles.comparisonSummary}>
+                                {detailed_comparison.price_analysis && (
+                                    <p><strong>가격 분석:</strong> {detailed_comparison.price_analysis}</p>
+                                )}
+                                {detailed_comparison.location_analysis && (
+                                    <p><strong>위치 분석:</strong> {detailed_comparison.location_analysis}</p>
+                                )}
+                                {detailed_comparison.area_analysis && (
+                                    <p><strong>면적 분석:</strong> {detailed_comparison.area_analysis}</p>
+                                )}
+                            </div>
+                        )}
+                    </section>
+
+                    {/* 추천 이유 */}
+                    <section className={styles.section}>
+                        <h2 className={styles.sectionTitle}>추천 이유</h2>
+                        <div className={styles.reasoningText}>
+                            {reasoning}
+                        </div>
+                    </section>
+
+                    {/* 액션 버튼 */}
+                    <div className={styles.actionsRow}>
+                        <button className={styles.shareButton} onClick={handleShare}>
+                            공유하기
+                        </button>
+                        <button className={styles.copyButton} onClick={handleCopySummary}>
+                            요약 복사하기
+                        </button>
                     </div>
-                </section>
-
-                {/* AI 요약 */}
-                <section className={styles.section}>
-                    <h2 className={styles.sectionTitle}>AI 요약</h2>
-                    <div className={styles.summaryText}>
-                        {analysis_summary}
-                    </div>
-                </section>
-
-                {/* 상세 비교 (백엔드 데이터 사용) */}
-                <section className={styles.section}>
-                    <h2 className={styles.sectionTitle}>상세 비교</h2>
-                    <div className={styles.comparisonTable}>
-                        <div className={styles.tableRow}>
-                            <div className={styles.tableCell}><strong>항목</strong></div>
-                            <div className={styles.tableCell}><strong>방 A</strong></div>
-                            <div className={styles.tableCell}><strong>방 B</strong></div>
-                        </div>
-                        <div className={styles.tableRow}>
-                            <div className={styles.tableCell}>제목</div>
-                            <div className={styles.tableCell}>{roomA?.title ?? '-'}</div>
-                            <div className={styles.tableCell}>{roomB?.title ?? '-'}</div>
-                        </div>
-                        <div className={styles.tableRow}>
-                            <div className={styles.tableCell}>유형</div>
-                            <div className={styles.tableCell}>{roomA?.room_type ?? '-'}</div>
-                            <div className={styles.tableCell}>{roomB?.room_type ?? '-'}</div>
-                        </div>
-                        <div className={styles.tableRow}>
-                            <div className={styles.tableCell}>월세</div>
-                            <div className={styles.tableCell}>{formatManWon(roomA?.monthly_fee)}</div>
-                            <div className={styles.tableCell}>{formatManWon(roomB?.monthly_fee)}</div>
-                        </div>
-                        <div className={styles.tableRow}>
-                            <div className={styles.tableCell}>주소</div>
-                            <div className={styles.tableCell}>{roomA?.address ?? '-'}</div>
-                            <div className={styles.tableCell}>{roomB?.address ?? '-'}</div>
-                        </div>
-                        <div className={styles.tableRow}>
-                            <div className={styles.tableCell}>추천</div>
-                            <div className={styles.tableCell}>{recommendation === 'room_a' ? '✅ 추천' : '-'}</div>
-                            <div className={styles.tableCell}>{recommendation === 'room_b' ? '✅ 추천' : '-'}</div>
-                        </div>
-                    </div>
-                    {(detailed_comparison && (
-                        detailed_comparison.price_analysis ||
-                        detailed_comparison.location_analysis ||
-                        detailed_comparison.area_analysis
-                    )) && (
-                        <div className={styles.comparisonSummary}>
-                            {detailed_comparison.price_analysis && (
-                                <p><strong>가격 분석:</strong> {detailed_comparison.price_analysis}</p>
-                            )}
-                            {detailed_comparison.location_analysis && (
-                                <p><strong>위치 분석:</strong> {detailed_comparison.location_analysis}</p>
-                            )}
-                            {detailed_comparison.area_analysis && (
-                                <p><strong>면적 분석:</strong> {detailed_comparison.area_analysis}</p>
-                            )}
-                        </div>
-                    )}
-                </section>
-
-                {/* 추천 이유 */}
-                <section className={styles.section}>
-                    <h2 className={styles.sectionTitle}>추천 이유</h2>
-                    <div className={styles.reasoningText}>
-                        {reasoning}
-                    </div>
-                </section>
-
-                {/* 액션 버튼 */}
-                <div className={styles.actionsRow}>
-                    <button className={styles.shareButton} onClick={handleShare}>
-                        공유하기
-                    </button>
-                    <button className={styles.copyButton} onClick={handleCopySummary}>
-                        요약 복사하기
-                    </button>
                 </div>
             </div>
         </div>
