@@ -1,0 +1,141 @@
+/* 전체 화면을 덮는 반투명 배경 */
+.overlay {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    backdrop-filter: blur(2px);
+}
+
+/* 팝업 컨테이너 */
+.popupContainer {
+    width: 420px;
+    max-height: 90vh;
+    background-color: #ffffff;
+    border-radius: 20px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    animation: fadeIn 0.3s ease-out forwards;
+}
+
+/* 닫힐 때 애니메이션 */
+.popupContainer.closing {
+    animation: fadeOut 0.3s ease-in forwards;
+}
+
+/* 팝업 헤더 */
+.header {
+    background-color: #0abab5; /* 프로젝트 메인 컬러 */
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 24px;
+}
+
+.headerIcon {
+    width: 24px;
+    height: 24px;
+}
+
+.title {
+    font-size: 20px;
+    font-weight: 700;
+    margin: 0;
+}
+
+/* 알림 목록 */
+.notificationList {
+    list-style: none;
+    padding: 8px 0;
+    margin: 0;
+    overflow-y: auto;
+    flex-grow: 1;
+}
+
+/* 개별 알림 항목 */
+.notificationItem {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 24px;
+    cursor: pointer;
+    border-bottom: 1px solid #f0f0f0;
+    transition: background-color 0.2s ease;
+}
+
+.notificationItem:hover {
+    background-color: #f7f7f7;
+}
+
+.notificationItem:last-child {
+    border-bottom: none;
+}
+
+.message {
+    margin: 0;
+    font-size: 15px;
+    color: #333;
+    line-height: 1.5;
+    flex-grow: 1;
+    padding-right: 16px;
+}
+
+.linkArrow {
+    font-size: 20px;
+    color: #0abab5;
+    transition: transform 0.2s ease;
+}
+
+.notificationItem:hover .linkArrow {
+    transform: translateX(4px);
+}
+
+/* 확인 버튼 */
+.closeButton {
+    width: calc(100% - 48px);
+    margin: 24px;
+    height: 50px;
+    border: none;
+    border-radius: 12px;
+    font-family: 'Pretendard Variable', sans-serif;
+    font-size: 16px;
+    font-weight: 600;
+    color: #ffffff;
+    background-color: #0abab5; /* 메인 컬러 */
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    flex-shrink: 0; /* 높이 고정 */
+}
+
+.closeButton:hover {
+    background-color: #009a95; /* 살짝 어둡게 */
+}
+
+/* 애니메이션 키프레임 */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px) scale(0.98);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+@keyframes fadeOut {
+    from {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+    to {
+        opacity: 0;
+        transform: translateY(-10px) scale(0.98);
+    }
+}

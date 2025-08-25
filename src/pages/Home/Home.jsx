@@ -8,14 +8,16 @@ import BookMark from '../../components/BookMark/BookMark';
 import { fetchAllBookmarks } from '../../apis/bookmarks';
 import { loadAuth } from '../../apis/auth';
 
+// 🔔 알림 팝업 & API
+import NotificationPopup from '../../components/NotificationPopup/NotificationPopup';
+import { fetchPopupNotifications, markNotificationsAsChecked } from '../../apis/notificationApi';
+
 // 금액 변환 함수 (억/만원 단위)
 const formatPrice = (value) => {
     const num = Number(value);
     if (isNaN(num) || num === 0) return '0원';
-
     const eok = Math.floor(num / 100000000);
     const man = Math.floor((num % 100000000) / 10000);
-
     if (eok > 0 && man > 0) return `${eok}억 ${man}`;
     if (eok > 0) return `${eok}억`;
     return `${man}`;
@@ -32,8 +34,6 @@ const getRandomUniqueIds = (count, min, max) => {
 /** 개별 방 카드 */
 const RoomCard = ({ room, isFav, onToggle, onClick }) => {
     const imageUrl = room.images && room.images.length > 0 ? room.images[0].image_url : '';
-
-    // 월세일 때: 보증금/월세, 전세일 때: 보증금만
     const priceLabel =
         room.contract_type === '전세'
             ? `전세 ${formatPrice(room.deposit)}`
@@ -77,15 +77,17 @@ const Home = () => {
     const [user, setUser] = useState(null);
     const [searchQuery, setSearchQuery] = useState('');
     const [roomType, setRoomType] = useState('');
-    const [rooms, setRooms] = useState([]);
+    const [rooms, setRooms] = useState([]); // (안 쓰더라도 기존 구조 유지)
     const [loading, setLoading] = useState(true);
 
     const [favoriteRoomIds, setFavoriteRoomIds] = useState(new Set());
-    const [syncing, setSyncing] = useState(false);
-
     const [randomRooms, setRandomRooms] = useState([]);
     const RANDOM_MIN_ID = 1;
     const RANDOM_MAX_ID = 209;
+
+    // 🔔 알림 상태
+    const [notifications, setNotifications] = useState([]);
+    const [showNotificationPopup, setShowNotificationPopup] = useState(false);
 
     const fetchRoomById = async (id) => {
         try {
@@ -130,7 +132,7 @@ const Home = () => {
     const loadBookmarks = async () => {
         try {
             const list = await fetchAllBookmarks();
-            setFavoriteRoomIds(new Set(list.map((bm) => bm?.room?.id).filter((id) => id !== null && id !== undefined)));
+            setFavoriteRoomIds(new Set(list.map((bm) => bm?.room?.id).filter((id) => id != null)));
         } catch (e) {
             console.error(e);
             setFavoriteRoomIds(new Set());
@@ -139,13 +141,23 @@ const Home = () => {
 
     useEffect(() => {
         const authData = loadAuth();
-        if (authData && authData.user) {
-            setUser(authData.user);
-        }
+        if (authData?.user) setUser(authData.user);
 
         fetchRooms();
-        if (authData && authData.access) {
+        if (authData?.access) {
             loadBookmarks();
+            // 🔔 로그인 상태에서만 알림 조회
+            (async () => {
+                try {
+                    const notis = await fetchPopupNotifications();
+                    if (Array.isArray(notis) && notis.length > 0) {
+                        setNotifications(notis);
+                        setShowNotificationPopup(true);
+                    }
+                } catch (e) {
+                    console.error('알림 조회 실패:', e);
+                }
+            })();
         }
     }, []);
 
@@ -171,64 +183,81 @@ const Home = () => {
         });
     };
 
+    // 🔔 팝업 닫기 → 읽음 처리
+    const handleClosePopup = async () => {
+        setShowNotificationPopup(false);
+        const ids = notifications.map((n) => n.id).filter((v) => typeof v === 'number');
+        if (ids.length) {
+            try {
+                await markNotificationsAsChecked(ids);
+            } catch (e) {
+                console.error('알림 읽음 처리 실패:', e);
+            }
+        }
+    };
+
     return (
-        <div className={styles.main__wrapper}>
-            <div className={styles.home__container1}>
-                <p className={styles.home__text1}>
-                    <span className={styles.home__text1__shadow}>어떤 집을 찾고 계세요?</span>
-                </p>
-                <form className={styles.home__searchbox} onSubmit={handleSearch}>
-                    <div className={styles.home__inputbox}>
-                        <input
-                            type="text"
-                            placeholder="원하시는 지역명, 지하철역, 단지명(아파트명)을 입력해주세요"
-                            className={styles.home__input}
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                        />
-                        <button type="submit" className={styles.home__inputbutton} />
-                    </div>
-                    <div className={styles.home__buttons1}>
-                        {['원룸', '투룸', '아파트', '빌라', '오피스텔'].map((type) => (
-                            <button
-                                key={type}
-                                type="button"
-                                className={`${styles.home__category} ${roomType === type ? styles.active : ''}`}
-                                onClick={() => handleRoomTypeFilter(type)}
-                            >
-                                {type}
-                            </button>
-                        ))}
-                    </div>
-                </form>
-            </div>
+        <>
+            {showNotificationPopup && <NotificationPopup notifications={notifications} onClose={handleClosePopup} />}
 
-            {/* AI 추천 매물 섹션 */}
-            <div className={styles.home__container2}>
-                <p className={styles.home__text2}>
-                    <span className={styles.home__text2__highlight}>{user ? user.username : '멋쟁이사자'}</span>
-                    님께 주변 매물을 추천드려요.
-                </p>
-
-                <div className={styles.home__lists}>
-                    {loading ? (
-                        <p>추천 매물을 불러오는 중...</p>
-                    ) : randomRooms.length > 0 ? (
-                        randomRooms.map((room) => (
-                            <RoomCard
-                                key={room.id}
-                                room={room}
-                                isFav={favoriteRoomIds.has(room.id)}
-                                onToggle={handleToggle}
-                                onClick={() => navigate(`/property/${room.id}`)}
+            <div className={styles.main__wrapper}>
+                <div className={styles.home__container1}>
+                    <p className={styles.home__text1}>
+                        <span className={styles.home__text1__shadow}>어떤 집을 찾고 계세요?</span>
+                    </p>
+                    <form className={styles.home__searchbox} onSubmit={handleSearch}>
+                        <div className={styles.home__inputbox}>
+                            <input
+                                type="text"
+                                placeholder="원하시는 지역명, 지하철역, 단지명(아파트명)을 입력해주세요"
+                                className={styles.home__input}
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
                             />
-                        ))
-                    ) : (
-                        <p>추천 매물이 없습니다.</p>
-                    )}
+                            <button type="submit" className={styles.home__inputbutton} />
+                        </div>
+                        <div className={styles.home__buttons1}>
+                            {['원룸', '투룸', '아파트', '빌라', '오피스텔'].map((type) => (
+                                <button
+                                    key={type}
+                                    type="button"
+                                    className={`${styles.home__category} ${roomType === type ? styles.active : ''}`}
+                                    onClick={() => handleRoomTypeFilter(type)}
+                                >
+                                    {type}
+                                </button>
+                            ))}
+                        </div>
+                    </form>
+                </div>
+
+                {/* AI 추천 매물 섹션 */}
+                <div className={styles.home__container2}>
+                    <p className={styles.home__text2}>
+                        <span className={styles.home__text2__highlight}>{user ? user.username : '멋쟁이사자'}</span>
+                        님께 주변 매물을 추천드려요.
+                    </p>
+
+                    <div className={styles.home__lists}>
+                        {loading ? (
+                            <p>추천 매물을 불러오는 중...</p>
+                        ) : randomRooms.length > 0 ? (
+                            randomRooms.map((room) => (
+                                <RoomCard
+                                    key={room.id}
+                                    room={room}
+                                    isFav={favoriteRoomIds.has(room.id)}
+                                    onToggle={handleToggle}
+                                    onClick={() => navigate(`/property/${room.id}`)}
+                                />
+                            ))
+                        ) : (
+                            <p>추천 매물이 없습니다.</p>
+                        )}
+                    </div>
                 </div>
             </div>
-        </div>
+        </>
     );
 };
 
