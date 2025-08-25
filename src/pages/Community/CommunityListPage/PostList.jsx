@@ -1,6 +1,7 @@
 import React from 'react';
 import styles from './CommunityListPage.module.css';
 import PostCard from './PostCard';
+import { ReactComponent as Heart } from '../../../assets/pic/heart.svg';
 
 const PostList = ({
     posts,

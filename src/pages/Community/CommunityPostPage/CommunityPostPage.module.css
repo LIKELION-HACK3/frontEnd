@@ -7,13 +7,33 @@
 }
 
 .backButton {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 6px;
     background: #ffffff;
     border: 1px solid #dee2e6;
-    padding: 8px 16px;
+    padding: 6px 12px;
     border-radius: 24px;
     cursor: pointer;
     margin-bottom: 20px;
     font-family: 'Pretendard Variable', sans-serif;
+}
+
+.backSlider {
+    width: 6px;
+    display: block;
+    color: #111111;
+}
+
+.backSlider * {
+    fill: currentColor;
+    stroke: currentColor;
+    stroke-width: 0.3px;
+    stroke-linejoin: round;
+    stroke-linecap: round;
+    vector-effect: non-scaling-stroke;
 }
 
 .postHeader {
@@ -44,7 +64,8 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 18px;
+    font-size: 24px;
+    cursor: default;
 }
 
 .authorMeta {
@@ -67,7 +88,7 @@
     background: #ffffff;
     border: 1px solid #e9ecef;
     border-radius: 16px;
-    padding: 24px;
+    padding: 26px 32px;
     font-size: 16px;
     line-height: 1.8;
     min-height: 200px;
@@ -76,9 +97,10 @@
 
 .postActions {
     display: flex;
+    flex-direction: row;
+    justify-content: space-between;
     align-items: center;
     flex-wrap: wrap;
-    gap: 12px;
     color: #6c757d;
     font-size: 14px;
     padding: 14px 0 18px;
@@ -92,11 +114,28 @@
     height: 36px;
 }
 
+.postActions1 {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+}
+
+.postActions2 {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 6px;
+}
+
 .likeButton {
     font-family: 'Pretendard Variable', sans-serif;
+    font-size: 13px;
     background: #fff;
-    border: 1px solid #ffc7d1;
-    color: #e85d75;
+    border: 1px solid #F35588;
+    color: #F35588;
     padding: 8px 14px;
     height: 36px;
     line-height: 20px;
@@ -105,43 +144,44 @@
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    transition: background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+    transition: background-color 0.15s ease;
 }
 
-.likeButton:hover { background: #fff4f7; border-color: #f3a3b1; box-shadow: 0 1px 2px rgba(0,0,0,0.04); }
+.likeHeart {
+    width: 12px;
+    display: block;
+    color: #F35588;
+    overflow: visible; 
+}
+
+.likeHeart * {
+    fill: currentColor;
+    stroke: currentColor;
+}
+
+.likeButton:hover { background: #fff4f7; }
 
 .likeButtonActive {
     background: #ffe9ee;
-    border-color: #e85d75;
+    border-color: #F35588;
 }
-
-.reportButton {
-    margin-left: auto;
-    background: #fff;
-    border: 1px solid #ffd8cc;
-    color: #ff6b00;
-    padding: 8px 14px;
-    border-radius: 18px;
-    cursor: pointer;
-    transition: background-color 0.15s ease, border-color 0.15s ease;
-}
-.reportButton:hover { background: #fff4ef; border-color: #ffb89e; }
 
 /* 링크 스타일 신고 버튼 */
 .reportLink {
     font-family: 'Pretendard Variable', sans-serif;
-    margin-left: auto;
-    background: none;
-    border: none;
-    color: #1971c2;
+    font-size: 13px;
+    background-color: transparent;
+    border: 1px solid #1076d5;
+    color: #1076d5;
     cursor: pointer;
-    padding: 0 6px;
+    padding: 8px 14px;
     height: 36px;
+    border-radius: 999px;
     display: inline-flex;
     align-items: center;
-    text-decoration: underline;
+    transition: background-color 0.15s ease;
 }
-.reportLink:hover { color: #1864ab; }
+.reportLink:hover { background-color: #dceeff; }
 
 .commentSection {
     background: #ffffff;
@@ -168,11 +208,16 @@
     font-size: 14px;
     resize: vertical;
     font-family: 'Pretendard Variable', sans-serif;
+    line-height: 1.4;
+}
+
+.commentTextarea:focus {
+    outline: none;
 }
 
 .commentSubmit {
     font-family: 'Pretendard Variable', sans-serif;
-    background: #5fb3b3;
+    background: #0ABAB5;
     color: #fff;
     border: none;
     padding: 12px 16px;
@@ -189,24 +234,34 @@
 
 .commentContent {
     margin-top: 8px;
-    padding-left: 46px; /* Avatar width + gap */
+    padding-left: 46px;
     color: #343a40;
     line-height: 1.7;
 }
 
 .commentActions {
+    margin-top: 6px;
     display: flex;
-    gap: 12px;
+    flex-direction: row;
+    align-items: center;
+    gap: 6px;
     padding-left: 46px;
     color: #868e96;
-    margin-top: 6px;
 }
 
 .commentActions button {
+    font-family: 'Pretendard Variable';
+    font-size: 14px;
+    font-weight: 400;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 4px;
     border: none;
     background: transparent;
     color: #868e96;
-    padding: 4px 6px;
+    padding : 4px 8px;
     border-radius: 6px;
     cursor: pointer;
 }
@@ -323,23 +378,24 @@
 .ownerActions {
     display: inline-flex;
     gap: 6px;
-    margin-left: 6px;
 }
 
 .editButton {
-    background-color: #37b24d;
-    color: white;
-    border: none;
-    padding: 6px 12px;
-    height: 30px;
-    border-radius: 8px;
-    cursor: pointer;
+    font-family: 'Pretendard Variable', sans-serif;
     font-size: 13px;
-    font-weight: 600;
-    transition: transform 0.12s ease, background-color 0.15s ease, box-shadow 0.15s ease;
+    background-color: transparent;
+    color: #37b24d;
+    border: 1px solid #37b24d;
+    padding: 8px 14px;
+    height: 36px;
+    border-radius: 999px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    transition: background-color 0.15s ease;
 }
-.editButton:hover { background-color: #2f9e44; box-shadow: 0 2px 6px rgba(55,178,77,0.18); }
-.editButton:active { transform: translateY(1px); }
+
+.editButton:hover { background-color: #ecfff0; }
 
 .editForm {
     display: flex;
@@ -373,16 +429,15 @@
 }
 
 .deleteButton {
-    background: #e03131;
-    color: #fff;
-    border: none;
-    padding: 6px 10px;
-    height: 30px;
-    border-radius: 8px;
-    cursor: pointer;
-    font-weight: 600;
+    font-family: 'Pretendard Variable', sans-serif;
     font-size: 13px;
-    transition: transform 0.12s ease, background-color 0.15s ease, box-shadow 0.15s ease;
+    background: transparent;
+    color: #e03131;
+    border: 1px solid #e03131;
+    padding: 8px 14px;
+    height: 36px;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: background-color 0.15s ease;
 }
-.deleteButton:hover { background: #c92a2a; box-shadow: 0 2px 6px rgba(224,49,49,0.18); }
-.deleteButton:active { transform: translateY(1px); }
+.deleteButton:hover { background: rgb(255, 233, 233); }

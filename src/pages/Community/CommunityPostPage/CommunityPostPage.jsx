@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { fetchCommunityPostDetail, fetchComments, createComment, togglePostLike, toggleCommentLike, reportCommunityPost, updateCommunityPost, deleteCommunityPost, deleteComment } from '../../../apis/communityApi';
 import { loadAuth } from '../../../apis/auth';
+import { ReactComponent as LeftArrow } from '../../../assets/pic/left_arrow.svg';
+import { ReactComponent as Heart } from '../../../assets/pic/heart.svg';
 import styles from './CommunityPostPage.module.css';
 
 const CommunityPostPage = () => {
@@ -197,7 +199,8 @@ const CommunityPostPage = () => {
     return (
         <div className={styles.container}>
             <button onClick={() => navigate(-1)} className={styles.backButton}>
-                &lt; 목록으로
+                <LeftArrow className={styles.backSlider} aria-hidden="true" />
+                <span>목록으로</span>
             </button>
             <div className={styles.postHeader}>
                 <h1 className={styles.postTitle}>{post.title}</h1>
@@ -216,22 +219,26 @@ const CommunityPostPage = () => {
             />
 
             <div className={styles.postActions}>
-                <span>조회 {post.views}</span>
-                <button
-                    type="button"
-                    onClick={handleLikePost}
-                    className={`${styles.likeButton} ${post.liked ? styles.likeButtonActive : ''}`}
-                >
-                    ❤️ 공감 {post.like_count}
-                </button>
-                <span>댓글 {post.comment_count}</span>
-                {post.author?.id === currentUserId && (
-                    <div className={styles.ownerActions}>
-                        <button type="button" className={styles.editButton} onClick={handleOpenEdit}>수정</button>
-                        <button type="button" className={styles.deleteButton} onClick={handleDeletePost}>삭제</button>
-                    </div>
-                )}
-                <button type="button" className={styles.reportLink} onClick={handleOpenReport}>신고</button>
+                <div className={styles.postActions1}>
+                    <span>조회 {post.views}</span>
+                    <button
+                        type="button"
+                        onClick={handleLikePost}
+                        className={`${styles.likeButton} ${post.liked ? styles.likeButtonActive : ''}`}
+                    >
+                        <Heart className={styles.likeHeart} /> 공감 {post.like_count}
+                    </button>
+                    <span>댓글 {post.comment_count}</span>
+                </div>
+                <div className={styles.postActions2}>
+                    {post.author?.id === currentUserId && (
+                        <div className={styles.ownerActions}>
+                            <button type="button" className={styles.editButton} onClick={handleOpenEdit}>수정</button>
+                            <button type="button" className={styles.deleteButton} onClick={handleDeletePost}>삭제</button>
+                        </div>
+                    )}
+                    <button type="button" className={styles.reportLink} onClick={handleOpenReport}>신고</button>
+                </div>
             </div>
 
             <div className={styles.commentSection}>
@@ -263,11 +270,11 @@ const CommunityPostPage = () => {
                         <p className={styles.commentContent}>{comment.content}</p>
                         <div className={styles.commentActions}>
                             <button type="button" onClick={() => handleLikeComment(comment.id)}>
-                                ❤️ {comment.like_count || 0}
+                                <Heart className={styles.likeHeart} /> {comment.like_count || 0}
                             </button>
                             <button type="button" onClick={() => setReplyTargetId(comment.id)}>답글</button>
                             {comment.author?.id === currentUserId && (
-                                <button type="button" onClick={() => handleDeleteComment(comment.id)} className={styles.deleteButton}>삭제</button>
+                                <button type="button" onClick={() => handleDeleteComment(comment.id)}>삭제</button>
                             )}
                         </div>
                         {comment.replies && comment.replies.length > 0 && (
